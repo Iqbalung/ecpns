@@ -440,6 +440,60 @@ class PaymentsController extends Controller
     }
 
     /**
+     * Midtrans Notifications Callback
+     * 
+     * URL: http://localhost:8000/payments/midtrans/notifications
+     * 
+     * Payment Notification 
+     * Recurring Notification 
+     * Pay Account Notification URL
+     */
+    public function mdNotificationsCallback(Request $request) {
+      $body = $request->json();
+
+      // Implementation here....
+
+      return response()->json([
+        'message' => 'Midtrans callback', 
+        'request' => $body
+      ]);
+    }
+
+    /**
+     * Midtrans Redirects Callback
+     * 
+     * URL: http://localhost:8000/payments/midtrans/{type}
+     * 
+     * For Finish Redirect set type = finish      (http://localhost:8000/payments/midtrans/finish)
+     * For Unfinish Redirect set type = unfinish  (http://localhost:8000/payments/midtrans/unfinish)
+     * For Error Redirect set tipe = error        (http://localhost:8000/payments/midtrans/error)
+     *
+     * @param Request $request
+     */
+    public function mdRedirectCallback(Request $request, $type)
+    {
+      if ($type == 'finish') {
+        // Implemantion of finish redirect here...
+        return response()->json(['message' => 'Midtrans Payment Finish.']);
+      }
+
+      if ($type == 'unfinish') {
+        // Implemantion of unfinish redirect here...
+        return response()->json(['message' => 'Midtrans Payment Unfinish']);
+      }
+
+      if ($type == 'error') {
+        // Implemantion of unfinish redirect here...
+        return response()->json(['message' => 'Midtrans Payment Error']);
+      }
+
+      // Implemantion Invalid callback type here...
+      return response()->json([
+        'message' => 'Unknown callback type'
+      ], 422);
+    }
+
+    /**
      * This method returns the object details
      * @param  [type] $type [description]
      * @param  [type] $slug [description]
