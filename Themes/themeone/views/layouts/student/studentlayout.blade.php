@@ -62,7 +62,7 @@
 	@endif
 
 
-
+	@stack('js_head')
 </head>
 
 

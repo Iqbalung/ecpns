@@ -1,5 +1,33 @@
 @extends($layout)
 
+@push('js_head')
+	@php
+		$isProd = app()->environment(['local', 'staging', 'testing', 'dev', 'development']) == false;
+
+		$snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
+
+		if ($isProd) {
+			$snapScript = "https://app.midtrans.com/snap/snap.js";
+		}
+		
+		$snapClientKey = env('MIDTRANS_CLIENT_KEY');
+
+		$snapTokenQuery = request()->query("md_snap_token", null);
+	@endphp
+	<script src="{{ $snapScript }}" data-client-key="{{ $snapClientKey }}"></script>
+
+	@if($snapTokenQuery)
+		<script>
+			function triggerSnapUI() {
+				window.snap.pay("{{ $snapTokenQuery }}");
+			}
+
+			window.addEventListener("DOMContentLoaded", triggerSnapUI);
+		</script>
+	@endif
+@endpush
+
+
 @section('content')
 
 
@@ -334,6 +362,8 @@
 
 									$razorpay_gateway = getSetting('razorpay', 'module');
 
+									$midtrans = '1';
+
                                     if($razorpay_gateway == '1'){
 
 
@@ -368,7 +398,15 @@
 									?>
 
 									<button type="submit" class="btn-lg btn button btn-info" onclick="submitForm('offline');" data-toggle="tooltip" data-placement="right" title="{{ getPhrase('click_here_to_update_payment_details') }}"><i class="fa fa-money" ></i> {{getPhrase('offline_payment')}}</button>
-
+									
+									<?php } if ($midtrans=='1') { ?>
+								
+									@if ($snapTokenQuery) 
+										<button type="submit" class="btn-lg btn button btn-info" onclick="triggerSnapUI()"><i class="fa fa-money" ></i> Midtrans</button>
+									@else
+										<button type="submit" class="btn-lg btn button btn-info" onclick="submitForm('midtrans');"><i class="fa fa-money" ></i> Midtrans</button>
+									@endif
+										
 									<?php } ?>
 
 									</div>

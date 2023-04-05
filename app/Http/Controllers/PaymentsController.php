@@ -383,6 +383,58 @@ class PaymentsController extends Controller
           $view_name = getTheme().'::payments.offline-payment';
         return view($view_name, $data);
        }
+       else if ($payment_gateway == 'midtrans') {
+
+        // if(!getSetting('midtrans', 'module'))
+        // {
+        //     flash('Ooops...!', 'this_payment_gateway_is_not_available', 'error');
+        //     return back();
+        // }
+
+        require_once base_path('includes/midtrans/Midtrans.php');
+
+        $midtransServerKey = env('MIDTRANS_SERVER_KEY');
+
+        \Midtrans\Config::$serverKey = $midtransServerKey;
+        \Midtrans\Config::$isProduction = app()->environment() === 'production' || app()->environment() === 'prod' || !app()->environment(['local','staging','testing']);
+        // Set sanitization on (default)
+        \Midtrans\Config::$isSanitized = true;
+        // Set 3DS transaction for credit card to true
+        \Midtrans\Config::$is3ds = true;
+  
+
+        $token = $this->preserveBeforeSave($item,$type, $payment_gateway, $other_details);
+
+        $transaction_details = array(
+          'order_id' => $token,
+          'gross_amount' => intval($request->after_discount), //
+        );
+
+        $item_details = array([
+          'id' => $item->id,
+          'price' => $item->cost,
+          'quantity' => 1,
+          'name' => $item->title
+        ]);
+
+        $transaction = array(
+          'transaction_details' => $transaction_details,
+          'item_details' => $item_details,
+        );
+
+        $snapToken = "";
+        
+        try {
+          $snapToken = \Midtrans\Snap::getSnapToken($transaction);
+        } catch (\Exception $e) {
+          flash('Ooops...!', 'Terjadi kesalahan saat memproses data.', 'error');
+          return back();
+        }
+
+        $url =  PREFIX . 'payments/checkout/exam/' . $item->slug . '?md_snap_token=' . $snapToken;
+
+        return redirect($url);
+       }
 
     	dd('please wait...');
     }
