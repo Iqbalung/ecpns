@@ -11,8 +11,6 @@
 |
 */
 
-use Illuminate\Routing\Route;
-
 if(env('DB_DATABASE')=='')
 {
    Route::get('/', 'InstallatationController@index');
