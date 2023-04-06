@@ -125,7 +125,7 @@
                                          <a href="{{ URL_START_EXAM_AFTER_LOGIN.$quiz->id }}" class="btn btn-blue btn-sm btn-radius">{{getPhrase('start_exam')}}</a>
                                           @if($quiz->is_paid)
 
-                                      <a href="#" class="hhfr">{{getPhrase('price')}} : {{getCurrencyCode()}} {{(int)$quiz->cost}}
+                                      <a href="#" class="hhfr">{{getPhrase('price')}} : {{getCurrencyCode()}} {{idrFormat((int)$quiz->cost)}}
                                       </a>
 
                                       @endif
@@ -241,7 +241,7 @@
                                     
                               @if($series->is_paid)
 
-                                      <li><a href="#" class="hhfr">{{getPhrase('price')}} : {{getCurrencyCode()}} {{(int)$series->cost}}
+                                      <li><a href="#" class="hhfr">{{getPhrase('price')}} : {{getCurrencyCode()}} {{ idrFormat((int)$series->cost) }}
                                       </a></li>
 
                                       @endif

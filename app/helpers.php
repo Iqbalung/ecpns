@@ -573,6 +573,11 @@ function getCurrencyCode()
   return getSetting('currency_code','site_settings') ;
 }
 
+
+function idrFormat($number) {
+    return number_format($number,2,',','.');
+}
+
 function digiCurrency( $amount ) {
   return getCurrencyCode() . ' ' . $amount;
 }
