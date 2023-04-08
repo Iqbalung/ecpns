@@ -1,11 +1,13 @@
 import React from "react";
-import SEO from "../../common/SEO";
+import SEO from "../../components/ecpns/common/SEO";
 import Header from "../../components/ecpns/Header";
-import Banner from "../../components/ecpns/Banner";
 import Footer from "../../components/ecpns/Footer";
-import ExamCategories from "../../components/ecpns/exams/ExamCategories";
-import HomeFiveCourses from "../../components/home-five/HomeFiveCourses";
-import HomeFiveProgress from "../../components/home-five/HomeFiveProgress";
+import Banner from "./home/Banner";
+import HowItWorks from "./home/HowItWorks";
+import ExamCategories from "./home/exams/ExamCategories";
+import ExamLists from "./home/exams/ExamLists";
+import CourseLists from "./home/courses/CourseLists";
+import Testimonials from "./home/Testimonials";
 
 export default function HomePage() {
   return (
@@ -20,11 +22,15 @@ export default function HomePage() {
 
       <Banner />
 
-      <HomeFiveProgress />
-
       <ExamCategories />
 
-      <HomeFiveCourses />
+      <ExamLists />
+
+      <CourseLists />
+
+      <Testimonials />
+
+      <HowItWorks />
 
       <Footer />
     </>

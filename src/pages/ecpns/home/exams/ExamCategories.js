@@ -1,6 +1,6 @@
 import React from "react";
-import SectionTitle from "../common/SectionTitle";
-import CategoryFour from "../../category/CategoryFour";
+import SectionTitle from "../../../../components/ecpns/common/SectionTitle";
+import ExamContent from "./ExamContent";
 
 export default function ExamCategories() {
   return (
@@ -12,7 +12,7 @@ export default function ExamCategories() {
           </div>
         </div>
         <div className="row">
-          <CategoryFour />
+          <ExamContent />
         </div>
 
         <div className="shape-dot-wrapper shape-wrapper d-xl-block d-none">

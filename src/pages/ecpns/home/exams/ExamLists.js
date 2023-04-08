@@ -1,9 +1,10 @@
 import React from "react";
 import Slider from "react-slick";
 import { Link } from "react-router-dom";
-import SectionTitle from "../common/SectionTitle";
-
-import { ThreeColumnCarousel } from "../../../utils/script";
+import Exam from "./Exam";
+import SectionTitle from "../../../../components/ecpns/common/SectionTitle";
+import CourseData from "../../../../data/course/CourseData.json";
+import { ThreeColumnCarousel } from "../../../../utils/script";
 
 export default function ExamLists() {
   return (
@@ -11,12 +12,16 @@ export default function ExamLists() {
       <div className="container eduvibe-animated-shape">
         <div className="row g-5">
           <div className="col-lg-6">
-            <SectionTitle classes="text-start" slogan="Exam Series" title="" />
+            <SectionTitle
+              classes="text-start"
+              slogan="Exams"
+              title="Our Exams"
+            />
           </div>
           <div className="col-lg-6">
             <div className="view-more-btn text-end">
               <Link className="edu-btn" to="/course-1">
-                Browse All Courses
+                Browse All Exams
                 <i className="icon-arrow-right-line-right"></i>
               </Link>
             </div>
@@ -30,7 +35,7 @@ export default function ExamLists() {
             >
               {CourseData.slice(0, 6).map((item) => (
                 <div className="single-slick-card" key={item.id}>
-                  <CourseTypeFive data={item} />
+                  <Exam data={item} />
                 </div>
               ))}
             </Slider>
