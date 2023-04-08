@@ -35,10 +35,13 @@ export default function Nav() {
       </li>
 
       <li className="has-droupdown">
-        <Link to="#">About Us</Link>
+        <Link to="#">About</Link>
         <ul className="submenu">
           <li>
             <Link to="#">Why Us</Link>
+          </li>
+          <li>
+            <Link to="#">About Us</Link>
           </li>
           <li>
             <Link to="#">Our Mission</Link>
