@@ -30,8 +30,6 @@ export default function HomePage() {
 
       <Testimonials />
 
-      <HowItWorks />
-
       <Footer />
     </>
   );

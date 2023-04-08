@@ -4,7 +4,7 @@ import HowItWorksContent from "./HowItWorksContent";
 
 export default function HowItWorks() {
   return (
-    <div className="eduvibe-home-five-progress  edu-service-area edu-section-gap bg-image">
+    <div className="eduvibe-home-five-progress edu-service-area edu-section-gap bg-image">
       <div className="container eduvibe-animated-shape">
         <div className="row">
           <div className="col-lg-12">
