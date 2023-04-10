@@ -1,6 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+function server_url(to) {
+  return `http://localhost:8000${to}`;
+}
+
 export default function Nav() {
   return (
     <ul className="mainmenu">
@@ -12,42 +16,42 @@ export default function Nav() {
         <Link to="#">Courses</Link>
         <ul className="submenu">
           <li>
-            <Link to="/site/courses">Browse</Link>
+            <a href={server_url("/site/courses")}>Browse</a>
           </li>
           <li>
-            <Link to="/site/pattren">Patterns</Link>
+            <a href={server_url("/site/patterns")}>Patterns</a>
           </li>
           <li>
-            <Link to="/site/syllabus">Syllabus</Link>
+            <a href={server_url("/site/syllabus")}>Syllabus</a>
           </li>
           <li>
-            <Link to="/practice-exams">Practice Exams</Link>
+            <a href={server_url("/practice-exams")}>Practice Exams</a>
           </li>
         </ul>
       </li>
 
       <li>
-        <Link to="/LMS/all-categories">LMS</Link>
+        <a href={server_url("/LMS/all-categories")}>LMS</a>
       </li>
 
       <li>
-        <Link to="#">Pricing</Link>
+        <a href={server_url("/site/pricing")}>Pricing</a>
       </li>
 
       <li className="has-droupdown">
         <Link to="#">About</Link>
         <ul className="submenu">
           <li>
-            <Link to="#">Why Us</Link>
+            <a href={server_url("/page/why-us")}>Why Us</a>
           </li>
           <li>
-            <Link to="#">About Us</Link>
+            <a href={server_url("/site/about-us")}>About Us</a>
           </li>
           <li>
             <Link to="#">Our Mission</Link>
           </li>
           <li>
-            <Link to="#">Contact Us</Link>
+            <a href={server_url("/contact-us")}>Contact Us</a>
           </li>
         </ul>
       </li>
@@ -56,10 +60,10 @@ export default function Nav() {
         <Link to="#">More</Link>
         <ul className="submenu">
           <li>
-            <Link to="#">Blogs</Link>
+            <a href={server_url("/blogs")}>Blogs</a>
           </li>
           <li>
-            <Link to="#">FAQs</Link>
+            <a href={server_url("/faqs")}>FAQs</a>
           </li>
         </ul>
       </li>
