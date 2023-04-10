@@ -1,10 +1,9 @@
 import React from "react";
 import Slider from "react-slick";
-import { Link } from "react-router-dom";
 import Exam from "./Exam";
 import SectionTitle from "../../../../components/ecpns/common/SectionTitle";
-import CourseData from "../../../../data/course/CourseData.json";
 import { ThreeColumnCarousel } from "../../../../utils/script";
+import { server_url } from "../../../../utils/ecpns";
 
 export default function ExamLists({ items }) {
   return (
@@ -20,10 +19,10 @@ export default function ExamLists({ items }) {
           </div>
           <div className="col-lg-6">
             <div className="view-more-btn text-end">
-              <Link className="edu-btn" to="/course-1">
+              <a className="edu-btn" href={server_url("/exam/categories")}>
                 Browse All Exams
                 <i className="icon-arrow-right-line-right"></i>
-              </Link>
+              </a>
             </div>
           </div>
         </div>

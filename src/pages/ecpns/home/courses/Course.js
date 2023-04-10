@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { lms_image_url, view_lms_url } from "../../../../utils/ecpns";
 
 export default function Course({ data, classes }) {
   const price = Number(data.price);
@@ -12,21 +13,20 @@ export default function Course({ data, classes }) {
     >
       <div className="inner">
         <div className="thumbnail">
-          <Link to={process.env.PUBLIC_URL + `/course-details/${data.id}`}>
+          <a href={view_lms_url(data.slug)}>
             <img
               className="w-100"
-              src={`${process.env.PUBLIC_URL}/images/course/course-01/${data.image}`}
+              src={lms_image_url(data.image)}
               alt="Course Thumb"
             />
-          </Link>
+          </a>
           <div className="top-position status-group left-top">
-            {isOffer && (
-              <span className="eduvibe-status status-01 bg-secondary-color">
-                {offerInPercentage}% Off
-              </span>
-            )}
-            <span className="eduvibe-status status-01 bg-primary-color">
-              {data.level}
+            <span
+              className={`eduvibe-status status-01 ${
+                data.is_paid === 0 ? "bg-secondary-color" : "bg-primary-color"
+              }`}
+            >
+              {data.is_paid === 0 ? "Free" : "Premium"} Exam
             </span>
           </div>
           <div className="wishlist-top-right">
@@ -37,38 +37,30 @@ export default function Course({ data, classes }) {
         </div>
         <div className="content">
           <div className="price-list price-style-03">
-            {data.price === "0" ? (
+            {data.is_paid === 0 ? (
               <div className="price current-price">Free</div>
             ) : (
-              <div className="price current-price">${data.price}</div>
+              <div className="price current-price">Rp. {data.cost}</div>
             )}
             {data.oldPrice && (
               <div className="price old-price">${data.oldPrice}</div>
             )}
           </div>
           <h6 className="title">
-            <Link to={process.env.PUBLIC_URL + `/course-details/${data.id}`}>
-              {data.title}
-            </Link>
+            <a href={view_lms_url(data.slug)}>{data.title}</a>
           </h6>
           <ul className="edu-meta meta-01">
-            <li>
-              <i className="icon-time-line"></i>
-              {data.duration}
-            </li>
-            <li>
+            <li>Total Items: {data.total_items}</li>
+            {/* <li>
               <i className="icon-group-line"></i>
               {data.student} Students
-            </li>
+            </li> */}
           </ul>
           <div className="card-bottom">
             <div className="read-more-btn">
-              <Link
-                className="btn-transparent"
-                to={process.env.PUBLIC_URL + `/course-details/${data.id}`}
-              >
-                Enroll Now<i className="icon-arrow-right-line-right"></i>
-              </Link>
+              <a className="btn-transparent" href={view_lms_url(data.slug)}>
+                View<i className="icon-arrow-right-line-right"></i>
+              </a>
             </div>
           </div>
         </div>

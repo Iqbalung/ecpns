@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { exam_image_url, take_exam_url } from "../../../../utils/ecpns";
 
 export default function Exam({ data, classes }) {
@@ -21,13 +20,12 @@ export default function Exam({ data, classes }) {
             />
           </a>
           <div className="top-position status-group left-top">
-            {isOffer && (
-              <span className="eduvibe-status status-01 bg-secondary-color">
-                {offerInPercentage}% Off
-              </span>
-            )}
-            <span className="eduvibe-status status-01 bg-primary-color">
-              {data.level}
+            <span
+              className={`eduvibe-status status-01 ${
+                data.is_paid === 0 ? "bg-secondary-color" : "bg-primary-color"
+              }`}
+            >
+              {data.is_paid === 0 ? "Free" : "Premium"} Exam
             </span>
           </div>
           <div className="wishlist-top-right">

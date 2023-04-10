@@ -20,7 +20,7 @@ export default function Testimonials(props) {
               animateOnce={true}
             >
               <div className="testimonial-card-box variation-2">
-                <TestimonialsContent />
+                <TestimonialsContent items={props.items} />
               </div>
             </ScrollAnimation>
           </div>

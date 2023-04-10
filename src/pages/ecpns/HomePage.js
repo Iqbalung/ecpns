@@ -13,6 +13,7 @@ export default function HomePage() {
   const [quizzes, setQuizzes] = useState([]);
   const [lmsCategories, setLmsCategories] = useState([]);
   const [lmsSeries, setLmsSeries] = useState([]);
+  const [testimonies, setTestimonies] = useState([]);
 
   const fetchHomeData = () => {
     fetch(`http://localhost:8000/api/v1/public/home-data`)
@@ -22,6 +23,7 @@ export default function HomePage() {
         setQuizzes(response.quizzes);
         setLmsCategories(response.lms_cates);
         setLmsSeries(response.lms_series);
+        setTestimonies(response.testimonies);
       })
       .catch((err) => {
         console.log(`Failed to fetch data from server.`, err);
@@ -48,9 +50,9 @@ export default function HomePage() {
 
       <ExamLists items={quizzes} />
 
-      <CourseLists />
+      <CourseLists items={lmsSeries} />
 
-      <Testimonials />
+      <Testimonials items={testimonies} />
 
       <Footer />
     </>

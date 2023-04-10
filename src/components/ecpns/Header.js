@@ -43,7 +43,7 @@ export default function Header({
               <Link to={process.env.PUBLIC_URL + "/"}>
                 <img
                   className="logo-light"
-                  src="/images/logo/logo.png"
+                  src="/yapresindo.png"
                   alt="Main Logo"
                 />
               </Link>
