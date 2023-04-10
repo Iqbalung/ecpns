@@ -328,7 +328,7 @@ class LoginController extends Controller
      *
      * @return Response
      */
-    public function handleProviderCallback($logintype)
+    public function handleProviderCallback(Request $request, $logintype)
     {
 
         try{
@@ -341,11 +341,14 @@ class LoginController extends Controller
 
             if ( 'twitter' === $logintype ) {
                 $user = $user->user();
+
+                $token = $user->token;
+                $tokenSecret = $user->tokenSecret;
+
+                $user = Socialite::driver('twitter')->userFromTokenAndSecret($token, $tokenSecret);
             } else {
                 $user = $user->stateless()->user();
             }
-
-
 
              if($user)
              {

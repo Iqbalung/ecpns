@@ -270,8 +270,14 @@ function getUserWithSlug($slug='')
 
  function checkRole($roles)
  {
-     if(Entrust::hasRole($roles))
+    // If error occourred (BadMethodCallException: This cache store does not support tagging.)
+    // Change cahe driver to array, memcache or apc.
+    // Reason: Cache tags are not supported when using the file or database cache drivers. The Entrust package probably uses them somewhere.
+    // Ref: https://stackoverflow.com/questions/37462365/laravel-cache-store-does-not-support-tagging
+    if(Entrust::hasRole($roles)) {
         return TRUE;
+    }
+
     return FALSE;
  }
 
@@ -565,6 +571,11 @@ function getHashCode()
 function getCurrencyCode()
 {
   return getSetting('currency_code','site_settings') ;
+}
+
+
+function idrFormat($number) {
+    return number_format($number,2,',','.');
 }
 
 function digiCurrency( $amount ) {

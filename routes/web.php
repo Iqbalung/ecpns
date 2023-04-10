@@ -11,8 +11,6 @@
 |
 */
 
-
-
 if(env('DB_DATABASE')=='')
 {
    Route::get('/', 'InstallatationController@index');
@@ -445,6 +443,9 @@ Route::get('payments/view-invoice/{invoice_id}', 'PaymentsController@viewInvoice
 Route::get('payments/view-invoice-pdf/{invoice_id}', 'PaymentsController@viewInvoicePdf')->name('payments.view_invoice_pdf');
 Route::get('payments/send-invoice/{invoice_id}', 'PaymentsController@sendInvoice')->name('payments.send_invoice');
 
+// Midtrans Callback
+Route::post('payments/midtrans/notifications', 'PaymentsController@mdNotificationsCallback');
+Route::get('payments/midtrans/{type}', 'PaymentsController@mdRedirectCallback');
 
 
                         ////////////////////////////
