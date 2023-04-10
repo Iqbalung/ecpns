@@ -6,7 +6,7 @@ import SectionTitle from "../../../../components/ecpns/common/SectionTitle";
 import CourseData from "../../../../data/course/CourseData.json";
 import { ThreeColumnCarousel } from "../../../../utils/script";
 
-export default function ExamLists() {
+export default function ExamLists({ items }) {
   return (
     <div className="eduvibe-home-five-course slider-dots edu-course-area edu-section-gap bg-image">
       <div className="container eduvibe-animated-shape">
@@ -33,7 +33,7 @@ export default function ExamLists() {
               className="slick-activation-wrapper course-activation-3 edu-slick-button"
               {...ThreeColumnCarousel}
             >
-              {CourseData.slice(0, 6).map((item) => (
+              {items.map((item) => (
                 <div className="single-slick-card" key={item.id}>
                   <Exam data={item} />
                 </div>

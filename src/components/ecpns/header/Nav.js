@@ -1,9 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
-function server_url(to) {
-  return `http://localhost:8000${to}`;
-}
+import { server_url } from "../../../utils/ecpns";
 
 export default function Nav() {
   return (

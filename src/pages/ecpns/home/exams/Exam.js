@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { exam_image_url, take_exam_url } from "../../../../utils/ecpns";
 
 export default function Exam({ data, classes }) {
-  const price = Number(data.price);
+  const price = Number(data.cost);
   const oldPrice = data.oldPrice ? Number(data.oldPrice) : 0;
   const isOffer = data.oldPrice && price < oldPrice;
   const offerInPercentage = Math.round((100 * (oldPrice - price)) / oldPrice);
@@ -12,13 +13,13 @@ export default function Exam({ data, classes }) {
     >
       <div className="inner">
         <div className="thumbnail">
-          <Link to={process.env.PUBLIC_URL + `/course-details/${data.id}`}>
+          <a href={take_exam_url(data.id, data.slug, data.is_paid === 0)}>
             <img
               className="w-100"
-              src={`${process.env.PUBLIC_URL}/images/course/course-01/${data.image}`}
+              src={exam_image_url(data.image)}
               alt="Course Thumb"
             />
-          </Link>
+          </a>
           <div className="top-position status-group left-top">
             {isOffer && (
               <span className="eduvibe-status status-01 bg-secondary-color">
@@ -37,28 +38,28 @@ export default function Exam({ data, classes }) {
         </div>
         <div className="content">
           <div className="price-list price-style-03">
-            {data.price === "0" ? (
+            {data.is_paid === 0 ? (
               <div className="price current-price">Free</div>
             ) : (
-              <div className="price current-price">${data.price}</div>
+              <div className="price current-price">Rp. {data.cost}</div>
             )}
             {data.oldPrice && (
               <div className="price old-price">${data.oldPrice}</div>
             )}
           </div>
           <h6 className="title">
-            <Link to={process.env.PUBLIC_URL + `/course-details/${data.id}`}>
+            <a href={take_exam_url(data.id, data.slug, data.is_paid === 0)}>
               {data.title}
-            </Link>
+            </a>
           </h6>
           <ul className="edu-meta meta-01">
             <li>
               <i className="icon-time-line"></i>
-              {data.duration}
+              {data.dueration} mins
             </li>
             <li>
               <i className="icon-group-line"></i>
-              {data.student} Students
+              {data.total_marks} Marks
             </li>
           </ul>
           <div className="card-bottom">
