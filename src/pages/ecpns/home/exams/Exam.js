@@ -64,12 +64,12 @@ export default function Exam({ data, classes }) {
           </ul>
           <div className="card-bottom">
             <div className="read-more-btn">
-              <Link
+              <a
                 className="btn-transparent"
-                to={process.env.PUBLIC_URL + `/course-details/${data.id}`}
+                href={take_exam_url(data.id, data.slug, data.is_paid === 0)}
               >
                 Enroll Now<i className="icon-arrow-right-line-right"></i>
-              </Link>
+              </a>
             </div>
           </div>
         </div>
