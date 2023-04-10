@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,5 +81,13 @@ Route::group([ 'prefix' => 'v1/'], function () {
     Route::get('get-currency-code', 'API\GeneralController@getCurrencyCode');
 
     Route::get('get-payment-gateways', 'API\GeneralController@getPaymentGateways');
+
+
+    // Public API
+    Route::group(['prefix' => 'public'], function() {
+        Route::get('/home-data', 'API\PublicController@getHomeData');
+        Route::get('/exam-categories', 'API\PublicController@getExamCategories');
+        Route::get('/testimonies', 'API\PublicController@getTestimonies');
+    });
 
 });
