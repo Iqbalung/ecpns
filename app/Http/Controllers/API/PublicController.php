@@ -43,11 +43,24 @@ class PublicController extends Controller
                 ->get();
         }
 
+        $quizzes = collect($quizzes)->map(function ($data) {
+            $data->cost = number_format($data->cost, 2, ',', '.');
+
+            return $data;
+        });
+
+        $testimonies = Feedback::join('users', 'users.id', '=', 'feedbacks.user_id')
+            ->select(['feedbacks.title','feedbacks.description','users.name','users.image'])
+            ->where('feedbacks.read_status', 1)
+            ->orderBy('feedbacks.updated_at', 'desc')
+            ->get();
+
         $data = [
-            'categories' => $categories,
-            'quizzes'    => $quizzes,
-            'lms_cates'  => $lms_cates,
-            'lms_series' => $lms_series
+            'categories'  => $categories,
+            'quizzes'     => $quizzes,
+            'lms_cates'   => $lms_cates,
+            'lms_series'  => $lms_series,
+            'testimonies' => $testimonies
         ];
 
         return response()->json($data, HttpResponse::HTTP_OK);
