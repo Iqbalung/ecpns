@@ -11,18 +11,18 @@
 |
 */
 
-if(env('DB_DATABASE')=='')
-{
-   Route::get('/', 'InstallatationController@index');
-   Route::get('/install', 'InstallatationController@index');
-   Route::get('/update-details', 'InstallatationController@updateDetails');
-   Route::post('/install', 'InstallatationController@installProject');
+use Illuminate\Support\Facades\Route;
+
+
+if (env('DB_DATABASE')=='') {
+    Route::get('/', 'InstallatationController@index');
+    Route::get('/install', 'InstallatationController@index');
+    Route::get('/update-details', 'InstallatationController@updateDetails');
+    Route::post('/install', 'InstallatationController@installProject');
 }
 
 Route::get('/', function () {
-
-    if(Auth::check())
-    {
+    if (Auth::check()) {
         return redirect('dashboard');
     }
 
@@ -32,39 +32,36 @@ Route::get('/', function () {
 
 
 
-if(env('DEMO_MODE')) {
-
+if (env('DEMO_MODE')) {
     Event::listen('eloquent.saving: *', function ($model) {
-        if(urlHasString('finish-exam') || urlHasString('start-exam'))
-          return true;
-      return false;
-
-
+        if (urlHasString('finish-exam') || urlHasString('start-exam')) {
+            return true;
+        }
+        return false;
     });
-
 }
 
- Route::get('install/reg', 'InstallatationController@reg');
- Route::post('install/register', 'InstallatationController@registerUser');
+Route::get('install/reg', 'InstallatationController@reg');
+Route::post('install/register', 'InstallatationController@registerUser');
 
 
-if(env('DB_DATABASE')==''){
-  Route::get('/', 'SiteController@index');
+if (env('DB_DATABASE')=='') {
+    Route::get('/', 'SiteController@index');
 }
-  Route::get('home', 'SiteController@index');
+Route::get('home', 'SiteController@index');
 
 
-  Route::get('setlayout/{layout_color?}', 'SiteController@setLayout');
-  Route::get('settheme/{layout_color?}', 'SiteController@setTheme');
+Route::get('setlayout/{layout_color?}', 'SiteController@setLayout');
+Route::get('settheme/{layout_color?}', 'SiteController@setTheme');
 
 
 
-Route::get('dashboard','DashboardController@index');
-Route::get('dashboard/testlang','DashboardController@testLanguage');
+Route::get('dashboard', 'DashboardController@index');
+Route::get('dashboard/testlang', 'DashboardController@testLanguage');
 
 
-Route::get('auth/{slug}','Auth\LoginController@redirectToProvider');
-Route::get('auth/{slug}/callback','Auth\LoginController@handleProviderCallback');
+Route::get('auth/{slug}', 'Auth\LoginController@redirectToProvider');
+Route::get('auth/{slug}/callback', 'Auth\LoginController@handleProviderCallback');
 
 
 
@@ -72,27 +69,27 @@ Route::get('auth/{slug}/callback','Auth\LoginController@handleProviderCallback')
 Route::get('login/{layout_type?}', 'Auth\LoginController@getLogin');
 Route::post('login', 'Auth\LoginController@postLogin');
 
-Route::get('logout', function(){
-  if(Auth::check()) {
-    $user = Auth::user();
-    $user->is_loggedin = 'no';
-    $user->save();
-    flash(getPhrase('success'),getPhrase('logged_out_successfully'),'success');
-  }
+Route::get('logout', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        $user->is_loggedin = 'no';
+        $user->save();
+        flash(getPhrase('success'), getPhrase('logged_out_successfully'), 'success');
+    }
 
-  Auth::logout();
-  Session::flush();
-  return redirect(URL_USERS_LOGIN);
+    Auth::logout();
+    Session::flush();
+    return redirect(URL_USERS_LOGIN);
 });
 
-Route::get('parent-logout', function(){
-    if(Auth::check()) {
+Route::get('parent-logout', function () {
+    if (Auth::check()) {
         $user = Auth::user();
         $user->is_loggedin = 'no';
         $user->save();
 
-        flash('Oops..!',getPhrase('parents_module_is_not_available'),'error');
-      }
+        flash('Oops..!', getPhrase('parents_module_is_not_available'), 'error');
+    }
     Auth::logout();
     Session::flush();
     return redirect(URL_USERS_LOGIN);
@@ -151,10 +148,10 @@ Route::patch('users/settings/{slug}', 'UsersController@updateSettings');
 Route::get('users/change-password/{slug}', 'UsersController@changePassword');
 Route::patch('users/change-password/{slug}', 'UsersController@updatePassword');
 
-Route::get('users/import','UsersController@importUsers');
-Route::post('users/import','UsersController@readExcel');
+Route::get('users/import', 'UsersController@importUsers');
+Route::post('users/import', 'UsersController@readExcel');
 
-Route::get('users/import-report','UsersController@importResult');
+Route::get('users/import-report', 'UsersController@importResult');
 
 Route::get('users/list/getList/{role_name?}', [ 'as'   => 'users.dataTable',
     'uses' => 'UsersController@getDatatable']);
@@ -164,17 +161,17 @@ Route::post('users/search/parent', 'UsersController@getParentsOnSearch');
 
 
 
-            //////////////////////
-            //Parent Controller //
-            //////////////////////
+//////////////////////
+//Parent Controller //
+//////////////////////
 Route::get('parent/children', 'ParentsController@index');
 Route::get('parent/children/list', 'ParentsController@index');
 Route::get('parent/children/getList/{slug}', 'ParentsController@getDatatable');
 Route::get('children/analysis', 'ParentsController@childrenAnalysis');
 
-                    /////////////////////
-                    // Master Settings //
-                    /////////////////////
+/////////////////////
+// Master Settings //
+/////////////////////
 
 
 //subjects
@@ -205,9 +202,9 @@ Route::get('mastersettings/topics/get-parents-topics/{subject_id}', 'TopicsContr
 Route::get('mastersettings/topics/import', 'TopicsController@import');
 Route::post('mastersettings/topics/import', 'TopicsController@readExcel');
 
-                    ////////////////////////
-                    // EXAMINATION SYSTEM //
-                    ////////////////////////
+////////////////////////
+// EXAMINATION SYSTEM //
+////////////////////////
 
 //Question bank
 Route::get('exams/questionbank', 'QuestionBankController@index');
@@ -218,12 +215,14 @@ Route::post('exams/questionbank/add', 'QuestionBankController@store');
 Route::get('exams/questionbank/edit-question/{slug}', 'QuestionBankController@edit');
 Route::patch('exams/questionbank/edit/{slug}', 'QuestionBankController@update');
 Route::delete('exams/questionbank/delete/{id}', 'QuestionBankController@delete');
-Route::get('exams/questionbank/getList',  'QuestionBankController@getDatatable');
+Route::get('exams/questionbank/getList', 'QuestionBankController@getDatatable');
 
-Route::get('exams/questionbank/getquestionslist/{slug}',
-     'QuestionBankController@getQuestions');
-Route::get('exams/questionbank/import',  'QuestionBankController@import');
-Route::post('exams/questionbank/import',  'QuestionBankController@readExcel');
+Route::get(
+    'exams/questionbank/getquestionslist/{slug}',
+    'QuestionBankController@getQuestions'
+);
+Route::get('exams/questionbank/import', 'QuestionBankController@import');
+Route::post('exams/questionbank/import', 'QuestionBankController@readExcel');
 
 
 //Quiz Categories
@@ -302,13 +301,13 @@ Route::post('exams/exam-series/get-exams', 'ExamSeriesController@getExams');
 Route::get('payment/cancel', 'ExamSeriesController@cancel');
 Route::post('payment/success', 'ExamSeriesController@success');
 
-            /////////////////////
-            // PAYMENT REPORTS //
-            /////////////////////
+/////////////////////
+// PAYMENT REPORTS //
+/////////////////////
 Route::get('payments-report/', 'PaymentsController@overallPayments');
 
- Route::get('payments-report/online/', 'PaymentsController@onlinePaymentsReport');
- Route::get('payments-report/online/{slug}', 'PaymentsController@listOnlinePaymentsReport');
+Route::get('payments-report/online/', 'PaymentsController@onlinePaymentsReport');
+Route::get('payments-report/online/{slug}', 'PaymentsController@listOnlinePaymentsReport');
 Route::get('payments-report/online/getList/{slug}', 'PaymentsController@getOnlinePaymentReportsDatatable');
 
 Route::get('payments-report/offline/', 'PaymentsController@offlinePaymentsReport');
@@ -320,9 +319,9 @@ Route::post('payments-report/export', 'PaymentsController@doExportPayments');
 Route::post('payments-report/getRecord', 'PaymentsController@getPaymentRecord');
 Route::post('payments/approve-reject-offline-request', 'PaymentsController@approveOfflinePayment');
 
-            //////////////////
-            // INSTRUCTIONS  //
-            //////////////////
+//////////////////
+// INSTRUCTIONS  //
+//////////////////
 
 Route::get('exam/instructions/list', 'InstructionsController@index');
 Route::get('exam/instructions', 'InstructionsController@index');
@@ -339,13 +338,13 @@ Route::get('student/bookmarks/{slug}', 'BookmarksController@index');
 Route::post('student/bookmarks/add', 'BookmarksController@create');
 Route::delete('student/bookmarks/delete/{id}', 'BookmarksController@delete');
 Route::delete('student/bookmarks/delete_id/{id}', 'BookmarksController@deleteById');
-Route::get('student/bookmarks/getList/{slug}',  'BookmarksController@getDatatable');
-Route::post('student/bookmarks/getSavedList',  'BookmarksController@getSavedBookmarks');
+Route::get('student/bookmarks/getList/{slug}', 'BookmarksController@getDatatable');
+Route::post('student/bookmarks/getSavedList', 'BookmarksController@getSavedBookmarks');
 
 
-                //////////////////////////
-                // Notifications Module //
-                /////////////////////////
+//////////////////////////
+// Notifications Module //
+/////////////////////////
 Route::get('admin/notifications/list', 'NotificationsController@index');
 Route::get('admin/notifications', 'NotificationsController@index');
 Route::get('admin/notifications/add', 'NotificationsController@create');
@@ -364,9 +363,9 @@ Route::get('notifications/show/{slug}', 'NotificationsController@display');
 Route::get('toppers/compare-with-topper/{user_result_slug}/{compare_slug?}', 'ExamToppersController@compare');
 
 
-                        ////////////////
-                        // LMS MODULE //
-                        ////////////////
+////////////////
+// LMS MODULE //
+////////////////
 
 //LMS Categories
 Route::get('lms/categories', 'LmsCategoryController@index');
@@ -431,10 +430,10 @@ Route::get('payments/getList/{slug}', 'PaymentsController@getDatatable');
 Route::get('payments/checkout/{type}/{slug}', 'PaymentsController@checkout');
 Route::get('payments/paynow/{slug}', 'DashboardController@index');
 Route::post('payments/paynow/{slug}', 'PaymentsController@paynow');
-Route::post('payments/paypal/status-success','PaymentsController@paypal_success');
+Route::post('payments/paypal/status-success', 'PaymentsController@paypal_success');
 Route::get('payments/paypal/status-cancel', 'PaymentsController@paypal_cancel');
 
-Route::post('payments/payu/status-success','PaymentsController@payu_success');
+Route::post('payments/payu/status-success', 'PaymentsController@payu_success');
 Route::post('payments/payu/status-cancel', 'PaymentsController@payu_cancel');
 Route::post('payments/offline-payment/update', 'PaymentsController@updateOfflinePayment');
 
@@ -443,14 +442,12 @@ Route::get('payments/view-invoice/{invoice_id}', 'PaymentsController@viewInvoice
 Route::get('payments/view-invoice-pdf/{invoice_id}', 'PaymentsController@viewInvoicePdf')->name('payments.view_invoice_pdf');
 Route::get('payments/send-invoice/{invoice_id}', 'PaymentsController@sendInvoice')->name('payments.send_invoice');
 
-// Midtrans Callback
-Route::post('payments/midtrans/notifications', 'PaymentsController@mdNotificationsCallback');
-Route::get('payments/midtrans/{type}', 'PaymentsController@mdRedirectCallback');
+ // Midtrans Callback
+ Route::post('/mdtxs/fdxs', 'PaymentsController@midtransCallback');
 
-
-                        ////////////////////////////
-                        // SETTINGS MODULE //
-                        ///////////////////////////
+////////////////////////////
+// SETTINGS MODULE //
+///////////////////////////
 
 
 //LMS Categories
@@ -468,9 +465,9 @@ Route::patch('mastersettings/settings/add-sub-settings/{slug}', 'SettingsControl
 Route::get('mastersettings/settings/getList', [ 'as'   => 'mastersettings.dataTable',
      'uses' => 'SettingsController@getDatatable']);
 
-                        ////////////////////////////
-                        // EMAIL TEMPLATES MODULE //
-                        ///////////////////////////
+////////////////////////////
+// EMAIL TEMPLATES MODULE //
+///////////////////////////
 
 //LMS Categories
 Route::get('email/templates', 'EmailTemplatesController@index');
@@ -513,9 +510,9 @@ Route::get('feedback/getlist', 'FeedbackController@getDatatable');
 Route::get('sms/index', 'SMSAgentController@index');
 Route::post('sms/send', 'SMSAgentController@sendSMS');
 
-                        /////////////////////
-                        // MESSAGES MODULE //
-                        /////////////////////
+/////////////////////
+// MESSAGES MODULE //
+/////////////////////
 
 
 Route::group(['prefix' => 'messages'], function () {
@@ -526,9 +523,9 @@ Route::group(['prefix' => 'messages'], function () {
     Route::put('{id}', ['as' => 'messages.update', 'uses' => 'MessagesController@update']);
 });
 
-                        /////////////////////
-                        // PRIVACY POLICY  //
-                        /////////////////////
+/////////////////////
+// PRIVACY POLICY  //
+/////////////////////
 
 
 
@@ -538,71 +535,70 @@ Route::get('site/{slug?}', 'SiteController@sitePages');
 // privacy-policy
 
 
-                         ////////////////////
-                         // UPDATE PATCHES //
-                         ////////////////////
- Route::get('updates/patch1', 'UpdatesController@patch1');
- Route::get('updates/patch2', 'UpdatesController@patch2');
- Route::get('updates/patch3', 'UpdatesController@patch3');
- Route::get('updates/patch4', 'UpdatesController@patch4');
- Route::get('update/application','UpdatesController@updateDatabase');
+////////////////////
+// UPDATE PATCHES //
+////////////////////
+Route::get('updates/patch1', 'UpdatesController@patch1');
+Route::get('updates/patch2', 'UpdatesController@patch2');
+Route::get('updates/patch3', 'UpdatesController@patch3');
+Route::get('updates/patch4', 'UpdatesController@patch4');
+Route::get('update/application', 'UpdatesController@updateDatabase');
 
-Route::get('/refresh-csrf', function(){
+Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
 
 
 //Fornt End Part
- Route::get('exams/list', 'FrontendExamsController@examsList');
+Route::get('exams/list', 'FrontendExamsController@examsList');
 Route::get('exams/start-exam/{slug}', 'FrontendExamsController@startExam');
 Route::post('exams/finish-exam/{slug}', 'FrontendExamsController@finishExam');
 
 //Resume Exam
-Route::post('resume/examdata/save','StudentQuizController@saveResumeExamData');
-Route::get('exam-types','QuizController@examTypes');
-Route::get('edit/exam-type/{code}','QuizController@editExamType');
-Route::post('update/exam-type/{code}','QuizController@updateExamType');
-Route::post('razoapay/success','PaymentsController@razorpaySuccess');
+Route::post('resume/examdata/save', 'StudentQuizController@saveResumeExamData');
+Route::get('exam-types', 'QuizController@examTypes');
+Route::get('edit/exam-type/{code}', 'QuizController@editExamType');
+Route::post('update/exam-type/{code}', 'QuizController@updateExamType');
+Route::post('razoapay/success', 'PaymentsController@razorpaySuccess');
 
 
 //Theme Updates
-Route::post('subscription/email','SiteController@saveSubscription');
+Route::post('subscription/email', 'SiteController@saveSubscription');
 
 
 //Subscribed Users
-Route::get('subscribed/users','UsersController@SubscribedUsers');
-Route::get('subscribed/users/data','UsersController@SubscribersData');
+Route::get('subscribed/users', 'UsersController@SubscribedUsers');
+Route::get('subscribed/users/data', 'UsersController@SubscribersData');
 
 //All Exam categories
-Route::get('exam/categories/{slug?}','SiteController@frontAllExamCats');
-Route::get('practice-exams/{slug?}','SiteController@frontAllExamCats');
-Route::get('LMS/all-categories/{slug?}','SiteController@forntAllLMSCats');
-Route::get('LMS/contents/{slug}','SiteController@forntLMSContents');
-Route::get('download/lms/contents/{slug}','SiteController@downloadLMSContent');
-Route::get('lms/video/{slug}/{cat_id?}','SiteController@viewVideo');
-Route::get('contact-us',function(){
-
-      $view_name = getTheme().'::site.contact-us';
-      $data['active_class']  = "contact-us";
-      $data['title']  = getPhrase('contact_us');
-        return view($view_name,$data);
+Route::get('exam/categories/{slug?}', 'SiteController@frontAllExamCats');
+Route::get('practice-exams/{slug?}', 'SiteController@frontAllExamCats');
+Route::get('LMS/all-categories/{slug?}', 'SiteController@forntAllLMSCats');
+Route::get('LMS/contents/{slug}', 'SiteController@forntLMSContents');
+Route::get('download/lms/contents/{slug}', 'SiteController@downloadLMSContent');
+Route::get('lms/video/{slug}/{cat_id?}', 'SiteController@viewVideo');
+Route::get('contact-us', function () {
+    $view_name = getTheme().'::site.contact-us';
+    $data['active_class']  = "contact-us";
+    $data['title']  = getPhrase('contact_us');
+    return view($view_name, $data);
 });
-Route::post('send/contact-us/details','SiteController@ContactUs');
-Route::post('get/series/contents','SiteController@getSeriesContents');
+Route::post('send/contact-us/details', 'SiteController@ContactUs');
+Route::post('get/series/contents', 'SiteController@getSeriesContents');
 
 //Themes
 
-Route::get('themes/list','SiteThemesController@index');
-Route::get('themes/data','SiteThemesController@getDatatable');
-Route::get('make/default/theme/{id}','SiteThemesController@makeDefault');
-Route::get('theme/settings/{slug}','SiteThemesController@viewSettings');
-Route::post('theme/update/settings/{slug}','SiteThemesController@updateSubSettings');
+Route::get('themes/list', 'SiteThemesController@index');
+Route::get('themes/data', 'SiteThemesController@getDatatable');
+Route::get('make/default/theme/{id}', 'SiteThemesController@makeDefault');
+Route::get('theme/settings/{slug}', 'SiteThemesController@viewSettings');
+Route::post('theme/update/settings/{slug}', 'SiteThemesController@updateSubSettings');
 
 
 
 
 //Front end Practice Exam
-Route::get('take-exam/{id}','SiteController@takeExamLogin');
+Route::get('take-exam/{id}', 'SiteController@takeExamLogin');
 //Feedback
 Route::get('feedback/status/{slug}', 'FeedbackController@updateStatus');
 
@@ -646,8 +642,8 @@ Route::get('faqs', 'FaqsController@index');
 
 
 //User Email Verification
-Route::get('user/confirmation/{slug}','Auth\LoginController@confirmUser');
-Route::get('add/email-verification-feature','EmailVerificationController@userVerification');
+Route::get('user/confirmation/{slug}', 'Auth\LoginController@confirmUser');
+Route::get('add/email-verification-feature', 'EmailVerificationController@userVerification');
 
 
 //User Account Status
@@ -680,8 +676,8 @@ Route::delete('resume/templates/delete/{slug}', 'ResumeTemplatesController@delet
 Route::get('resume/templates/getList', [ 'as'   => 'resumetemplates.dataTable',
     'uses' => 'ResumeTemplatesController@getDatatable']);
 
-Route::get('resume/build-resume/{slug}','ResumeController@editResume');
-Route::patch('resume/build-resume/{slug}','ResumeController@updateResume');
+Route::get('resume/build-resume/{slug}', 'ResumeController@editResume');
+Route::patch('resume/build-resume/{slug}', 'ResumeController@updateResume');
 Route::post('resume/get-user-resume-data', 'ResumeController@getUserResumeData');
 Route::get('resume/get-template/{slug}/{template}', 'ResumeController@resumeTemplate');
 Route::get('users/view-resume/{slug}', 'ResumeController@userResume');
@@ -700,9 +696,9 @@ Route::delete('packages/delete/{slug}', 'PackagesController@delete');
 
 
 //Run new migrations
-Route::get('/new-migrations', function() {
-  $exitCode = Artisan::call('migrate', ['--path'=>'database/migrations/version2']);
-  return redirect(PREFIX);
+Route::get('/new-migrations', function () {
+    $exitCode = Artisan::call('migrate', ['--path'=>'database/migrations/version2']);
+    return redirect(PREFIX);
 });
 
 Route::post('mastersettings/settings/smtp-test', 'SettingsController@smtpTest')->name('mastersettings.smtp_test');

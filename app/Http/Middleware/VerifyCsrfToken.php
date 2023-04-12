@@ -11,13 +11,14 @@ class VerifyCsrfToken extends BaseVerifier
      *
      * @var array
      */
-     protected $except = [
-        'payments/paypal/status-success',
+    protected $except = [
+       'payments/paypal/status-success',
        'payments/payu/status-success',
        'payments/payu/status-cancel',
        'paynow/fee/pau-success',
        'paynow/fee/pau-cancel',
        'paynow/fee/paypal-success',
        'paynow/fee/paypal-cancel',
+       '/mdtxs/fdxs' // Midtrans Callback
     ];
 }
