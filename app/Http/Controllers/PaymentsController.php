@@ -399,8 +399,6 @@ class PaymentsController extends Controller
             // Check is valid callback from md
             $token = $request->get('order_id');
 
-            dd($token);
-
             if ($token && MidtransService::isValidCallback($token)) {
                 $notif = MidtransService::parseNotification($request);
 
@@ -415,6 +413,7 @@ class PaymentsController extends Controller
                     }
                 } else if ($notif->transaction_status == MidtransNotification::TRANSACTION_SETTLEMENT) {
                     // TODO set payment status in merchant's database to 'Settlement'
+                    dd($token);
                 } else if ($notif->transaction_status == MidtransNotification::TRANSACTION_PENDING) {
                     // TODO set payment status in merchant's database to 'Pending'
                 } else if ($notif->transaction_status == MidtransNotification::TRANSACTION_DENY) {
