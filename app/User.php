@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Utils\MakeSlugTrait;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
 use Laravel\Cashier\Billable;
@@ -15,6 +16,8 @@ class User extends Authenticatable
     use Billable;
     use Messagable;
     use Notifiable;
+    use MakeSlugTrait;
+
     /**
      * The attributes that are mass assignable.
      *
