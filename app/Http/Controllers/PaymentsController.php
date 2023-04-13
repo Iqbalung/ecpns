@@ -400,7 +400,17 @@ class PaymentsController extends Controller
             $token = $request->get('order_id');
 
             if ($token && MidtransService::isValidCallback($token)) {
-                $notif = MidtransService::parseNotification($request);
+                $notif   = MidtransService::parseNotification($request);
+                $payment = Payment::where('slug', $notif->order_id)->first();
+
+                if (!$payment) {
+                    // Valid but payment record not found on our db?
+                    return response()->json([
+                        'message' => 'Callback identified as a valid callback, but payment record not found on database.',
+                        'payment' => $payment,
+                        'payload' => $notif->toArray()
+                    ], 500);
+                }
 
                 if ($notif->transaction_status == MidtransNotification::TRANSACTION_CAPTURE) {
                     if ($notif->payment_type == MidtransNotification::PAYMENT_TYPE_CC) {
@@ -411,16 +421,24 @@ class PaymentsController extends Controller
                             // TODO set payment status in merchant's database to 'Success'
                         }
                     }
-                } else if ($notif->transaction_status == MidtransNotification::TRANSACTION_SETTLEMENT) {
-                    // TODO set payment status in merchant's database to 'Settlement'
-                    dd($token);
-                } else if ($notif->transaction_status == MidtransNotification::TRANSACTION_PENDING) {
-                    // TODO set payment status in merchant's database to 'Pending'
-                } else if ($notif->transaction_status == MidtransNotification::TRANSACTION_DENY) {
+                } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_SETTLEMENT) {
+                    // Payment success
+                    $this->processMidtransSuccessPayment($payment, $notif);
+                    return response()->json([
+                        'message' => "Transaction order_id: " . $notif->order_id ." successfully transfered using " . $notif->payment_type,
+                        'status'  => $notif->transaction_status
+                    ]);
+                } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_PENDING) {
+                    // Payment status already pending
+                    return response()->json([
+                        'message' => "Waiting customer to finish transaction order_id: " . $notif->order_id . " using " . $notif->payment_type,
+                        'status'  => $notif->transaction_status,
+                    ]);
+                } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_DENY) {
                     // TODO set payment status in merchant's database to 'Denied'
-                } else if ($notif->transaction_status == MidtransNotification::TRANSACTION_EXPIRE) {
+                } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_EXPIRE) {
                     // TODO set payment status in merchant's database to 'expire'
-                } else if ($notif->transaction_status == MidtransNotification::TRANSACTION_CANCEL) {
+                } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_CANCEL) {
                     // TODO set payment status in merchant's database to 'Denied'
                 } else {
                     // Safe to log (Midtrans Dashboard)
@@ -437,7 +455,90 @@ class PaymentsController extends Controller
         ], 422);
     }
 
-    
+    private function processMidtransSuccessPayment(Payment $payment_record, MidtransNotification $notification)
+    {
+        $payment_record->payment_status = PAYMENT_STATUS_SUCCESS;
+        $item_details = '';
+
+        if ($payment_record->plan_type == 'combo') {
+            $item_model = new ExamSeries();
+        }
+
+        if ($payment_record->plan_type == 'exam') {
+            $item_model = new Quiz();
+        }
+
+        if ($payment_record->plan_type == 'lms') {
+            $item_model = new LmsSeries();
+        }
+
+        if ($payment_record->plan_type == 'subscribe') {
+            $item_model = new Package();
+        }
+
+        $item_details = $item_model->where('id', '=', $payment_record->item_id)->first();
+
+        if ($payment_record->plan_type == 'subscribe') {
+            $validity = $item_details->validity;
+            $validity_type = $item_details->validity_type;
+            $days = $validity;
+            switch ($validity_type) {
+                case 'Day':
+                    $days = $validity * 1;
+                    break;
+                case 'Week':
+                    $days = $validity * 7;
+                    break;
+                case 'Month':
+                    $days = $validity * 30;
+                    break;
+                case 'Year':
+                    $days = $validity * 365;
+                    break;
+            }
+            $daysToAdd = '+'.$days.'days';
+        } else {
+            $daysToAdd = '+'.$item_details->validity.'days';
+        }
+
+        $payment_record->start_date = date('Y-m-d');
+        $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
+
+        $details_before_payment         = (object)json_decode($payment_record->other_details);
+        $payment_record->coupon_applied = $details_before_payment->is_coupon_applied;
+        $payment_record->coupon_id      = $details_before_payment->coupon_id;
+        $payment_record->actual_cost    = $details_before_payment->actual_cost;
+        $payment_record->discount_amount= $details_before_payment->discount_availed;
+        $payment_record->after_discount = $details_before_payment->after_discount;
+        $payment_record->transaction_id = $notification->transaction_id ?? null;
+        $payment_record->paid_amount    = $notification->gross_amount;
+
+        if ($notification->fraud_status == MidtransNotification::TRANSACTION_CAPTURE) {
+        } else {
+            $va_numbers = $notification->va_numbers[0] ?? null;
+            $va_number  = $va_numbers['va_number'] ?? 'unknown va_number';
+            $va_bank    = $va_numbers['bank'] ?? 'unknown bank';
+
+            $payment_record->paid_by = $notification->payment_type . ' - ' . $va_bank . ' - ' . $va_number;
+        }
+
+        //Capcture all the response from the payment.
+        //In case want to view total details, we can fetch this record
+        $payment_record->transaction_record = json_encode($notification->toArray());
+
+        $payment_record->save();
+
+        if ($payment_record->coupon_applied) {
+            $this->couponcodes_usage($payment_record);
+        }
+
+        // Ignore for now (unhandled error :v)
+        // $this->sendEmail($payment_record->user_id, $payment_record->id);
+
+        return true;
+    }
+
+
     /**
      * This method returns the object details
      * @param  [type] $type [description]
@@ -585,17 +686,17 @@ class PaymentsController extends Controller
             $user = getUserRecord($other_details['child_id']);
         }
 
-        $payment 					        = new Payment();
-        $payment->item_id 		    = $item->id;
+        $payment 					  = new Payment();
+        $payment->item_id 		      = $item->id;
         $payment->item_name 		  = $item->title;
         $payment->plan_type 		  = $package_type;
-        $payment->payment_gateway = $payment_method;
+        $payment->payment_gateway     = $payment_method;
         $payment->slug 			      = $payment::makeSlug(getHashCode());
         $payment->cost 			      = $item->cost;
-        $payment->user_id         = $user->id;
-        $payment->paid_by_parent 	= $other_details['paid_by_parent'];
-        $payment->payment_status 	= PAYMENT_STATUS_PENDING;
-        $payment->other_details 	= json_encode($other_details);
+        $payment->user_id             = $user->id;
+        $payment->paid_by_parent 	  = $other_details['paid_by_parent'];
+        $payment->payment_status 	  = PAYMENT_STATUS_PENDING;
+        $payment->other_details 	  = json_encode($other_details);
 
         if (!$coupon_zero) {
             if ($payment_method=='offline') {
