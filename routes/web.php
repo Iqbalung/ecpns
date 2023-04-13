@@ -13,7 +13,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-
 if (env('DB_DATABASE')=='') {
     Route::get('/', 'InstallatationController@index');
     Route::get('/install', 'InstallatationController@index');
@@ -442,8 +441,8 @@ Route::get('payments/view-invoice/{invoice_id}', 'PaymentsController@viewInvoice
 Route::get('payments/view-invoice-pdf/{invoice_id}', 'PaymentsController@viewInvoicePdf')->name('payments.view_invoice_pdf');
 Route::get('payments/send-invoice/{invoice_id}', 'PaymentsController@sendInvoice')->name('payments.send_invoice');
 
- // Midtrans Callback
- Route::post('/mdtxs/fdxs', 'PaymentsController@midtransCallback');
+// Midtrans Callback
+Route::post('/mdtxs/fdxs', 'PaymentsController@midtransCallback');
 
 ////////////////////////////
 // SETTINGS MODULE //

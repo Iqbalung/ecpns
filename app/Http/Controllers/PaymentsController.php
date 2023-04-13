@@ -418,7 +418,12 @@ class PaymentsController extends Controller
                             // TODO set payment status in merchant's database to 'Challenge by FDS'
                             // TODO merchant should decide whether this transaction is authorized or not in MAP
                         } else {
-                            // TODO set payment status in merchant's database to 'Success'
+                            // Payment success
+                            $this->processMidtransSuccessPayment($payment, $notif);
+                            return response()->json([
+                                'message' => "Transaction order_id: " . $notif->order_id ." successfully captured using " . $notif->payment_type,
+                                'status'  => $notif->transaction_status
+                            ]);
                         }
                     }
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_SETTLEMENT) {
@@ -437,14 +442,17 @@ class PaymentsController extends Controller
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_DENY) {
                     // TODO set payment status in merchant's database to 'Denied'
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_EXPIRE) {
-                    // TODO set payment status in merchant's database to 'expire'
+                    $this->processMidtransFailedPayment($payment, $notif);
+                    return response()->json([
+                        'message' => "Payment using " . $notif->payment_type . " for transaction order_id: " . $notif->order_id . " is expired.",
+                        'status'  => $notif->transaction_status,
+                    ]);
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_CANCEL) {
                     // TODO set payment status in merchant's database to 'Denied'
                 } else {
-                    // Safe to log (Midtrans Dashboard)
                     return response()->json([
                         'message' => 'Unhandled Midtrans Callback',
-                        'request' => $request->all()
+                        'request' => $request->all(),
                     ], 422);
                 }
             }
@@ -455,9 +463,14 @@ class PaymentsController extends Controller
         ], 422);
     }
 
-    private function processMidtransSuccessPayment(Payment $payment_record, MidtransNotification $notification)
+    /**
+     * Fill basic midtrans payment info
+     * @param Payment &$payment_record
+     * @param MidtransNotification $notification
+     * @return void
+     */
+    private function prepareMidtransPaymentRecord(Payment &$payment_record, MidtransNotification $notification)
     {
-        $payment_record->payment_status = PAYMENT_STATUS_SUCCESS;
         $item_details = '';
 
         if ($payment_record->plan_type == 'combo') {
@@ -513,7 +526,37 @@ class PaymentsController extends Controller
         $payment_record->transaction_id = $notification->transaction_id ?? null;
         $payment_record->paid_amount    = $notification->gross_amount;
 
-        if ($notification->fraud_status == MidtransNotification::TRANSACTION_CAPTURE) {
+        //Capcture all the response from the payment.
+        //In case want to view total details, we can fetch this record
+        $payment_record->transaction_record = json_encode($notification->toArray());
+    }
+
+    private function processMidtransFailedPayment(Payment $payment_record, MidtransNotification $notification)
+    {
+        $payment_record->payment_status = PAYMENT_STATUS_CANCELLED;
+
+        $this->prepareMidtransPaymentRecord($payment_record, $notification);
+
+        if ($notification->transaction_status == MidtransNotification::TRANSACTION_EXPIRE) {
+            // Add notes
+            $payment_record->notes = "Payment using " . $notification->payment_type . " for transaction order_id: " . $notification->order_id . " is expired.";
+        }
+
+        $payment_record->save();
+
+        return true;
+    }
+
+    private function processMidtransSuccessPayment(Payment $payment_record, MidtransNotification $notification)
+    {
+        $payment_record->payment_status = PAYMENT_STATUS_SUCCESS;
+
+        $this->prepareMidtransPaymentRecord($payment_record, $notification);
+
+        if ($notification->transaction_status == MidtransNotification::TRANSACTION_CAPTURE) {
+            $card_type   = $notification->card_type ?? "unknown card type";
+            $masked_card = $notification->masked_card ?? "unknown masked card";
+            $payment_record->paid_by = $notification->payment_type . ' - ' . $card_type . ' - ' . $masked_card;
         } else {
             $va_numbers = $notification->va_numbers[0] ?? null;
             $va_number  = $va_numbers['va_number'] ?? 'unknown va_number';
@@ -521,10 +564,6 @@ class PaymentsController extends Controller
 
             $payment_record->paid_by = $notification->payment_type . ' - ' . $va_bank . ' - ' . $va_number;
         }
-
-        //Capcture all the response from the payment.
-        //In case want to view total details, we can fetch this record
-        $payment_record->transaction_record = json_encode($notification->toArray());
 
         $payment_record->save();
 
@@ -599,33 +638,30 @@ class PaymentsController extends Controller
         return redirect(URL_PAYMENTS_LIST.$user->slug);
     }
 
+    public function paypal_success(Request $request)
+    {
+        $user = Auth::user();
+        $response = $request->all();
 
-      public function paypal_success(Request $request)
-      {
-          $user = Auth::user();
-          $response = $request->all();
-
-          $package_name = ucwords($response['item_name1']);
-
-
-          if ($this->paymentSuccess($request)) {
-              try {
-                  $user->notify(new \App\Notifications\UsersNotifcations($user, $content_data));
-              } catch (Exception $e) {
-              }
-
-                 flash('success', 'your_subscription_was_successfull', 'success');
-          } else {
-              //PAYMENT RECORD IS NOT VALID
-              //PREPARE METHOD FOR FAILED CASE
-              pageNotFound();
-          }
-          //REDIRECT THE USER BY LOADING A VIEW
-
-          return redirect(URL_PAYMENTS_LIST.$user->slug);
-      }
+        $package_name = ucwords($response['item_name1']);
 
 
+        if ($this->paymentSuccess($request)) {
+            try {
+                $user->notify(new \App\Notifications\UsersNotifcations($user, $content_data));
+            } catch (Exception $e) {
+            }
+
+               flash('success', 'your_subscription_was_successfull', 'success');
+        } else {
+            //PAYMENT RECORD IS NOT VALID
+            //PREPARE METHOD FOR FAILED CASE
+            pageNotFound();
+        }
+        //REDIRECT THE USER BY LOADING A VIEW
+
+        return redirect(URL_PAYMENTS_LIST.$user->slug);
+    }
 
     public function payu_success(Request $request)
     {
@@ -653,32 +689,32 @@ class PaymentsController extends Controller
         return redirect(URL_PAYMENTS_LIST.$user->slug);
     }
 
-     public function payu_cancel(Request $request)
-     {
-         if ($this->paymentFailed()) {
-             //FAILED PAYMENT RECORD UPDATED SUCCESSFULLY
-             //PREPARE SUCCESS MESSAGE
-             flash('Ooops...!', 'your_payment_was cancelled', 'overlay');
-         } else {
-             //PAYMENT RECORD IS NOT VALID
-             //PREPARE METHOD FOR FAILED CASE
-             pageNotFound();
-         }
+    public function payu_cancel(Request $request)
+    {
+        if ($this->paymentFailed()) {
+            //FAILED PAYMENT RECORD UPDATED SUCCESSFULLY
+            //PREPARE SUCCESS MESSAGE
+            flash('Ooops...!', 'your_payment_was cancelled', 'overlay');
+        } else {
+            //PAYMENT RECORD IS NOT VALID
+            //PREPARE METHOD FOR FAILED CASE
+            pageNotFound();
+        }
 
-         //REDIRECT THE USER BY LOADING A VIEW
-         $user = Auth::user();
-         return redirect(URL_PAYMENTS_LIST.$user->slug);
-     }
+        //REDIRECT THE USER BY LOADING A VIEW
+        $user = Auth::user();
+        return redirect(URL_PAYMENTS_LIST.$user->slug);
+    }
 
 
     /**
-      * This method saves the record before going to payment method
-      * The exact record can be identified by using the slug
-      * By using slug we will fetch the record and update the payment status to completed
-      * @param  [type] $item           [description]
-      * @param  [type] $payment_method [description]
-      * @return [type]                 [description]
-      */
+     * This method saves the record before going to payment method
+     * The exact record can be identified by using the slug
+     * By using slug we will fetch the record and update the payment status to completed
+     * @param  [type] $item           [description]
+     * @param  [type] $payment_method [description]
+     * @return [type]                 [description]
+     */
     public function preserveBeforeSave($item, $package_type, $payment_method, $other_details, $coupon_zero=0)
     {
         $user = getUserRecord();
