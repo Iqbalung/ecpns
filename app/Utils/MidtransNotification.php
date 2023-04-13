@@ -68,4 +68,21 @@ class MidtransNotification
 
         return null;
     }
+
+    public function toArray()
+    {
+        $props = [];
+
+        foreach (get_object_vars($this) as $k => $v) {
+            if ($k === 'others_props') {
+                foreach ($v as $k1 => $v1) {
+                    $props[$k1] = $v1;
+                }
+            } else {
+                $props[$k] = $v;
+            }
+        }
+
+        return $props;
+    }
 }
