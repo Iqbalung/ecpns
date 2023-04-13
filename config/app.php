@@ -162,12 +162,11 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-         Milon\Barcode\BarcodeServiceProvider::class,
-         SimpleSoftwareIO\SMS\SMSServiceProvider::class,
+        Milon\Barcode\BarcodeServiceProvider::class,
+        SimpleSoftwareIO\SMS\SMSServiceProvider::class,
 
-         Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
-         Shipu\Themevel\Providers\ThemevelServiceProvider::class,
-       Fideloper\Proxy\TrustedProxyServiceProvider::class,
+        Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
+        Shipu\Themevel\Providers\ThemevelServiceProvider::class,
         Laravel\Tinker\TinkerServiceProvider::class,
 
 
@@ -175,13 +174,13 @@ return [
         /*
          * Package Service Providers...
          */
-         Laravel\Cashier\CashierServiceProvider::class,
-          Cmgmyr\Messenger\MessengerServiceProvider::class,
+        Laravel\Cashier\CashierServiceProvider::class,
+        Cmgmyr\Messenger\MessengerServiceProvider::class,
 
         Zizaco\Entrust\EntrustServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class,
-         Collective\Html\HtmlServiceProvider::class,
-         Intervention\Image\ImageServiceProvider::class,
+        Collective\Html\HtmlServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
 
         ConsoleTVs\Charts\ChartsServiceProvider::class,
         //

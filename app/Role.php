@@ -13,8 +13,8 @@ class Role extends EntrustRole
 		return Role::all();		
 	}
 
-	 /**
-     * The users that belong to the role.
+	/**
+     *  The users that belong to the role.
      */
     public function users()
     {
@@ -25,7 +25,4 @@ class Role extends EntrustRole
     {
     	return Role::where('name', '=', $role_name)->get()->first();
     }
- 
-
-
 }
