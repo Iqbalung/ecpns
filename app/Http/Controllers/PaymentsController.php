@@ -456,7 +456,11 @@ class PaymentsController extends Controller
                         'status'  => $notif->transaction_status,
                     ]);
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_CANCEL) {
-                    // TODO set payment status in merchant's database to 'Denied'
+                    $this->processMidtransFailedPayment($payment, $notif);
+                    return response()->json([
+                        'message' => "Payment using " . $notif->payment_type . " for transaction order_id: " . $notif->order_id . " is denied.",
+                        'status'  => $notif->transaction_status
+                    ]);
                 } else {
                     return response()->json([
                         'message' => 'Unhandled Midtrans Callback',
@@ -548,6 +552,9 @@ class PaymentsController extends Controller
         if ($notification->transaction_status == MidtransNotification::TRANSACTION_EXPIRE) {
             // Add notes
             $payment_record->notes = "Payment using " . $notification->payment_type . " for transaction order_id: " . $notification->order_id . " is expired.";
+        } elseif ($notification->transaction_status == MidtransNotification::TRANSACTION_CANCEL) {
+            // Add notes
+            $payment_record->notes = "Payment using " . $notification->payment_type . " for transaction order_id: " . $notification->order_id . " is canceled.";
         }
 
         $payment_record->save();
