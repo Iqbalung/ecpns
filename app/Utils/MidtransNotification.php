@@ -5,21 +5,25 @@ namespace App\Utils;
 class MidtransNotification
 {
     /**
+     * @readonly
      * @var string
      */
     public $transaction_status;
 
     /**
+     * @readonly
      * @var string
      */
     public $payment_type;
 
     /**
+     * @readonly
      * @var string
      */
     public $order_id;
 
     /**
+     * @readonly
      * @var string
      */
     public $fraud_status;
