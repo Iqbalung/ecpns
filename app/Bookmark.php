@@ -2,10 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class Bookmark extends Model
 {
     protected $table = 'bookmarks';
-    
 }

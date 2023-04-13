@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 use App\FaqCategory;
 
 class Faq extends Model
@@ -14,11 +14,11 @@ class Faq extends Model
 
     public function getFaqCategory()
     {
-    	return $this->belongsTo(FaqCategory::class, 'category_id');
+        return $this->belongsTo(FaqCategory::class, 'category_id');
     }
 
     public static function getFaqCategories()
     {
-    	return FaqCategory::where('status', 1)->pluck('category', 'id');
+        return FaqCategory::where('status', 1)->pluck('category', 'id');
     }
 }

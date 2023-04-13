@@ -2,11 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class QuizQuestions extends Model
 {
-	
     protected $table = 'quiz_questions';
 
     /**
@@ -15,19 +14,18 @@ class QuizQuestions extends Model
     * @param  [type] $schedule_data [description]
     * @return [type]                [description]
     */
-   public static function resumeExam($quiz_id='')
-   {
-     
-     $user  = \Auth::user();
-     
-     $exam = QuizQuestions::where('student_id',$user->id)
-                            ->where('quiz_id',$quiz_id)
-                            ->where('is_exam_completed',0)
-                            ->first();
-     if($exam)
-      return TRUE;
+    public static function resumeExam($quiz_id='')
+    {
+        $user  = \Auth::user();
 
-      return FALSE;                      
+        $exam = QuizQuestions::where('student_id', $user->id)
+                               ->where('quiz_id', $quiz_id)
+                               ->where('is_exam_completed', 0)
+                               ->first();
+        if ($exam) {
+            return true;
+        }
 
-   }
+        return false;
+    }
 }

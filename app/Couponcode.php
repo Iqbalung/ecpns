@@ -2,11 +2,11 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class Couponcode extends Model
 {
-     protected $table= "couponcodes";
+    protected $table= "couponcodes";
 
 
     public static function getRecordWithSlug($slug)
@@ -24,24 +24,24 @@ class Couponcode extends Model
     {
         $coupon_record = Couponcode::where('coupon_code', '=', $code)->first();
         $applicable_categories = [];
-        if(!$coupon_record)
-            return FALSE;
-        if($coupon_record->coupon_code_applicability)
-        {
+        if (!$coupon_record) {
+            return false;
+        }
+        if ($coupon_record->coupon_code_applicability) {
             $applicable_categories = (array) json_decode($coupon_record->coupon_code_applicability)->categories;
             array_push($applicable_categories, 'subscribe');
         }
 
-    	$record = Couponcode::where('coupon_code', '=', $code)
-    						->where('valid_from','<=',date('Y-m-d'))
-    						->where('valid_to', '>=', date('Y-m-d'))
-                            ->where('status','=','Active')
+        $record = Couponcode::where('coupon_code', '=', $code)
+                            ->where('valid_from', '<=', date('Y-m-d'))
+                            ->where('valid_to', '>=', date('Y-m-d'))
+                            ->where('status', '=', 'Active')
                            ->first();
 
-        if($record)
-        {
-            if(in_array($item_type, $applicable_categories))
+        if ($record) {
+            if (in_array($item_type, $applicable_categories)) {
                 return $record;
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class ResumeTemplate extends Model
 {
@@ -13,5 +13,4 @@ class ResumeTemplate extends Model
     {
         return ResumeTemplate::where('slug', '=', $slug)->first();
     }
-	
 }

@@ -2,9 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 use App\User;
 use Image;
+
 class ImageSettings extends Model
 {
     ////////////////////////////
@@ -37,19 +38,19 @@ class ImageSettings extends Model
     protected $defaultBlogImgPath               = "uploads/blogs/default.jpg";
     protected $defaultBlogImgThumbnailpath      = "uploads/blogs/thumbnail/default.jpg";
 
-    function __construct() {
+    public function __construct()
+    {
         $server_software = ! empty($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
-        if ( ! empty( $server_software ) ) {
-            if(strpos($server_software, 'nginx') !== false){
+        if (! empty($server_software)) {
+            if (strpos($server_software, 'nginx') !== false) {
                 $this->prefix = '';
             }
         }
-
-     }
+    }
      /**
-     * Returns the Profile Pics Path
-     * @return [string] [description]
-     */
+    * Returns the Profile Pics Path
+    * @return [string] [description]
+    */
     public function getResumePicsPath()
     {
         return $this->prefix . $this->resumePicsPath;
@@ -215,5 +216,4 @@ class ImageSettings extends Model
     {
         return $this->prefix . $this->blogImgSize;
     }
-
 }

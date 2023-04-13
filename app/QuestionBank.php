@@ -1,13 +1,15 @@
 <?php
 
 namespace App;
+
 use DB;
-use Illuminate\Database\Eloquent\Model;
-use \App;
+use App\Core\Model;
+use App;
 use App\Bookmark;
 use Auth;
-Use App\Subject;
+use App\Subject;
 use App\Topic;
+
 class QuestionBank extends Model
 {
     protected $table = 'questionbank';
@@ -16,24 +18,24 @@ class QuestionBank extends Model
     public $excelRecords   = [];
     public $questionType   = '';
     public $columns_list   = [];
- 
 
-	public function subject()
-	{
-		return $this->belongsTo('App\Subject');
-	}
+
+    public function subject()
+    {
+        return $this->belongsTo('App\Subject');
+    }
 
     public function isBookmarked($question_id, $type ='all')
     {
         $records = Bookmark::where('user_id', '=', Auth::user()->id)
                         ->where('item_id', '=', $question_id)
                         ->where('item_type', '=', 'questions');
-        if($type=='all')
+        if ($type=='all') {
             return $records;
+        }
         return count($records);
-
     }
-	public static function getRecordWithSlug($slug)
+    public static function getRecordWithSlug($slug)
     {
         return QuestionBank::where('slug', '=', $slug)->first();
     }
@@ -46,10 +48,10 @@ class QuestionBank extends Model
      */
     public function questionExistsQuizzes($question_id)
     {
-    	$quizzes = DB::table('questionbank_quizzes')
-    	->select('id')
-    	->where('questionbank_id','=',$question_id)->get();
-    	return count($quizzes) ? TRUE : FALSE ;
+        $quizzes = DB::table('questionbank_quizzes')
+        ->select('id')
+        ->where('questionbank_id', '=', $question_id)->get();
+        return count($quizzes) ? true : false ;
     }
 
     /**
@@ -62,15 +64,15 @@ class QuestionBank extends Model
     {
         $this->excelRecords = $records;
         $this->questionType = 'radio';
-        $recordsHavingIssues = FALSE;        
-        if(!$this->validateQuestions())
-            $recordsHavingIssues = TRUE;
-        if(!$this->prepareAndPushRadioQuestions())
-            $recordsHavingIssues = TRUE;
-       
+        $recordsHavingIssues = false;
+        if (!$this->validateQuestions()) {
+            $recordsHavingIssues = true;
+        }
+        if (!$this->prepareAndPushRadioQuestions()) {
+            $recordsHavingIssues = true;
+        }
+
         return $recordsHavingIssues;
-       
-        
     }
 
     /**
@@ -82,12 +84,14 @@ class QuestionBank extends Model
     {
         $this->excelRecords = $records;
         $this->questionType = 'checkbox';
-        $recordsHavingIssues = FALSE;        
-        if(!$this->validateQuestions())
-            $recordsHavingIssues = TRUE;
-        if(!$this->prepareAndPushCheckboxQuestions())
-            $recordsHavingIssues = TRUE;
-       
+        $recordsHavingIssues = false;
+        if (!$this->validateQuestions()) {
+            $recordsHavingIssues = true;
+        }
+        if (!$this->prepareAndPushCheckboxQuestions()) {
+            $recordsHavingIssues = true;
+        }
+
         return $recordsHavingIssues;
     }
     /**
@@ -99,12 +103,14 @@ class QuestionBank extends Model
     {
         $this->excelRecords = $records;
         $this->questionType = 'blanks';
-        $recordsHavingIssues = FALSE;        
-        if(!$this->validateQuestions())
-            $recordsHavingIssues = TRUE;
-        if(!$this->prepareAndPushBlankQuestions())
-            $recordsHavingIssues = TRUE;
-       
+        $recordsHavingIssues = false;
+        if (!$this->validateQuestions()) {
+            $recordsHavingIssues = true;
+        }
+        if (!$this->prepareAndPushBlankQuestions()) {
+            $recordsHavingIssues = true;
+        }
+
         return $recordsHavingIssues;
     }
 
@@ -122,29 +128,31 @@ class QuestionBank extends Model
     public function validateQuestions()
     {
         $this->validateQuestionType();
-        
-        if(!count($this->excelRecords))
-            return FALSE;
+
+        if (!count($this->excelRecords)) {
+            return false;
+        }
         $this->validateSubjectsAndTopics();
 
-        if(!count($this->excelRecords))
-            return FALSE;
-        
+        if (!count($this->excelRecords)) {
+            return false;
+        }
+
         $this->validateDifficultyLevels();
 
-        if(!count($this->excelRecords))
-            return FALSE;
+        if (!count($this->excelRecords)) {
+            return false;
+        }
 
-       if($this->questionType!='blanks') {
-        $this->validateTotalAnswers();
-        
-        if(!count($this->excelRecords))
-            return FALSE;
-    }
+        if ($this->questionType!='blanks') {
+            $this->validateTotalAnswers();
 
-        return TRUE;
+            if (!count($this->excelRecords)) {
+                return false;
+            }
+        }
 
-
+        return true;
     }
 
     /**
@@ -154,29 +162,28 @@ class QuestionBank extends Model
     public function validateQuestionType()
     {
         $records  = $this->excelRecords;
-        foreach($records as $key => $record)
-        {
-            
-            if($record->question_type=='')
+        foreach ($records as $key => $record) {
+            if ($record->question_type=='') {
                 continue;
+            }
 
-            if(trim($record->question_type) != $this->questionType) {
-               $message = 'this_question_is_not_type_of_'.' '.$this->questionType;
-               $this->moveToFailedList($record, $message, $key);
-              
+            if (trim($record->question_type) != $this->questionType) {
+                $message = 'this_question_is_not_type_of_'.' '.$this->questionType;
+                $this->moveToFailedList($record, $message, $key);
+
                 continue;
             }
         }
 
-        return TRUE;        
+        return true;
     }
 
     public function moveToFailedList($record, $message, $key)
     {
-         $temp['record']        = $record;
-         $temp['type']          = getPhrase($message);
-         $this->failed_list[]   = (object)$temp;
-         $this->removeRecordFromList($key);
+        $temp['record']        = $record;
+        $temp['type']          = getPhrase($message);
+        $this->failed_list[]   = (object)$temp;
+        $this->removeRecordFromList($key);
     }
 
     /**
@@ -187,7 +194,7 @@ class QuestionBank extends Model
     public function removeRecordFromList($key)
     {
         unset($this->excelRecords[$key]);
-        return TRUE;
+        return true;
     }
 
     /**
@@ -206,17 +213,15 @@ class QuestionBank extends Model
      */
     public function validateSubjects()
     {
-        foreach($this->excelRecords as $key => $record)
-        {
-            if($record->subject_id=='')
+        foreach ($this->excelRecords as $key => $record) {
+            if ($record->subject_id=='') {
                 continue;
-            if(!$this->isValidSubject($record->subject_id))
-            {
+            }
+            if (!$this->isValidSubject($record->subject_id)) {
                 $message = 'invalid_subject';
                 $this->moveToFailedList($record, $message, $key);
             }
         }
-        
     }
 
     /**
@@ -226,7 +231,7 @@ class QuestionBank extends Model
      */
     public function isValidSubject($subject_id)
     {
-        return Subject::where('id','=',$subject_id)->get()->count();
+        return Subject::where('id', '=', $subject_id)->get()->count();
     }
 
     /**
@@ -235,13 +240,12 @@ class QuestionBank extends Model
      */
     public function validateTopics()
     {
-        foreach($this->excelRecords as $key => $record)
-        {
-             if($record->topic_id=='')
+        foreach ($this->excelRecords as $key => $record) {
+            if ($record->topic_id=='') {
                 continue;
+            }
 
-            if(!$this->isValidTopic($record->subject_id, $record->topic_id))
-            {
+            if (!$this->isValidTopic($record->subject_id, $record->topic_id)) {
                 $message = 'topic_not_available_with_subject';
                 $this->moveToFailedList($record, $message, $key);
             }
@@ -267,14 +271,13 @@ class QuestionBank extends Model
     public function validateDifficultyLevels()
     {
         $difficultyLevels = (new GeneralSettings())->getDifficultyLevels();
-        foreach($this->excelRecords as  $key => $record)
-        {
-             if($record->difficulty_level=='')
+        foreach ($this->excelRecords as  $key => $record) {
+            if ($record->difficulty_level=='') {
                 continue;
+            }
 
-            if(!array_key_exists($record->difficulty_level, $difficultyLevels))
-            {
-                 $message = 'invalid_difficulty_level';
+            if (!array_key_exists($record->difficulty_level, $difficultyLevels)) {
+                $message = 'invalid_difficulty_level';
                 $this->moveToFailedList($record, $message, $key);
             }
         }
@@ -287,13 +290,12 @@ class QuestionBank extends Model
      */
     public function validateTotalAnswers()
     {
-        foreach($this->excelRecords as  $key => $record)
-        {
-            if($record->total_answers=='')
+        foreach ($this->excelRecords as  $key => $record) {
+            if ($record->total_answers=='') {
                 continue;
-            if(!$this->isAllAnswersAvailable($record))
-            {
-                 $message = 'insufficient_answers';
+            }
+            if (!$this->isAllAnswersAvailable($record)) {
+                $message = 'insufficient_answers';
                 $this->moveToFailedList($record, $message, $key);
             }
         }
@@ -309,20 +311,17 @@ class QuestionBank extends Model
     {
         $field = 'answer';
         $keys = $this->getKeys($record);
-        for($number = 1; $number<=$record->total_answers; $number++)
-        {
-
-            if(!in_array($field.$number,$keys))
-            {
-                return FALSE;
+        for ($number = 1; $number<=$record->total_answers; $number++) {
+            if (!in_array($field.$number, $keys)) {
+                return false;
             }
-          
         }
 
-        if($record->correct_answer>=1 && $record->correct_answer<=$record->total_answers)
-            return TRUE;
-       
-        return FALSE;
+        if ($record->correct_answer>=1 && $record->correct_answer<=$record->total_answers) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -333,8 +332,7 @@ class QuestionBank extends Model
     public function getKeys($record)
     {
         $keys = array();
-        foreach($record as $key=>$value)
-        {
+        foreach ($record as $key=>$value) {
             $keys[] = $key;
         }
 
@@ -343,15 +341,13 @@ class QuestionBank extends Model
 
     public function getAllColumnsList($records)
     {
-        
         $keys = array();
 
-        foreach($records as $item)
-        {
-            foreach($item as $key=>$value)
-            {
-                if(!in_array($key,$keys))
-                $keys[] = $key;
+        foreach ($records as $item) {
+            foreach ($item as $key=>$value) {
+                if (!in_array($key, $keys)) {
+                    $keys[] = $key;
+                }
             }
         }
         return $keys;
@@ -365,10 +361,10 @@ class QuestionBank extends Model
     public function prepareAndPushRadioQuestions()
     {
         $pushable_records = [];
-        foreach($this->excelRecords as $record)    
-        {
-            if(!$this->isValidSuccessRecord($record))
+        foreach ($this->excelRecords as $record) {
+            if (!$this->isValidSuccessRecord($record)) {
                 continue;
+            }
             unset($tempRecord);
             $tempRecord['topic_id']     = $record->topic_id;
             $tempRecord['subject_id']   = $record->subject_id;
@@ -391,19 +387,24 @@ class QuestionBank extends Model
 
     public function isValidSuccessRecord($record)
     {
-        $valid = FALSE;
-        if($record->topic_id=='')
-         return $valid;
-        if($record->subject_id=='')
+        $valid = false;
+        if ($record->topic_id=='') {
             return $valid;
+        }
+        if ($record->subject_id=='') {
+            return $valid;
+        }
 
-        if($record->question_type=='')
+        if ($record->question_type=='') {
             return $valid;
-        if($record->question=='')
+        }
+        if ($record->question=='') {
             return $valid;
-        if($record->total_answers=='')
+        }
+        if ($record->total_answers=='') {
             return $valid;
-        return TRUE;
+        }
+        return true;
     }
 
 
@@ -417,89 +418,85 @@ class QuestionBank extends Model
         $answers = [];
         $field = 'answer';
         $keys = $this->getKeys($record);
-        for($number = 1; $number<=$record->total_answers; $number++)
-        {
+        for ($number = 1; $number<=$record->total_answers; $number++) {
             $newkey = $field.$number;
-            if(in_array($newkey,$keys))
-            {
+            if (in_array($newkey, $keys)) {
                 unset($temp);
                 $temp['option_value']   = $record[$newkey];
                 $temp['has_file']       = 0;
                 $temp['file_name']      = '';
                 $answers[] = $temp;
             }
-          
         }
 
         return json_encode($answers);
     }
 
 
-    
+
      public function prepareAndPushCheckboxQuestions()
-    {
-        $pushable_records = [];
-        foreach($this->excelRecords as $record)    
-        {
-             if(!$this->isValidSuccessRecord($record))
-                continue;
+     {
+         $pushable_records = [];
+         foreach ($this->excelRecords as $record) {
+             if (!$this->isValidSuccessRecord($record)) {
+                 continue;
+             }
 
-            unset($tempRecord);
-            $tempRecord['topic_id']     = $record->topic_id;
-            $tempRecord['subject_id']   = $record->subject_id;
-            $tempRecord['question_type']= $record->question_type;
-            $tempRecord['question']     = $record->question;
-            $tempRecord['total_answers']= $record->total_answers;
-            $tempRecord['marks']        = $record->marks;
-            $tempRecord['total_correct_answers']= $record->total_correct_answers;
-            $tempRecord['correct_answers']= $this->prepareCorrectAnswers($record);
-            $tempRecord['time_to_spend']= $record->time_to_spend;
-            $tempRecord['difficulty_level']= $record->difficulty_level;
-            $tempRecord['hint']         = ($record->hint) ? $record->hint : '';
-            $tempRecord['explanation']  = ($record->explanation) ? $record->explanation : '';
-            $tempRecord['answers']      = $this->prepareRadioAnswers($record);
-            $pushable_records[]         = $tempRecord;
-            $this->success_list[]       = $record;
-        }
+             unset($tempRecord);
+             $tempRecord['topic_id']     = $record->topic_id;
+             $tempRecord['subject_id']   = $record->subject_id;
+             $tempRecord['question_type']= $record->question_type;
+             $tempRecord['question']     = $record->question;
+             $tempRecord['total_answers']= $record->total_answers;
+             $tempRecord['marks']        = $record->marks;
+             $tempRecord['total_correct_answers']= $record->total_correct_answers;
+             $tempRecord['correct_answers']= $this->prepareCorrectAnswers($record);
+             $tempRecord['time_to_spend']= $record->time_to_spend;
+             $tempRecord['difficulty_level']= $record->difficulty_level;
+             $tempRecord['hint']         = ($record->hint) ? $record->hint : '';
+             $tempRecord['explanation']  = ($record->explanation) ? $record->explanation : '';
+             $tempRecord['answers']      = $this->prepareRadioAnswers($record);
+             $pushable_records[]         = $tempRecord;
+             $this->success_list[]       = $record;
+         }
 
-        
-        return $this->pushToDb($pushable_records);
-    }
+
+         return $this->pushToDb($pushable_records);
+     }
 
 
      public function prepareAndPushBlankQuestions()
-    {
+     {
+         $pushable_records = [];
+         foreach ($this->excelRecords as $record) {
+             if (!$this->isValidSuccessRecord($record)) {
+                 continue;
+             }
+             unset($tempRecord);
+             $tempRecord['topic_id']     = $record->topic_id;
+             $tempRecord['subject_id']   = $record->subject_id;
+             $tempRecord['question_type']= $record->question_type;
+             $tempRecord['question']     = $record->question;
+             $tempRecord['total_answers']= 0;
+             $tempRecord['marks']        = $record->marks;
+             $tempRecord['total_correct_answers']= $record->total_answers;
+             $tempRecord['correct_answers']= $this->prepareCorrectAnswers($record);
+             $tempRecord['time_to_spend']= $record->time_to_spend;
+             $tempRecord['difficulty_level']= $record->difficulty_level;
+             $tempRecord['hint']         = ($record->hint) ? $record->hint : '';
+             $tempRecord['explanation']  = ($record->explanation) ? $record->explanation : '';
+             $tempRecord['answers']      = '';
+             $pushable_records[]         = $tempRecord;
+             $this->success_list[]       = $record;
+         }
 
-        $pushable_records = [];
-        foreach($this->excelRecords as $record)    
-        {
-             if(!$this->isValidSuccessRecord($record))
-                continue;
-            unset($tempRecord);
-            $tempRecord['topic_id']     = $record->topic_id;
-            $tempRecord['subject_id']   = $record->subject_id;
-            $tempRecord['question_type']= $record->question_type;
-            $tempRecord['question']     = $record->question;
-            $tempRecord['total_answers']= 0;
-            $tempRecord['marks']        = $record->marks;
-            $tempRecord['total_correct_answers']= $record->total_answers;
-            $tempRecord['correct_answers']= $this->prepareCorrectAnswers($record);
-            $tempRecord['time_to_spend']= $record->time_to_spend;
-            $tempRecord['difficulty_level']= $record->difficulty_level;
-            $tempRecord['hint']         = ($record->hint) ? $record->hint : '';
-            $tempRecord['explanation']  = ($record->explanation) ? $record->explanation : '';
-            $tempRecord['answers']      = '';
-            $pushable_records[]         = $tempRecord;
-            $this->success_list[]       = $record;
-        }
-
-        return $this->pushToDb($pushable_records);
-    }
+         return $this->pushToDb($pushable_records);
+     }
 
     public function prepareCorrectAnswers($record)
     {
         $answers = [];
-        $list = explode(',',$record->correct_answer);
+        $list = explode(',', $record->correct_answer);
         foreach ($list as $key => $value) {
             $temp['answer'] = $value;
             $answers[] = $temp;
@@ -515,8 +512,7 @@ class QuestionBank extends Model
      */
     public function pushToDb($records)
     {
-        foreach($records as $record)
-        {
+        foreach ($records as $record) {
             $record = (object)$record;
             $question = new QuestionBank();
             $question->topic_id     = $record->topic_id;
@@ -538,8 +534,7 @@ class QuestionBank extends Model
     }
 
      public function isQuestionBookmarked()
-    {
-        return $this->hasOne('\App\Bookmark','item_id','id');
-    }
-
+     {
+         return $this->hasOne('\App\Bookmark', 'item_id', 'id');
+     }
 }

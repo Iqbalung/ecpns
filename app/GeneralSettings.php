@@ -2,26 +2,27 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 use DB;
+
 class GeneralSettings extends Model
 {
     protected $pageLength 		= 10;
 
     protected $staffIDPrefix    = 'ACA';
-    
+
     protected $studentIDPrefix  = 'ACASTU';
-    
+
     protected $studentAdmissionNoLength = 5;
 
     protected $staffSettings	= array();
 
     protected $staffExtraFields = array();
-    
+
     protected $systemDateFormat	= "yyyy/mm/dd";
 
     protected $countries        = array();
-    
+
 
     protected $questionTypes    = array(
                                         ''              => 'Select',
@@ -52,7 +53,7 @@ class GeneralSettings extends Model
      */
     public function setPageLength($length = 10)
     {
-    	$this->pageLength = $length;
+        $this->pageLength = $length;
     }
 
     /**
@@ -60,7 +61,7 @@ class GeneralSettings extends Model
      */
     public function getPageLength()
     {
-    	return $this->pageLength;
+        return $this->pageLength;
     }
 
     /**
@@ -69,7 +70,7 @@ class GeneralSettings extends Model
      */
     public function getStaffIDPrefix()
     {
-    	return $this->staffIDPrefix;
+        return $this->staffIDPrefix;
     }
 
      /**
@@ -138,8 +139,9 @@ class GeneralSettings extends Model
     public function getExamMaxOptions()
     {
         $options = [];
-        for($i=0; $i < $this->examMaxOptions; $i++)
+        for ($i=0; $i < $this->examMaxOptions; $i++) {
             $options[] = $i;
+        }
         return $options;
     }
 }

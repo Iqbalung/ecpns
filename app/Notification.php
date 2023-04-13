@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class Notification extends Model
 {
@@ -12,5 +12,4 @@ class Notification extends Model
     {
         return Notification::where('slug', '=', $slug)->first();
     }
-
 }

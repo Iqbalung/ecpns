@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 use App\QuestionBank;
 use DB;
 
@@ -30,25 +30,24 @@ class Quiz extends Model
      */
     public function getQuestions()
     {
-         return DB::table('questionbank_quizzes')
-                     ->where('quize_id','=',$this->id)
-                     ->orderBy('subject_id')
-                     ->inRandomOrder()
-                     ->get();
+        return DB::table('questionbank_quizzes')
+                    ->where('quize_id', '=', $this->id)
+                    ->orderBy('subject_id')
+                    ->inRandomOrder()
+                    ->get();
     }
 
      /*
      * This method save the quiz questions for resume exam
      * @return [type] [description]
      */
-    public function saveQuizQuestions($questions,$subjects='')
+    public function saveQuizQuestions($questions, $subjects='')
     {
-
-         $record                        = new QuizQuestions();
-         $record->quiz_id               = $this->id;
-         $record->student_id            = \Auth::user()->id;
-         $record->questions_data        = json_encode($questions);
-         $record->save();
+        $record                        = new QuizQuestions();
+        $record->quiz_id               = $this->id;
+        $record->student_id            = \Auth::user()->id;
+        $record->questions_data        = json_encode($questions);
+        $record->save();
     }
 
 
@@ -62,29 +61,23 @@ class Quiz extends Model
         $all_questions  = array();
 
         foreach ($section_data as $sec_data) {
+            $sec_questions   = $sec_data->questions;
 
-          $sec_questions   = $sec_data->questions;
-
-          foreach ($sec_questions as $key => $value) {
-
-             $question  = QuestionBank::where('id',$value)->first();
-             $all_questions[]   = $question;
-
-          }
-
-
+            foreach ($sec_questions as $key => $value) {
+                $question  = QuestionBank::where('id', $value)->first();
+                $all_questions[]   = $question;
+            }
         }
 
         return $all_questions;
     }
 
-    public function prepareQuestions($questions,$type='', $user_id='')
+    public function prepareQuestions($questions, $type='', $user_id='')
     {
-         $final_questions = array();
-         $final_subjects = array();
-         $sno=1;
-        foreach($questions as $r)
-        {
+        $final_questions = array();
+        $final_subjects = array();
+        $sno=1;
+        foreach ($questions as $r) {
             $temp_question = array();
             $temp_subject = array();
             $temp_question       =  QuestionBank::find($r->questionbank_id);
@@ -97,8 +90,9 @@ class Quiz extends Model
             $temp_subject        = Subject::find($r->subject_id);
 
             array_push($final_questions, $temp_question);
-            if(!$this->compareSubjects($final_subjects, $temp_subject))
+            if (!$this->compareSubjects($final_subjects, $temp_subject)) {
                 array_push($final_subjects, $temp_subject);
+            }
         }
 
         return  array('questions' => $final_questions,
@@ -116,20 +110,19 @@ class Quiz extends Model
     public function compareSubjects($final_subjects, $temp_subject)
     {
         $flag = 0;
-        foreach($final_subjects as $sub)
-        {
-            if($sub->id == $temp_subject->id){
-                $flag=1; break;
+        foreach ($final_subjects as $sub) {
+            if ($sub->id == $temp_subject->id) {
+                $flag=1;
+                break;
             }
         }
         return $flag;
     }
 
      public function language()
-    {
-        $language = '';
-        $language = \App\ExamLanguage::where('id','=',2)->first();
-        return $language;
-    }
-
+     {
+         $language = '';
+         $language = \App\ExamLanguage::where('id', '=', 2)->first();
+         return $language;
+     }
 }

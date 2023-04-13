@@ -2,10 +2,11 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 use App\QuizResult;
 use App\Quiz;
 use DB;
+
 class ExamTopper extends Model
 {
     protected $table = 'examtoppers';
@@ -34,23 +35,20 @@ class ExamTopper extends Model
      */
     public function validateWithExamTopper($quiz_id, $user_id, $percentage)
     {
-
         $examSettings = getExamSettings();
-        $eligibleAsTopper = TRUE;
+        $eligibleAsTopper = true;
 
-        if(!$percentage >= $examSettings->topper_percentage) {
-            $eligibleAsTopper = FALSE;
+        if (!$percentage >= $examSettings->topper_percentage) {
+            $eligibleAsTopper = false;
             return $eligibleAsTopper;
         }
         $total_records = $this->isToppersTableEmpty($quiz_id);
-        if($total_records)
-        {
+        if ($total_records) {
             $toppers_with_minimum_percentage = ExamTopper::where('quiz_id', '=', $quiz_id)
                                         ->where('percentage', '<=', $percentage)
                                         ->get()->count();
-            if(!$toppers_with_minimum_percentage && $total_records == $examSettings->maximum_toppers_per_quiz)
-            {
-                return $eligibleAsTopper = FALSE;
+            if (!$toppers_with_minimum_percentage && $total_records == $examSettings->maximum_toppers_per_quiz) {
+                return $eligibleAsTopper = false;
             }
         }
 
@@ -58,7 +56,7 @@ class ExamTopper extends Model
 
         ExamTopper::where('quiz_id', '=', $quiz_id)->delete();
         $rank = 1;
-        foreach($new_list_of_toppers as $newtopper) {
+        foreach ($new_list_of_toppers as $newtopper) {
             $topper = new ExamTopper();
             $topper->slug = $newtopper->slug;
             $topper->user_id = $newtopper->user_id;
@@ -70,7 +68,6 @@ class ExamTopper extends Model
         }
 
         return $eligibleAsTopper;
-
     }
 
     /**
@@ -80,7 +77,7 @@ class ExamTopper extends Model
      */
     public function isToppersTableEmpty($quiz_id)
     {
-        return ExamTopper::where('quiz_id','=',$quiz_id)->get()->count();
+        return ExamTopper::where('quiz_id', '=', $quiz_id)->get()->count();
     }
 
         /**
@@ -122,16 +119,15 @@ class ExamTopper extends Model
 
         return array('rank' => $rank,
                 'total_users'=>$total_users_for_this_quiz);
-
     }
 
     public function findRankOfUser($records, $user_id)
     {
         $rank = 1;
-        foreach($records as $record)
-        {
-            if($record->user_id == $user_id)
+        foreach ($records as $record) {
+            if ($record->user_id == $user_id) {
                 return $rank;
+            }
             $rank++;
         }
         return $rank;
@@ -144,13 +140,11 @@ class ExamTopper extends Model
      */
     public function getBestQuizRecords($quiz_id)
     {
-
-       return  QuizResult::where('quiz_id', '=', $quiz_id)
-                     ->where('percentage','>=',getExamSettings()->topper_percentage)
-                     ->orderBy('percentage', 'desc')
-                     ->groupBy('quiz_id','user_id')
-                     ->get();
-
+        return  QuizResult::where('quiz_id', '=', $quiz_id)
+                      ->where('percentage', '>=', getExamSettings()->topper_percentage)
+                      ->orderBy('percentage', 'desc')
+                      ->groupBy('quiz_id', 'user_id')
+                      ->get();
     }
 
     /**
@@ -160,8 +154,8 @@ class ExamTopper extends Model
      */
     public function getQuizRecords($quiz_id)
     {
-        return QuizResult::where('quiz_id','=',$quiz_id)
-                            ->groupBy('quiz_id','user_id')
+        return QuizResult::where('quiz_id', '=', $quiz_id)
+                            ->groupBy('quiz_id', 'user_id')
                             ->get(['user_id', DB::raw('MAX(percentage) as percentage'),'quiz_id']);
     }
 
@@ -175,23 +169,21 @@ class ExamTopper extends Model
      */
     public function getResultRecords($userSlug, $topperSlug = '')
     {
-        $user_record = QuizResult::where('quizresults.slug','=',$userSlug)->first();
+        $user_record = QuizResult::where('quizresults.slug', '=', $userSlug)->first();
 
         $resultObject = new QuizResult();
         $toppers = array();
         $toppers = $this->getToppersList($user_record->quiz_id);
 
-        $quiz_record = Quiz::where('id',$user_record->quiz_id)->first();
+        $quiz_record = Quiz::where('id', $user_record->quiz_id)->first();
         $total_users  = $this->getUsersInQuiz($user_record->quiz_id);
         $topper_record = array();
 
-        if($topperSlug == '')
-        {
-            if(count($toppers))
-            $topper_record = $toppers[0];
-        }
-
-        else {
+        if ($topperSlug == '') {
+            if (count($toppers)) {
+                $topper_record = $toppers[0];
+            }
+        } else {
             $topper_record = QuizResult::where('slug', '=', $topperSlug)->first();
         }
 
@@ -211,8 +203,8 @@ class ExamTopper extends Model
      */
     public function getUsersInQuiz($quiz_id)
     {
-        return QuizResult::where('quiz_id',$quiz_id)
-                            ->groupBy('quiz_id','user_id')
+        return QuizResult::where('quiz_id', $quiz_id)
+                            ->groupBy('quiz_id', 'user_id')
                             ->get()->count();
     }
 
@@ -226,17 +218,15 @@ class ExamTopper extends Model
     public function getTimeAnalysis($json_data)
     {
         $records = json_decode($json_data);
-         $time_to_spend = 0;
+        $time_to_spend = 0;
         $time_spent = 0;
 
-        if(!count($records))
-        {
+        if (!count($records)) {
             return array('time_to_spend' => $time_to_spend, 'time_spent' => $time_spent);
         }
 
 
-        foreach($records as $record)
-        {
+        foreach ($records as $record) {
             $time_to_spend  += $record->time_to_spend;
             $time_spent     += $record->time_spent;
         }
@@ -252,15 +242,10 @@ class ExamTopper extends Model
 
     public function rankOfUserInQuiz($quiz_id, $user_id)
     {
-
-        $result= QuizResult::where('quiz_id','=',$quiz_id)
-                            ->groupBy('quiz_id','user_id')
-                            ->orderBy('percentage','desc')
+        $result= QuizResult::where('quiz_id', '=', $quiz_id)
+                            ->groupBy('quiz_id', 'user_id')
+                            ->orderBy('percentage', 'desc')
                             ->get(['user_id', DB::raw('MAX(percentage) as percentage'),'quiz_id']);
         return $this->findRankOfUser($result, $user_id);
-
-
-
-
     }
 }

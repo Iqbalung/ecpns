@@ -2,15 +2,15 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class SubscriptionSettings extends Model
 {
     ////////////////////////////
     // Subscription settings  //
     ////////////////////////////
-    protected  $settings = array(
-     'live_mode'				=> FALSE,
+    protected $settings = array(
+     'live_mode'				=> false,
      'test_secret_key'			=> 'sk_test_vzXssRGOW23fFOlBqaHZnRd4',
      'test_public_key'			=> 'pk_test_m7tw4GCJaZk9BlonvnViwZV7',
      'live_secret_key'			=> 'sk_live_4RCGpc2RsLflnrO9g1L5vpTk',
@@ -25,11 +25,11 @@ class SubscriptionSettings extends Model
      * @param  boolean $key [For specific setting ]
      * @return [json]       [description]
      */
-    public function getSettings($key = FALSE)
+    public function getSettings($key = false)
     {
-    	if($key && array_key_exists($key,$settings))
-    		return json_encode($this->settings[$key]);
-    	return json_encode($this->settings);
+        if ($key && array_key_exists($key, $settings)) {
+            return json_encode($this->settings[$key]);
+        }
+        return json_encode($this->settings);
     }
-
 }

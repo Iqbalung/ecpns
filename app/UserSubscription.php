@@ -2,10 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class UserSubscription extends Model
 {
     protected $table = 'site_user_subscription';
-    
 }

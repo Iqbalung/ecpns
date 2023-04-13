@@ -2,16 +2,16 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class Topic extends Model
 {
     public function subject()
     {
-    	return $this->belongsTo('App\Subject');
+        return $this->belongsTo('App\Subject');
     }
 
-   
+
 
     /**
      * Get the list of topics from selected topic
@@ -21,9 +21,9 @@ class Topic extends Model
      */
     public static function getTopics($subject_id, $parent_id = 0)
     {
-    	return Topic::where('parent_id', '=', $parent_id)
-    			->where('subject_id', '=', $subject_id)
-    			->get();
+        return Topic::where('parent_id', '=', $parent_id)
+                ->where('subject_id', '=', $subject_id)
+                ->get();
     }
 
     /**
@@ -32,6 +32,6 @@ class Topic extends Model
      */
     public function getQuestions()
     {
-        return $this->hasMany('App\QuestionBank','topic_id');
+        return $this->hasMany('App\QuestionBank', 'topic_id');
     }
 }

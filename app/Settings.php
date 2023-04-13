@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class Settings extends Model
 {
@@ -22,8 +22,7 @@ class Settings extends Model
      */
     public static function getSetting($key, $setting_module)
     {
-
-       $setting_module     = strtolower($setting_module);
+        $setting_module     = strtolower($setting_module);
         $key      =  strtolower($key);
         return Settings::isSettingAvailable($key, $setting_module);
     }
@@ -38,39 +37,35 @@ class Settings extends Model
      */
     public static function isSettingAvailable($key, $setting_module)
     {
-        if ( env('APP_DEBUG') ) {
+        if (env('APP_DEBUG')) {
             session()->forget('settings');
         }
 
-        if(!session()->has('settings'))
-        {
-            if(!Settings::loadSettingsModule($setting_module))
+        if (!session()->has('settings')) {
+            if (!Settings::loadSettingsModule($setting_module)) {
                 return '';
+            }
         }
 
-      $settings =(array) json_decode(session('settings'));
+        $settings =(array) json_decode(session('settings'));
 
-      /**
-       * Check if key exists in specified module settings data
-       * If not exists return invalid setting
-       */
-      if(!array_key_exists($setting_module, $settings)) {
-
-
-            if(!Settings::loadSettingsModule($setting_module))
-            {
+        /**
+         * Check if key exists in specified module settings data
+         * If not exists return invalid setting
+         */
+        if (!array_key_exists($setting_module, $settings)) {
+            if (!Settings::loadSettingsModule($setting_module)) {
                 return '';
             }
 
-         $settings =(array) json_decode(session('settings'));
+            $settings =(array) json_decode(session('settings'));
         }
         $sub_settings = (array) $settings[$setting_module];
 
-        if(!array_key_exists($key, $sub_settings))
-        {
+        if (!array_key_exists($key, $sub_settings)) {
             return '';
         }
-            return $sub_settings[$key]->value;
+        return $sub_settings[$key]->value;
     }
 
     /**
@@ -83,10 +78,11 @@ class Settings extends Model
      */
     public static function loadSettingsModule($setting_module)
     {
-        $setting_record = Settings::where('key','=',$setting_module)->first();
+        $setting_record = Settings::where('key', '=', $setting_module)->first();
 
-        if(!$setting_record)
-            return FALSE;
+        if (!$setting_record) {
+            return false;
+        }
 
         $data = json_decode($setting_record->settings_data);
 
@@ -100,7 +96,6 @@ class Settings extends Model
         session()->put('settings', json_encode($global_settings));
 
 
-        return TRUE;
+        return true;
     }
-
 }

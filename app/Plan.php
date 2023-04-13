@@ -2,14 +2,14 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 use DB;
 use Spatie\Activitylog\LogsActivityInterface;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Plan extends Model
 {
-	use LogsActivity;
+    use LogsActivity;
     protected $table = 'plans';
     protected static $logAttributes = ['title', 'name', 'slug', 'amount', 'type'];
 
@@ -23,6 +23,4 @@ class Plan extends Model
     {
         return 'plans_module';
     }
-
-
 }

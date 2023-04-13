@@ -2,14 +2,14 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 use App\Topic;
+
 class Subject extends Model
 {
-    
     public function topics()
     {
-    	return $this->hasMany('App\Topic');
+        return $this->hasMany('App\Topic');
     }
 
 
@@ -21,10 +21,10 @@ class Subject extends Model
 
     public function course()
     {
-    	return $this->belongsToMany('App\Course','course_subject','subject_id','academic_course_id')->withPivot('year','semister', 'sessions_needed')->withTimestamps();
+        return $this->belongsToMany('App\Course', 'course_subject', 'subject_id', 'academic_course_id')->withPivot('year', 'semister', 'sessions_needed')->withTimestamps();
     }
 
-   
+
 
     public static function getRecordWithSlug($slug)
     {
@@ -33,6 +33,6 @@ class Subject extends Model
 
     public static function getName($subject_id)
     {
-        return Subject::where('id',$subject_id)->first()->subject_title;
+        return Subject::where('id', $subject_id)->first()->subject_title;
     }
 }

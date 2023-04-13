@@ -2,14 +2,13 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
- 
+use App\Core\Model;
+
 class PdfGenerator extends Model
 {
-	public $html_data = '';
-  
-  public function generatePDF()
-  {
-   
-  }
+    public $html_data = '';
+
+    public function generatePDF()
+    {
+    }
 }

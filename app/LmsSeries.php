@@ -2,11 +2,12 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 use DB;
+
 class LmsSeries extends Model
 {
-   protected $table = 'lmsseries';
+    protected $table = 'lmsseries';
 
     public static function getRecordWithSlug($slug)
     {
@@ -27,51 +28,40 @@ class LmsSeries extends Model
 
     public static function getFreeSeries($limit=0)
     {
-         $records  = LmsSeries::where('show_in_front',1)
-                                ->groupby('lms_category_id')
-                                ->orderby('created_at','desc')
-                                ->pluck('lms_category_id')
-                                ->toArray();
-        if($limit > 0){
-
-          $lms_cats  = LmsCategory::whereIn('id',$records)->orderby('created_at','desc')->limit(6)->get();
-        }
-        else{
-
-          $lms_cats  = LmsCategory::whereIn('id',$records)->orderby('created_at','desc')->get();
-
+        $records  = LmsSeries::where('show_in_front', 1)
+                               ->groupby('lms_category_id')
+                               ->orderby('created_at', 'desc')
+                               ->pluck('lms_category_id')
+                               ->toArray();
+        if ($limit > 0) {
+            $lms_cats  = LmsCategory::whereIn('id', $records)->orderby('created_at', 'desc')->limit(6)->get();
+        } else {
+            $lms_cats  = LmsCategory::whereIn('id', $records)->orderby('created_at', 'desc')->get();
         }
         return $lms_cats;
-
     }
 
 
     public function viewContents($limit= '')
     {
+        $contents_data   = LmsSeriesData::where('lmsseries_id', $this->id)
+                                    ->pluck('lmscontent_id')
+                                    ->toArray();
 
-      $contents_data   = LmsSeriesData::where('lmsseries_id',$this->id)
-                                  ->pluck('lmscontent_id')
-                                  ->toArray();
+        if ($contents_data) {
+            if ($limit!='') {
+                $contents  = LmsContent::whereIn('id', $contents_data)->paginate($limit);
+            } else {
+                $contents  = LmsContent::whereIn('id', $contents_data)->get();
+            }
 
-       if($contents_data){
+            if ($contents) {
+                return $contents;
+            }
 
-        if($limit!=''){
-
-         $contents  = LmsContent::whereIn('id',$contents_data)->paginate($limit);
-        }else{
-         $contents  = LmsContent::whereIn('id',$contents_data)->get();
-
+            return false;
         }
 
-         if($contents)
-         return $contents;
-
-          return FALSE;
-
-       }
-
-       return FALSE;
-
+        return false;
     }
-
 }

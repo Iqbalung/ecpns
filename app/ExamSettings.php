@@ -2,14 +2,14 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 
 class ExamSettings extends Model
 {
-   ////////////////////////////
+    ////////////////////////////
     // Exam upload options //
     ////////////////////////////
-    protected  $settings = array(
+    protected $settings = array(
      'categoryImagepath'     	=> "public/uploads/exams/categories/",
      'defaultCategoryImage'     => "default.png",
      'seriesImagepath'          => "public/uploads/exams/series/",
@@ -21,18 +21,18 @@ class ExamSettings extends Model
      'maximum_toppers_per_quiz'        => 10,
      );
 
- 
+
 
     /**
      * This method returns the settings related to Library System
      * @param  boolean $key [For specific setting ]
      * @return [json]       [description]
      */
-    public function getSettings($key = FALSE)
+    public function getSettings($key = false)
     {
-    	if($key && array_key_exists($key,$settings))
-    		return json_encode($this->settings[$key]);
-    	return json_encode($this->settings);
+        if ($key && array_key_exists($key, $settings)) {
+            return json_encode($this->settings[$key]);
+        }
+        return json_encode($this->settings);
     }
-
 }

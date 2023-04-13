@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Core\Model;
 use App\Faq;
 
 class FaqCategory extends Model
@@ -17,6 +17,6 @@ class FaqCategory extends Model
 
     public function getFaqs()
     {
-    	return $this->hasMany(Faq::class, 'category_id', 'id');
+        return $this->hasMany(Faq::class, 'category_id', 'id');
     }
 }
