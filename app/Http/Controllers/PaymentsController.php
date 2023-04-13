@@ -444,7 +444,7 @@ class PaymentsController extends Controller
                         'status'  => $notif->transaction_status,
                     ]);
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_DENY) {
-                    // Do nothing coz customer can select other payment methods
+                    $this->processMidtransFailedPayment($payment, $notif);
                     return response()->json([
                         'message' => "Payment using " . $notif->payment_type . " for transaction order_id: " . $notif->order_id . " is denied.",
                         'status'  => $notif->transaction_status
@@ -555,6 +555,9 @@ class PaymentsController extends Controller
         } elseif ($notification->transaction_status == MidtransNotification::TRANSACTION_CANCEL) {
             // Add notes
             $payment_record->notes = "Payment using " . $notification->payment_type . " for transaction order_id: " . $notification->order_id . " is canceled.";
+        } elseif ($notification->transaction_status == MidtransNotification::TRANSACTION_DENY) {
+            // Add notes
+            $payment_record->notes = "Payment using " . $notification->payment_type . " for transaction order_id: " . $notification->order_id . " is denied.";
         }
 
         $payment_record->save();
