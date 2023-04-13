@@ -417,6 +417,10 @@ class PaymentsController extends Controller
                         if ($notif->fraud_status == MidtransNotification::FRAUD_STATUS_CHALLENGE) {
                             // TODO set payment status in merchant's database to 'Challenge by FDS'
                             // TODO merchant should decide whether this transaction is authorized or not in MAP
+                            return response()->json([
+                                'message' => "Transaction order_id: " . $notif->order_id . " is challenged by FDS.",
+                                'status'  => $notif->transaction_status
+                            ]);
                         } else {
                             // Payment success
                             $this->processMidtransSuccessPayment($payment, $notif);
@@ -440,7 +444,11 @@ class PaymentsController extends Controller
                         'status'  => $notif->transaction_status,
                     ]);
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_DENY) {
-                    // TODO set payment status in merchant's database to 'Denied'
+                    // Do nothing coz customer can select other payment methods
+                    return response()->json([
+                        'message' => "Payment using " . $notif->payment_type . " for transaction order_id: " . $notif->order_id . " is denied.",
+                        'status'  => $notif->transaction_status
+                    ]);
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_EXPIRE) {
                     $this->processMidtransFailedPayment($payment, $notif);
                     return response()->json([
