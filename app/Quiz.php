@@ -4,7 +4,7 @@ namespace App;
 
 use App\Core\Model;
 use App\QuestionBank;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class Quiz extends Model
 {

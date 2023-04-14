@@ -34,8 +34,6 @@ define('BASE_PATH', $base.'/');
 define('PREFIX', $base);
 
 
-
-
 define('URL_HOME', PREFIX.'home');
 
 //Design Source File Paths
@@ -93,7 +91,7 @@ define('PAYMENT_STATUS_CANCELLED', 'cancelled');
 define('PAYMENT_STATUS_SUCCESS', 'success');
 define('PAYMENT_STATUS_PENDING', 'pending');
 define('PAYMENT_STATUS_ABORTED', 'aborted');
-define('PAYMENT_RECORD_MAXTIME', '30'); //TIME IN MINUTES
+define('PAYMENT_RECORD_MAXTIME', '60'); //TIME IN MINUTES
 
 define('URL_INSTALL_SYSTEM', PREFIX.'install');
 define('URL_UPDATE_INSTALLATATION_DETAILS', PREFIX.'update-details');

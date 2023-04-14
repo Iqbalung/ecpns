@@ -659,7 +659,6 @@ class PaymentsController extends Controller
         return null;
     }
 
-
     public function paypal_cancel()
     {
         if ($this->paymentFailed()) {
@@ -830,8 +829,6 @@ class PaymentsController extends Controller
 
         $slug = $params[1];
 
-
-
         $payment_record = Payment::where('slug', '=', $slug)->first();
 
         if ($this->processPaymentRecord($payment_record)) {
@@ -916,27 +913,27 @@ class PaymentsController extends Controller
     public function selectCustomPackage(Request $request)
     {
         $rules = [
-         'validity'     => 'required',
-         'validity_type'     => 'required',
+            'validity'      => 'required',
+            'validity_type' => 'required',
         ];
 
         $this->validate($request, $rules);
 
         $record = new \App\Package();
 
-        $name           = $request->validity_type;
+        $name               = $request->validity_type;
         $record->name       = $name;
         $record->slug       = $record->makeSlug($name);
-        $record->validity = $request->validity;
+        $record->validity   = $request->validity;
 
         $parts = explode('_', $name);
-        $record->validity_type    = $parts[0];
+        $record->validity_type = $parts[0];
 
         $amount = $parts[1] * $request->validity;
-        $record->amount    = $amount;
-        $record->description    = 'Custom Package';
-        $record->status     = 1;
-        $record->type     = 'temp';
+        $record->amount      = $amount;
+        $record->description = 'Custom Package';
+        $record->status      = 1;
+        $record->type        = 'temp';
         $record->save();
 
         return redirect(URL_PAYMENTS_CHECKOUT . 'subscribe/' . $record->slug);
@@ -1037,6 +1034,7 @@ class PaymentsController extends Controller
             $record->cost = $record->amount;
             $record->title = $record->name;
         }
+
         $user = Auth::user();
         //Check if user is already paid to the same item and the item is in valid date
 
@@ -1047,6 +1045,7 @@ class PaymentsController extends Controller
             foreach ($children_ids as $key => $value) {
                 $is_paid[]  = Payment::isParentPurchased($record->id, $type, $value);
             }
+
             $paid_staus  = in_array('notpurchased', $is_paid);
 
             if (!$paid_staus) {
@@ -1061,27 +1060,31 @@ class PaymentsController extends Controller
             flash('Hey '.$user->name, 'you_already_purchased_this_item', 'overlay');
             return back();
         }
+
         $active_class = 'lms';
         if ($type == 'combo' || $type=='exams'|| $type=='exam') {
             $active_class = 'exams';
         }
-        $data['active_class']       = $active_class;
-        $data['pay_by']             = '';
-        $data['title']              = $record->title;
-        $data['item_type']          = $type;
-        $data['item']               = $record;
+
+        $data['active_class']     = $active_class;
+        $data['pay_by']           = '';
+        $data['title']            = $record->title;
+        $data['item_type']        = $type;
+        $data['item']             = $record;
         $current_theme            = getDefaultTheme();
+
         if ($current_theme == 'default') {
             $data['right_bar']          = false;
             $data['right_bar_class']   	= 'order-user-details';
             $data['right_bar_path']     = 'student.payments.billing-address-right-bar';
             $data['right_bar_data']     = array(
-                                                'item' => $record,
-                                                );
+                'item' => $record,
+            );
         }
 
-        $data['layout']              = getLayout();
+        $data['layout'] = getLayout();
         $data['parent_user'] = false;
+
         if (checkRole(getUserGrade(7))) {
             $data['parent_user'] = true;
             $data['children'] = App\User::where('parent_id', '=', $user->id)->get();
@@ -1089,8 +1092,8 @@ class PaymentsController extends Controller
 
         $data['use_razorpay']   = false;
 
-
         $view_name = getTheme().'::student.payments.checkout';
+
         return view($view_name, $data);
     }
 
@@ -1137,8 +1140,8 @@ class PaymentsController extends Controller
         $token = $this->preserveBeforeSave($item, $payment_data->type, $payment_gateway, $other_details);
 
         try {
-            $owner       = App\User::where('role_id', 1)->first();
-            $paid_user    = getUserRecord();
+            $owner     = App\User::where('role_id', 1)->first();
+            $paid_user = getUserRecord();
             $owner->notify(new \App\Notifications\UserOfflinePaymentSubmit($owner, $paid_user, $item));
             $paid_user->notify(new \App\Notifications\PaidUserOfflinePayment($paid_user, $item));
         } catch (Exception $e) {
@@ -1225,16 +1228,16 @@ class PaymentsController extends Controller
             return back();
         }
 
-
-        $data['active_class']       = 'reports';
-        $data['title']              = getPhrase('online_payments');
-        $data['payments']           = (object)$this->prepareSummaryRecord('online');
-        $data['payments_chart_data']= (object)$this->getPaymentStats($data['payments']);
+        $data['active_class']          = 'reports';
+        $data['title']                 = getPhrase('online_payments');
+        $data['payments']              = (object)$this->prepareSummaryRecord('online');
+        $data['payments_chart_data']   = (object)$this->getPaymentStats($data['payments']);
         $data['payments_monthly_data'] = (object)$this->getPaymentMonthlyStats();
-        $data['payment_mode']      = 'online';
-        $data['layout']             = getLayout();
+        $data['payment_mode']          = 'online';
+        $data['layout']                = getLayout();
 
         $view_name = getTheme().'::payments.reports.payments-report';
+
         return view($view_name, $data);
     }
 
@@ -1257,8 +1260,9 @@ class PaymentsController extends Controller
         $payment = new Payment();
         $this->updatePaymentTransactionRecords($payment->updateTransactionRecords('online'));
 
-        $data['active_class']       = 'reports';
-        $data['payments_mode']      = getPhrase('online_payments');
+        $data['active_class']  = 'reports';
+        $data['payments_mode'] = getPhrase('online_payments');
+
         if ($slug=='all') {
             $data['title']              = getPhrase('all_payments');
         } elseif ($slug=='success') {
@@ -1268,6 +1272,7 @@ class PaymentsController extends Controller
         } elseif ($slug='cancelled') {
             $data['title']              = getPhrase('cancelled_list');
         }
+
         $data['layout']             = getLayout();
         $data['ajax_url']           = URL_ONLINE_PAYMENT_REPORT_DETAILS_AJAX.$slug;
         $data['payment_mode']       = 'online';
@@ -1284,82 +1289,83 @@ class PaymentsController extends Controller
         }
     }
 
-     public function getOnlinePaymentReportsDatatable($slug)
-     {
-         if (!checkRole(getUserGrade(2))) {
-             prepareBlockUserMessage();
-             return back();
-         }
+    public function getOnlinePaymentReportsDatatable($slug)
+    {
+        if (!checkRole(getUserGrade(2))) {
+            prepareBlockUserMessage();
+            return back();
+        }
 
-         $records = Payment::join('users', 'users.id', '=', 'payments.user_id')
+        $records = Payment::join('users', 'users.id', '=', 'payments.user_id')
+            ->select(['users.image', 'users.name',  'item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway','payments.updated_at','payment_status','payments.cost', 'payments.after_discount', 'payments.paid_amount','payments.id' ])
+            ->where('payment_gateway', '!=', 'offline')
+            ->orderBy('updated_at', 'desc');
 
-         ->select(['users.image', 'users.name',  'item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway','payments.updated_at','payment_status','payments.cost', 'payments.after_discount', 'payments.paid_amount','payments.id' ])
-         ->where('payment_gateway', '!=', 'offline')
-         ->orderBy('updated_at', 'desc');
-         if ($slug!='all') {
-             $records->where('payment_status', '=', $slug);
-         }
-         return Datatables::of($records)
+        if ($slug!='all') {
+            $records->where('payment_status', '=', $slug);
+        }
 
-           ->editColumn('payment_status', function ($records) {
-               $rec = '';
-               if ($records->payment_status==PAYMENT_STATUS_CANCELLED) {
-                   $rec = '<span class="label label-danger">'.ucfirst($records->payment_status).'</span>';
-               } elseif ($records->payment_status==PAYMENT_STATUS_PENDING) {
-                   $rec = '<span class="label label-info">'.ucfirst($records->payment_status).'</span>';
-               } elseif ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                   $view_invoice = '&nbsp;|&nbsp;<a href="'.route('payments.view_invoice', $records->id).'" class="btn btn-xs btn-success button">'.getPhrase('invoice').'</a>';
-                   $rec = '<span class="label label-success">'.ucfirst($records->payment_status).'</span>' . $view_invoice;
-               }
-               return $rec;
-           })
-           ->editColumn('image', function ($records) {
-               return '<img src="'.getProfilePath($records->image).'"  /> ';
-           })
-           ->editColumn('name', function ($records) {
-               return ucfirst($records->name);
-           })
+        return Datatables::of($records)
 
-           ->editColumn('plan_type', function ($records) {
-               return ucfirst($records->plan_type);
-           })
-           ->editColumn('payment_gateway', function ($records) {
-               $text =  ucfirst($records->payment_gateway);
+          ->editColumn('payment_status', function ($records) {
+              $rec = '';
+              if ($records->payment_status==PAYMENT_STATUS_CANCELLED) {
+                  $rec = '<span class="label label-danger">'.ucfirst($records->payment_status).'</span>';
+              } elseif ($records->payment_status==PAYMENT_STATUS_PENDING) {
+                  $rec = '<span class="label label-info">'.ucfirst($records->payment_status).'</span>';
+              } elseif ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
+                  $view_invoice = '&nbsp;|&nbsp;<a href="'.route('payments.view_invoice', $records->id).'" class="btn btn-xs btn-success button">'.getPhrase('invoice').'</a>';
+                  $rec = '<span class="label label-success">'.ucfirst($records->payment_status).'</span>' . $view_invoice;
+              }
+              return $rec;
+          })
+          ->editColumn('image', function ($records) {
+              return '<img src="'.getProfilePath($records->image).'"  /> ';
+          })
+          ->editColumn('name', function ($records) {
+              return ucfirst($records->name);
+          })
 
-               if ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                   $extra = '<ul class="list-unstyled payment-col clearfix"><li>'.$text.'</li>';
-                   $extra .='<li><p>Cost:'.$records->cost.'</p><p>Aftr Dis.:'.$records->after_discount.'</p><p>Paid:'.$records->paid_amount.'</p></li></ul>';
-                   return $extra;
-               }
-               return $text;
-           })
-           ->editColumn('start_date', function ($records) {
-               if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
-                   return '-';
-               }
-               return $records->start_date;
-           })
-           ->editColumn('end_date', function ($records) {
-               if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
-                   return '-';
-               }
-               return $records->end_date;
-           })
+          ->editColumn('plan_type', function ($records) {
+              return ucfirst($records->plan_type);
+          })
+          ->editColumn('payment_gateway', function ($records) {
+              $text =  ucfirst($records->payment_gateway);
 
-           ->removeColumn('id')
-           ->removeColumn('users.image')
-           ->removeColumn('action')
-           ->make();
-     }
+              if ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
+                  $extra = '<ul class="list-unstyled payment-col clearfix"><li>'.$text.'</li>';
+                  $extra .='<li><p>Cost:'.$records->cost.'</p><p>Aftr Dis.:'.$records->after_discount.'</p><p>Paid:'.$records->paid_amount.'</p></li></ul>';
+                  return $extra;
+              }
+              return $text;
+          })
+          ->editColumn('start_date', function ($records) {
+              if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
+                  return '-';
+              }
+              return $records->start_date;
+          })
+          ->editColumn('end_date', function ($records) {
+              if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
+                  return '-';
+              }
+              return $records->end_date;
+          })
+
+          ->removeColumn('id')
+          ->removeColumn('users.image')
+          ->removeColumn('action')
+          ->make();
+    }
 
 
     /**
-      * This method redirects the user to view the onlinepayments reports dashboard
-      * It contains an optional slug, if slug is null it will redirect the user to dashboard
-      * If the slug is success/failed/cancelled/all it will show the appropriate result based on slug status from payments table
-      * @param  string $slug [description]
-      * @return [type]       [description]
-      */
+     * This method redirects the user to view the onlinepayments reports dashboard
+     * It contains an optional slug, if slug is null it will redirect the user to dashboard
+     * If the slug is success/failed/cancelled/all it will show the appropriate result based on slug status from payments table
+     * @param  string $slug [description]
+     * @return [type]       [description]
+     */
     public function offlinePaymentsReport()
     {
         if (!checkRole(getUserGrade(2))) {
@@ -1578,7 +1584,7 @@ class PaymentsController extends Controller
         return $payments_stats;
     }
 
-     /**
+    /**
      * This method returns the overall monthly summary of the payments made with status success
      * @return [type] [description]
      */
@@ -1699,306 +1705,307 @@ class PaymentsController extends Controller
         $this->downloadExcel();
     }
 
-  public function getPaymentRecords()
-  {
-      return $this->payment_records;
-  }
-
-  public function downloadExcel()
-  {
-      if (!checkRole(getUserGrade(2))) {
-          prepareBlockUserMessage();
-          return back();
-      }
-      Excel::create('payments_report', function ($excel) {
-          $excel->sheet('payments_records', function ($sheet) {
-              $sheet->row(1, array('sno','ItemID', 'Purchased Item Name','User ID','Plan Startdate','Plan Enddate','Subscription Type', 'Payment Gateway', 'TransactionID','Paid by parent', 'Paid UserID', 'Cost', 'Coupon Applied', 'CouponID', 'Actual Cost', 'Discount Amount', 'After Discount', 'Paid Amount', 'Payment status', 'created_datetime','updated_datetime'));
-              $records = $this->getPaymentRecords();
-              $cnt = 2;
-              foreach ($records as $item) {
-                  $item_type = ucfirst($item->plan_type);
-                  if ($item->plan_type=='combo') {
-                      $item_type = 'Exam Series';
-                  }
-
-                  $sheet->appendRow($cnt, array(($cnt-1), $item->item_id, $item->item_name, $item->user_id, $item->start_date, $item->end_date, $item_type, $item->payment_gateway, $item->transaction_id, $item->paid_by_parent, $item->paid_by, $item->cost, $item->coupon_applied, $item->coupon_id, $item->actual_cost, $item->discount_amount, $item->after_discount, $item->paid_amount, $item->payment_status, $item->created_at, $item->updated_at));
-                  $cnt++;
-              }
-          });
-      })->download('xlsx');
-  }
-
-public function getPaymentRecord(Request $request)
-{
-    if (!checkRole(getUserGrade(2))) {
-        prepareBlockUserMessage();
-        return back();
-    }
-    $payment_record = Payment::where('id', '=', $request->record_id)->first();
-    $result['status'] = 0;
-    $result['record'] = null;
-    if ($payment_record) {
-        $result['status'] = 1;
-        $result['record'] = $payment_record;
-    }
-    return json_encode($result);
-}
-
-public function validateAndApproveZeroDiscount($token, Request $request)
-{
-    $payment_record = Payment::where('slug', '=', $token)->first();
-
-
-    return $this->approvePayment($payment_record, $request, 1);
-}
-
-public function approvePayment(Payment $payment_record, Request $request, $iscoupon_zero = 0)
-{
-    if ($payment_record->plan_type == 'combo') {
-        $item_model = new ExamSeries();
+    public function getPaymentRecords()
+    {
+        return $this->payment_records;
     }
 
-
-    if ($payment_record->plan_type == 'exam') {
-        $item_model = new Quiz();
-    }
-
-    if ($payment_record->plan_type == 'lms') {
-        $item_model = new LmsSeries();
-    }
-
-    if ($payment_record->plan_type == 'subscribe') {
-        $item_model = new Package();
-    }
-
-    $item_details = $item_model->where('id', '=', $payment_record->item_id)->first();
-
-    if ($payment_record->plan_type == 'subscribe') {
-        $validity = $item_details->validity;
-        $validity_type = $item_details->validity_type;
-        $days = $validity;
-        switch ($validity_type) {
-            case 'Day':
-                $days = $validity * 1;
-                break;
-            case 'Week':
-                $days = $validity * 7;
-                break;
-            case 'Month':
-                $days = $validity * 30;
-                break;
-            case 'Year':
-                $days = $validity * 365;
-                break;
+    public function downloadExcel()
+    {
+        if (!checkRole(getUserGrade(2))) {
+            prepareBlockUserMessage();
+            return back();
         }
-        $daysToAdd = '+'.$days.'days';
-    } else {
-        $daysToAdd = '+'.$item_details->validity.'days';
+
+        Excel::create('payments_report', function ($excel) {
+            $excel->sheet('payments_records', function ($sheet) {
+                $sheet->row(1, array('sno','ItemID', 'Purchased Item Name','User ID','Plan Startdate','Plan Enddate','Subscription Type', 'Payment Gateway', 'TransactionID','Paid by parent', 'Paid UserID', 'Cost', 'Coupon Applied', 'CouponID', 'Actual Cost', 'Discount Amount', 'After Discount', 'Paid Amount', 'Payment status', 'created_datetime','updated_datetime'));
+                $records = $this->getPaymentRecords();
+                $cnt = 2;
+                foreach ($records as $item) {
+                    $item_type = ucfirst($item->plan_type);
+                    if ($item->plan_type=='combo') {
+                        $item_type = 'Exam Series';
+                    }
+
+                    $sheet->appendRow($cnt, array(($cnt-1), $item->item_id, $item->item_name, $item->user_id, $item->start_date, $item->end_date, $item_type, $item->payment_gateway, $item->transaction_id, $item->paid_by_parent, $item->paid_by, $item->cost, $item->coupon_applied, $item->coupon_id, $item->actual_cost, $item->discount_amount, $item->after_discount, $item->paid_amount, $item->payment_status, $item->created_at, $item->updated_at));
+                    $cnt++;
+                }
+            });
+        })->download('xlsx');
     }
 
-    $payment_record->start_date = date('Y-m-d');
-    $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
+    public function getPaymentRecord(Request $request)
+    {
+        if (!checkRole(getUserGrade(2))) {
+            prepareBlockUserMessage();
+            return back();
+        }
 
-    $details_before_payment          = (object)json_decode($payment_record->other_details);
-    $payment_record->coupon_applied  = $details_before_payment->is_coupon_applied;
-    $payment_record->coupon_id       = $details_before_payment->coupon_id;
-    $payment_record->actual_cost     = $details_before_payment->actual_cost;
-    $payment_record->discount_amount = $details_before_payment->discount_availed;
-    $payment_record->after_discount  = $details_before_payment->after_discount;
-    $payment_record->paid_amount     = $details_before_payment->after_discount;
+        $payment_record = Payment::where('id', '=', $request->record_id)->first();
+        $result['status'] = 0;
+        $result['record'] = null;
 
-    if (!$iscoupon_zero) {
-        $payment_record->admin_comments = $request->admin_comment;
+        if ($payment_record) {
+            $result['status'] = 1;
+            $result['record'] = $payment_record;
+        }
+
+        return json_encode($result);
     }
 
-    $payment_record->payment_status = PAYMENT_STATUS_SUCCESS;
+    public function validateAndApproveZeroDiscount($token, Request $request)
+    {
+        $payment_record = Payment::where('slug', '=', $token)->first();
 
-    $user = getUserRecord($payment_record->user_id);
+        return $this->approvePayment($payment_record, $request, 1);
+    }
 
-    $email_template = 'offline_subscription_success';
-    try {
-        if ($iscoupon_zero) {
-            $email_template = 'subscription_success';
-            $subject  = getPhrase($email_template);
-            $template     = new EmailTemplate();
-            $content_data   =  $template->sendEmailNotification(
-                $email_template,
-                array('username'  =>$user->name,
-                      'plan'     => $payment_record->plan_type,
-                      'to_email' => $user->email)
-            );
+    public function approvePayment(Payment $payment_record, Request $request, $iscoupon_zero = 0)
+    {
+        if ($payment_record->plan_type == 'combo') {
+            $item_model = new ExamSeries();
+        }
 
+        if ($payment_record->plan_type == 'exam') {
+            $item_model = new Quiz();
+        }
 
+        if ($payment_record->plan_type == 'lms') {
+            $item_model = new LmsSeries();
+        }
 
-            try {
-                $user->notify(new \App\Notifications\AdminApproveOfflinePayment($user, $payment_record->plan_type));
-            } catch (Exception $e) {
+        if ($payment_record->plan_type == 'subscribe') {
+            $item_model = new Package();
+        }
+
+        $item_details = $item_model->where('id', '=', $payment_record->item_id)->first();
+
+        if ($payment_record->plan_type == 'subscribe') {
+            $validity = $item_details->validity;
+            $validity_type = $item_details->validity_type;
+            $days = $validity;
+            switch ($validity_type) {
+                case 'Day':
+                    $days = $validity * 1;
+                    break;
+                case 'Week':
+                    $days = $validity * 7;
+                    break;
+                case 'Month':
+                    $days = $validity * 30;
+                    break;
+                case 'Year':
+                    $days = $validity * 365;
+                    break;
             }
+            $daysToAdd = '+'.$days.'days';
         } else {
-            $template    = new EmailTemplate();
-            $subject  = getPhrase($email_template);
-            $content_data =  $template->sendEmailNotification(
-                $email_template,
-                array('username' =>$user->name,
-                      'plan'     => $payment_record->plan_type,
-                      'to_email' => $user->email,
-                      'admin_comment'=>$request->admin_comment)
-            );
-
-            try {
-                $user->notify(new \App\Notifications\AdminApproveOfflinePayment($user, $payment_record->plan_type));
-            } catch (Exception $e) {
-            }
+            $daysToAdd = '+'.$item_details->validity.'days';
         }
-    } catch(Exception $ex) {
-        $message = getPhrase('\ncannot_send_email_to_user, please_check_your_server_settings');
-        $exception = 1;
+
+        $payment_record->start_date = date('Y-m-d');
+        $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
+
+        $details_before_payment          = (object)json_decode($payment_record->other_details);
+        $payment_record->coupon_applied  = $details_before_payment->is_coupon_applied;
+        $payment_record->coupon_id       = $details_before_payment->coupon_id;
+        $payment_record->actual_cost     = $details_before_payment->actual_cost;
+        $payment_record->discount_amount = $details_before_payment->discount_availed;
+        $payment_record->after_discount  = $details_before_payment->after_discount;
+        $payment_record->paid_amount     = $details_before_payment->after_discount;
+
+        if (!$iscoupon_zero) {
+            $payment_record->admin_comments = $request->admin_comment;
+        }
+
+        $payment_record->payment_status = PAYMENT_STATUS_SUCCESS;
+
+        $user = getUserRecord($payment_record->user_id);
+
+        $email_template = 'offline_subscription_success';
+        try {
+            if ($iscoupon_zero) {
+                $email_template = 'subscription_success';
+                $subject  = getPhrase($email_template);
+                $template     = new EmailTemplate();
+                $content_data   =  $template->sendEmailNotification(
+                    $email_template,
+                    array('username'  =>$user->name,
+                          'plan'     => $payment_record->plan_type,
+                          'to_email' => $user->email)
+                );
+
+
+
+                try {
+                    $user->notify(new \App\Notifications\AdminApproveOfflinePayment($user, $payment_record->plan_type));
+                } catch (Exception $e) {
+                }
+            } else {
+                $template    = new EmailTemplate();
+                $subject  = getPhrase($email_template);
+                $content_data =  $template->sendEmailNotification(
+                    $email_template,
+                    array('username' =>$user->name,
+                          'plan'     => $payment_record->plan_type,
+                          'to_email' => $user->email,
+                          'admin_comment'=>$request->admin_comment)
+                );
+
+                try {
+                    $user->notify(new \App\Notifications\AdminApproveOfflinePayment($user, $payment_record->plan_type));
+                } catch (Exception $e) {
+                }
+            }
+        } catch(Exception $ex) {
+            $message = getPhrase('\ncannot_send_email_to_user, please_check_your_server_settings');
+            $exception = 1;
+        }
+
+           $payment_record->save();
+
+        if ($payment_record->coupon_applied) {
+            $this->couponcodes_usage($payment_record);
+        }
+
+        return true;
     }
 
-       $payment_record->save();
+    public function razorpaySuccess(Request $request)
+    {
+        $user    = Auth::user();
+        //Input items of form
+        $input = Input::all();
 
-    if ($payment_record->coupon_applied) {
-        $this->couponcodes_usage($payment_record);
+        //get API Configuration
+        $api = new Api(env('RAZORPAY_APIKEY'), env('RAZORPAY_SECRET'));
+        //Fetch payment information by razorpay_payment_id
+        $payment = $api->payment->fetch($input['razorpay_payment_id']);
+
+        if (count($input)  && !empty($input['razorpay_payment_id'])) {
+            try {
+                $response = $api->payment->fetch($input['razorpay_payment_id'])->capture(array('amount'=>$payment['amount']));
+
+                $item = $this->getPackageDetails($request->type, $request->item_name);
+                $user = getUserRecord();
+
+                if ($request->parent_user) {
+                    $user = getUserRecord($request->selected_child_id);
+                }
+
+                $payment_record                  = new Payment();
+                $payment_record->transaction_id  = $request->razorpay_payment_id;
+                $payment_record->item_id         = $item->id;
+                $payment_record->item_name       = $item->title;
+                $payment_record->plan_type       = $request->type;
+                $payment_record->payment_gateway = 'Razorpay';
+                $payment_record->slug            = $payment_record::makeSlug(getHashCode());
+                $payment_record->cost            = $item->cost;
+                $payment_record->user_id         = $user->id;
+                $payment_record->payment_status  = PAYMENT_STATUS_SUCCESS;
+                $payment_record->coupon_applied  = $request->is_coupon_applied;
+                $payment_record->coupon_id       = $request->coupon_id;
+                $payment_record->actual_cost     = $request->actual_cost;
+                $payment_record->discount_amount = $request->discount_availed;
+                $payment_record->after_discount  = $request->after_discount;
+                $payment_record->paid_by         = $response->email;
+                $payment_record->paid_amount     = $request->after_discount;
+                $payment_record->paid_by_parent  = $request->parent_user;
+
+                $daysToAdd = '+'.$item->validity.'days';
+
+                $payment_record->start_date = date('Y-m-d');
+                $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
+
+                $payment_record->save();
+
+                if ($payment_record->coupon_applied) {
+                    $this->couponcodes_usage($payment_record);
+                }
+
+                $this->sendEmail($user->id, $payment_record->id);
+            } catch (\Exception $e) {
+                flash('Ooops..!', $e->getMessage(), 'overlay');
+                return redirect(URL_PAYMENTS_CHECKOUT.$request->type.'/'.$request->item_name);
+            }
+
+            flash('success', 'your_payment_done_successfully', 'success');
+            return redirect(URL_PAYMENTS_LIST.$user->slug);
+
+            // Do something here for store payment details in database...
+        }
     }
 
-    return true;
-}
+    public function sendEmail($user_id, $payment_id, $type = 'both')
+    {
+        $user_record = \App\User::find($user_id);
+        $invoice = $payment_record = Payment::find($payment_id);
 
+        switch ($type) {
+            case 'subscription':
+                if ($payment_record->plan_type == 'subscribe') {
+                    // Subscription Details Email.
+                    $data = [];
+                    $data['site_title'] = getSetting('site_title', 'site_settings');
+                    $logo = getSetting('site_logo', 'site_settings');
 
-  public function razorpaySuccess(Request $request)
-  {
-      $user    = Auth::user();
-      //Input items of form
-      $input = Input::all();
+                    $logo = getSetting('Invoice-Logo', 'invoice-settings');
+                    if (empty($logo)) {
+                        $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
+                    } else {
+                        $logo = asset('uploads/settings/' . $logo);
+                    }
 
-      //get API Configuration
-      $api = new Api(env('RAZORPAY_APIKEY'), env('RAZORPAY_SECRET'));
-      //Fetch payment information by razorpay_payment_id
-      $payment = $api->payment->fetch($input['razorpay_payment_id']);
+                    $record = \App\Package::find($payment_record->item_id);
+                    if ($record) {
+                        $product_name = $record->name;
+                        if ($record->type === 'temp') {
+                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
+                        }
+                    }
 
-      if (count($input)  && !empty($input['razorpay_payment_id'])) {
-          try {
-              $response = $api->payment->fetch($input['razorpay_payment_id'])->capture(array('amount'=>$payment['amount']));
+                    $data['logo'] = $logo;
+                    $data['date'] = date('d-m-Y');
+                    $data['plan'] = $product_name;
+                    $data['id'] = $payment_record->id;
+                    $data['username'] = $user_record->name;
+                    $data['to_email'] = $user_record->email;
+                    $template    = new EmailTemplate();
+                    $template->sendEmail('subscription', $data);
+                }
+                break;
+            case 'invoice':
+                // Payment Invoice.
+                $data = [];
+                $data['site_title'] = getSetting('site_title', 'site_settings');
+                $logo = getSetting('site_logo', 'site_settings');
 
-              $item = $this->getPackageDetails($request->type, $request->item_name);
-              $user = getUserRecord();
+                $logo = getSetting('Invoice-Logo', 'invoice-settings');
+                if (empty($logo)) {
+                    $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
+                } else {
+                    $logo = asset('uploads/settings/' . $logo);
+                }
 
-              if ($request->parent_user) {
-                  $user = getUserRecord($request->selected_child_id);
-              }
+                $data['logo'] = $logo;
+                $data['date'] = date('d-m-Y');
 
-              $payment_record                  = new Payment();
-              $payment_record->transaction_id  = $request->razorpay_payment_id;
-              $payment_record->item_id         = $item->id;
-              $payment_record->item_name       = $item->title;
-              $payment_record->plan_type       = $request->type;
-              $payment_record->payment_gateway = 'Razorpay';
-              $payment_record->slug            = $payment_record::makeSlug(getHashCode());
-              $payment_record->cost            = $item->cost;
-              $payment_record->user_id         = $user->id;
-              $payment_record->payment_status  = PAYMENT_STATUS_SUCCESS;
-              $payment_record->coupon_applied  = $request->is_coupon_applied;
-              $payment_record->coupon_id       = $request->coupon_id;
-              $payment_record->actual_cost     = $request->actual_cost;
-              $payment_record->discount_amount = $request->discount_availed;
-              $payment_record->after_discount  = $request->after_discount;
-              $payment_record->paid_by         = $response->email;
-              $payment_record->paid_amount     = $request->after_discount;
-              $payment_record->paid_by_parent  = $request->parent_user;
+                $invoice = $payment_record;
 
-              $daysToAdd = '+'.$item->validity.'days';
+                $data['invoice_no'] = $invoice->invoicenumberdisplay;
+                $data['invoice_amount'] = digiCurrency($invoice->paid_amount, $invoice->currency_id);
+                $data['invoice_date'] = digiDate($invoice->start_date);
+                $data['client_name'] = $user_record->name;
+                $data['invoice_url'] = route('payments.view_invoice', ['invoice_id' => $invoice->id]);
 
-              $payment_record->start_date = date('Y-m-d');
-              $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
+                $data['site_address'] = getSetting('site_address', 'site_settings');
+                $data['site_phone'] = getSetting('site_phone', 'site_settings');
 
-              $payment_record->save();
+                $data['to_email'] = $user_record->email;
 
-              if ($payment_record->coupon_applied) {
-                  $this->couponcodes_usage($payment_record);
-              }
-
-              $this->sendEmail($user->id, $payment_record->id);
-          } catch (\Exception $e) {
-              flash('Ooops..!', $e->getMessage(), 'overlay');
-              return redirect(URL_PAYMENTS_CHECKOUT.$request->type.'/'.$request->item_name);
-          }
-
-          flash('success', 'your_payment_done_successfully', 'success');
-          return redirect(URL_PAYMENTS_LIST.$user->slug);
-
-          // Do something here for store payment details in database...
-      }
-  }
-
-  public function sendEmail($user_id, $payment_id, $type = 'both')
-  {
-      $user_record = \App\User::find($user_id);
-      $invoice = $payment_record = Payment::find($payment_id);
-
-      switch ($type) {
-          case 'subscription':
-              if ($payment_record->plan_type == 'subscribe') {
-                  // Subscription Details Email.
-                  $data = [];
-                  $data['site_title'] = getSetting('site_title', 'site_settings');
-                  $logo = getSetting('site_logo', 'site_settings');
-
-                  $logo = getSetting('Invoice-Logo', 'invoice-settings');
-                  if (empty($logo)) {
-                      $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
-                  } else {
-                      $logo = asset('uploads/settings/' . $logo);
-                  }
-
-                  $record = \App\Package::find($payment_record->item_id);
-                  if ($record) {
-                      $product_name = $record->name;
-                      if ($record->type === 'temp') {
-                          $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
-                      }
-                  }
-
-                  $data['logo'] = $logo;
-                  $data['date'] = date('d-m-Y');
-                  $data['plan'] = $product_name;
-                  $data['id'] = $payment_record->id;
-                  $data['username'] = $user_record->name;
-                  $data['to_email'] = $user_record->email;
-                  $template    = new EmailTemplate();
-                  $template->sendEmail('subscription', $data);
-              }
-              break;
-          case 'invoice':
-              // Payment Invoice.
-              $data = [];
-              $data['site_title'] = getSetting('site_title', 'site_settings');
-              $logo = getSetting('site_logo', 'site_settings');
-
-              $logo = getSetting('Invoice-Logo', 'invoice-settings');
-              if (empty($logo)) {
-                  $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
-              } else {
-                  $logo = asset('uploads/settings/' . $logo);
-              }
-
-              $data['logo'] = $logo;
-              $data['date'] = date('d-m-Y');
-
-              $invoice = $payment_record;
-
-              $data['invoice_no'] = $invoice->invoicenumberdisplay;
-              $data['invoice_amount'] = digiCurrency($invoice->paid_amount, $invoice->currency_id);
-              $data['invoice_date'] = digiDate($invoice->start_date);
-              $data['client_name'] = $user_record->name;
-              $data['invoice_url'] = route('payments.view_invoice', ['invoice_id' => $invoice->id]);
-
-              $data['site_address'] = getSetting('site_address', 'site_settings');
-              $data['site_phone'] = getSetting('site_phone', 'site_settings');
-
-              $data['to_email'] = $user_record->email;
-
-              ob_start();
-              ?>
+                ob_start();
+                ?>
 <table class="table invoice-items">
     <thead>
         <tr class="h4 text-dark text-view">
@@ -2023,40 +2030,40 @@ public function approvePayment(Payment $payment_record, Request $request, $iscou
         <tr height="90px" class="product_row">
             <td valign="top" valign="top">
                 <?php
-                        $product_name = '';
-              $item_id = $invoice->item_id;
-              if ('subscribe' === $invoice->plan_type) {
-                  $record = \App\Package::find($item_id);
-                  if ($record) {
-                      $product_name = $record->name;
-                      if ($record->type === 'temp') {
-                          $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
-                      }
-                  }
-              } elseif ('lms' === $invoice->plan_type) {
-                  $record = \App\LmsSeries::find($item_id);
-                  if ($record) {
-                      $product_name = $record->title;
-                  }
-              } elseif ('exam' === $invoice->plan_type) {
-                  $record = \App\Quiz::find($item_id);
-                  if ($record) {
-                      $product_name = $record->title;
-                  }
-              } elseif ('combo' === $invoice->plan_type) {
-                  $record = \App\ExamSeries::find($item_id);
-                  if ($record) {
-                      $product_name = $record->title;
-                  }
-              }
+                          $product_name = '';
+                $item_id = $invoice->item_id;
+                if ('subscribe' === $invoice->plan_type) {
+                    $record = \App\Package::find($item_id);
+                    if ($record) {
+                        $product_name = $record->name;
+                        if ($record->type === 'temp') {
+                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
+                        }
+                    }
+                } elseif ('lms' === $invoice->plan_type) {
+                    $record = \App\LmsSeries::find($item_id);
+                    if ($record) {
+                        $product_name = $record->title;
+                    }
+                } elseif ('exam' === $invoice->plan_type) {
+                    $record = \App\Quiz::find($item_id);
+                    if ($record) {
+                        $product_name = $record->title;
+                    }
+                } elseif ('combo' === $invoice->plan_type) {
+                    $record = \App\ExamSeries::find($item_id);
+                    if ($record) {
+                        $product_name = $record->title;
+                    }
+                }
 
-              $product_tax_display = 0;
-              $tax_value = 0;
-              $discount_value = 0;
-              $amount = $invoice->paid_amount;
-              $product_qty = 1;
-              $product_discount_display = $invoice->discount_amount;
-              ?>
+                $product_tax_display = 0;
+                $tax_value = 0;
+                $discount_value = 0;
+                $amount = $invoice->paid_amount;
+                $product_qty = 1;
+                $product_discount_display = $invoice->discount_amount;
+                ?>
                 <?php echo $product_name; ?>
             </td>
 
@@ -2077,72 +2084,72 @@ public function approvePayment(Payment $payment_record, Request $request, $iscou
 <?php
         $data['products'] = ob_get_clean();
 
-              $template    = new EmailTemplate();
-              $template->sendEmail('payment-invoice', $data);
-              break;
+                $template    = new EmailTemplate();
+                $template->sendEmail('payment-invoice', $data);
+                break;
 
-          default:
-              if ($payment_record->plan_type == 'subscribe') {
-                  // Subscription Details Email.
-                  $data = [];
-                  $data['site_title'] = getSetting('site_title', 'site_settings');
-                  $logo = getSetting('site_logo', 'site_settings');
+            default:
+                if ($payment_record->plan_type == 'subscribe') {
+                    // Subscription Details Email.
+                    $data = [];
+                    $data['site_title'] = getSetting('site_title', 'site_settings');
+                    $logo = getSetting('site_logo', 'site_settings');
 
-                  $logo = getSetting('Invoice-Logo', 'invoice-settings');
-                  if (empty($logo)) {
-                      $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
-                  } else {
-                      $logo = asset('uploads/settings/' . $logo);
-                  }
+                    $logo = getSetting('Invoice-Logo', 'invoice-settings');
+                    if (empty($logo)) {
+                        $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
+                    } else {
+                        $logo = asset('uploads/settings/' . $logo);
+                    }
 
-                  $record = \App\Package::find($payment_record->item_id);
-                  if ($record) {
-                      $product_name = $record->name;
-                      if ($record->type === 'temp') {
-                          $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
-                      }
-                  }
+                    $record = \App\Package::find($payment_record->item_id);
+                    if ($record) {
+                        $product_name = $record->name;
+                        if ($record->type === 'temp') {
+                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
+                        }
+                    }
 
-                  $data['logo'] = $logo;
-                  $data['date'] = date('d-m-Y');
-                  $data['plan'] = $product_name;
-                  $data['id'] = $payment_record->id;
-                  $data['username'] = $user_record->name;
-                  $data['to_email'] = $user_record->email;
-                  $template    = new EmailTemplate();
-                  $template->sendEmail('subscription', $data);
-              }
+                    $data['logo'] = $logo;
+                    $data['date'] = date('d-m-Y');
+                    $data['plan'] = $product_name;
+                    $data['id'] = $payment_record->id;
+                    $data['username'] = $user_record->name;
+                    $data['to_email'] = $user_record->email;
+                    $template    = new EmailTemplate();
+                    $template->sendEmail('subscription', $data);
+                }
 
-              // Payment Invoice.
-              $data = [];
-              $data['site_title'] = getSetting('site_title', 'site_settings');
-              $logo = getSetting('site_logo', 'site_settings');
+                // Payment Invoice.
+                $data = [];
+                $data['site_title'] = getSetting('site_title', 'site_settings');
+                $logo = getSetting('site_logo', 'site_settings');
 
-              $logo = getSetting('Invoice-Logo', 'invoice-settings');
-              if (empty($logo)) {
-                  $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
-              } else {
-                  $logo = asset('uploads/settings/' . $logo);
-              }
+                $logo = getSetting('Invoice-Logo', 'invoice-settings');
+                if (empty($logo)) {
+                    $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
+                } else {
+                    $logo = asset('uploads/settings/' . $logo);
+                }
 
-              $data['logo'] = $logo;
-              $data['date'] = date('d-m-Y');
+                $data['logo'] = $logo;
+                $data['date'] = date('d-m-Y');
 
-              $invoice = $payment_record;
+                $invoice = $payment_record;
 
-              $data['invoice_no'] = $invoice->invoicenumberdisplay;
-              $data['invoice_amount'] = digiCurrency($invoice->paid_amount, $invoice->currency_id);
-              $data['invoice_date'] = digiDate($invoice->start_date);
-              $data['client_name'] = $user_record->name;
-              $data['invoice_url'] = route('payments.view_invoice', ['invoice_id' => $invoice->id]);
+                $data['invoice_no'] = $invoice->invoicenumberdisplay;
+                $data['invoice_amount'] = digiCurrency($invoice->paid_amount, $invoice->currency_id);
+                $data['invoice_date'] = digiDate($invoice->start_date);
+                $data['client_name'] = $user_record->name;
+                $data['invoice_url'] = route('payments.view_invoice', ['invoice_id' => $invoice->id]);
 
-              $data['site_address'] = getSetting('site_address', 'site_settings');
-              $data['site_phone'] = getSetting('site_phone', 'site_settings');
+                $data['site_address'] = getSetting('site_address', 'site_settings');
+                $data['site_phone'] = getSetting('site_phone', 'site_settings');
 
-              $data['to_email'] = $user_record->email;
+                $data['to_email'] = $user_record->email;
 
-              ob_start();
-              ?>
+                ob_start();
+                ?>
 <table class="table invoice-items">
     <thead>
         <tr class="h4 text-dark text-view">
@@ -2167,40 +2174,40 @@ public function approvePayment(Payment $payment_record, Request $request, $iscou
         <tr height="90px" class="product_row">
             <td valign="top" valign="top">
                 <?php
-                        $product_name = '';
-              $item_id = $invoice->item_id;
-              if ('subscribe' === $invoice->plan_type) {
-                  $record = \App\Package::find($item_id);
-                  if ($record) {
-                      $product_name = $record->name;
-                      if ($record->type === 'temp') {
-                          $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
-                      }
-                  }
-              } elseif ('lms' === $invoice->plan_type) {
-                  $record = \App\LmsSeries::find($item_id);
-                  if ($record) {
-                      $product_name = $record->title;
-                  }
-              } elseif ('exam' === $invoice->plan_type) {
-                  $record = \App\Quiz::find($item_id);
-                  if ($record) {
-                      $product_name = $record->title;
-                  }
-              } elseif ('combo' === $invoice->plan_type) {
-                  $record = \App\ExamSeries::find($item_id);
-                  if ($record) {
-                      $product_name = $record->title;
-                  }
-              }
+                          $product_name = '';
+                $item_id = $invoice->item_id;
+                if ('subscribe' === $invoice->plan_type) {
+                    $record = \App\Package::find($item_id);
+                    if ($record) {
+                        $product_name = $record->name;
+                        if ($record->type === 'temp') {
+                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
+                        }
+                    }
+                } elseif ('lms' === $invoice->plan_type) {
+                    $record = \App\LmsSeries::find($item_id);
+                    if ($record) {
+                        $product_name = $record->title;
+                    }
+                } elseif ('exam' === $invoice->plan_type) {
+                    $record = \App\Quiz::find($item_id);
+                    if ($record) {
+                        $product_name = $record->title;
+                    }
+                } elseif ('combo' === $invoice->plan_type) {
+                    $record = \App\ExamSeries::find($item_id);
+                    if ($record) {
+                        $product_name = $record->title;
+                    }
+                }
 
-              $product_tax_display = 0;
-              $tax_value = 0;
-              $discount_value = 0;
-              $amount = $invoice->paid_amount;
-              $product_qty = 1;
-              $product_discount_display = $invoice->discount_amount;
-              ?>
+                $product_tax_display = 0;
+                $tax_value = 0;
+                $discount_value = 0;
+                $amount = $invoice->paid_amount;
+                $product_qty = 1;
+                $product_discount_display = $invoice->discount_amount;
+                ?>
                 <?php echo $product_name; ?>
             </td>
 
@@ -2221,11 +2228,11 @@ public function approvePayment(Payment $payment_record, Request $request, $iscou
 <?php
         $data['products'] = ob_get_clean();
 
-              $template    = new EmailTemplate();
-              $template->sendEmail('payment-invoice', $data);
-              break;
-      }
-  }
+                $template    = new EmailTemplate();
+                $template->sendEmail('payment-invoice', $data);
+                break;
+        }
+    }
 
   public function sendInvoice($invoice_id)
   {

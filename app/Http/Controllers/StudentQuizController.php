@@ -73,10 +73,9 @@ class StudentQuizController extends Controller
     {
         $category = false;
 
-
         $user = Auth::user();
 
-        $interested_categories      = null;
+        $interested_categories = null;
 
         if ($slug) {
             if ($slug!='all') {
@@ -131,14 +130,12 @@ class StudentQuizController extends Controller
         $data['title']            = getphrase('all_exams');
 
         if ($category) {
-            $data['title']            = $category->category;
+            $data['title'] = $category->category;
         }
-        $data['layout']           = getLayout();
 
-
+        $data['layout'] = getLayout();
 
         $view_name = getTheme().'::student.exams.list';
-
 
         return view($view_name, $data);
     }
@@ -950,69 +947,70 @@ class StudentQuizController extends Controller
                 ->where('start_date', '<=', date('Y-m-d'))
                 ->where('end_date', '>=', date('Y-m-d'))
                 ->get();
+
+            // dd($records->toArray());
         }
 
 
         return Datatables::of($records)
-        ->addColumn('action', function ($records) {
-            if (!checkRole(['student'])) {
-                if ($records->is_paid) {
-                    return '<a href="'.URL_PAYMENTS_CHECKOUT.'exam/'.$records->slug.'">'.getPhrase('buy_now').'</a>';
-                } else {
-                    return '-';
+            ->escapeColumns([])
+            ->addColumn('action', function ($records) {
+                if (!checkRole(['student'])) {
+                    if ($records->is_paid) {
+                        return '<a href="'.URL_PAYMENTS_CHECKOUT.'exam/'.$records->slug.'">'.getPhrase('buy_now').'</a>';
+                    } else {
+                        return '-';
+                    }
                 }
-            }
-            return '<div class="dropdown more">
-                        <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="mdi mdi-dots-vertical"></i>
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="dLabel">
-                            <li><a onClick="showInstructions(\''.URL_STUDENT_TAKE_EXAM.$records->slug.'\')" href="javascript:void(0);"><i class="fa fa-pencil"></i>'.getPhrase("take_exam").'</a></li>
+                return '<div class="dropdown more">
+                            <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="mdi mdi-dots-vertical"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dLabel">
+                                <li><a onClick="showInstructions(\''.URL_STUDENT_TAKE_EXAM.$records->slug.'\')" href="javascript:void(0);"><i class="fa fa-pencil"></i>'.getPhrase("take_exam").'</a></li>
 
-                        </ul>
-                    </div>';
-        })
-        ->editColumn('is_paid', function ($records) {
-            $status = ($records->is_paid) ? '<span class="label label-primary">'.getPhrase('paid') .'</span>' : '<span class="label label-success">'.getPhrase('free').'</span>';
+                            </ul>
+                        </div>';
+            })
+            ->editColumn('is_paid', function ($records) {
+                $status = ($records->is_paid) ? '<span class="label label-primary">'.getPhrase('paid') .'</span>' : '<span class="label label-success">'.getPhrase('free').'</span>';
 
-            if ($records->is_paid) {
-                $extra = '<ul class="list-unstyled payment-col clearfix"><li>'.$status.'</li>';
-                $extra .='<li><p>Cost: '.getCurrencyCode().' '.$records->cost.'</p><p>Validity: '.$records->validity.' '.getPhrase("days").'</p></li></ul>';
-                return $extra;
-            }
-            return $status;
-        })
-        ->editColumn('dueration', function ($records) {
-            return $records->dueration . ' '.getPhrase('mins');
-        })
-        ->editColumn('title', function ($records) {
-            if (!checkRole(['student'])) {
                 if ($records->is_paid) {
+                    $extra = '<ul class="list-unstyled payment-col clearfix"><li>'.$status.'</li>';
+                    $extra .='<li><p>Cost: '.getCurrencyCode().' '.$records->cost.'</p><p>Validity: '.$records->validity.' '.getPhrase("days").'</p></li></ul>';
+                    return $extra;
+                }
+                return $status;
+            })
+            ->editColumn('dueration', function ($records) {
+                return $records->dueration . ' '.getPhrase('mins');
+            })
+            ->editColumn('title', function ($records) {
+                if (!checkRole(['student'])) {
+                    if ($records->is_paid) {
+                        return '<a href="'.URL_PAYMENTS_CHECKOUT.'exam/'.$records->slug.'">'.$records->title.'</a>';
+                    }
+                    return $records->title;
+                }
+
+                $paid_type =  false;
+                if ($records->is_paid && !isItemPurchased($records->id, 'exam')) {
+                    $paid_type = true;
+                }
+
+                if ($paid_type) {
                     return '<a href="'.URL_PAYMENTS_CHECKOUT.'exam/'.$records->slug.'">'.$records->title.'</a>';
                 }
-                return $records->title;
-            }
 
-            $paid_type =  false;
-            if ($records->is_paid && !isItemPurchased($records->id, 'exam')) {
-                $paid_type = true;
-            }
+                return '<a onClick="showInstructions(\''.URL_STUDENT_TAKE_EXAM.$records->slug.'\')" href="javascript:void(0);">'.$records->title.'</a>';
+            })
+            ->removeColumn('tags')
+            ->removeColumn('id')
+            ->removeColumn('slug')
+            ->removeColumn('validity')
+            ->removeColumn('cost')
 
-
-
-            if ($paid_type) {
-                return '<a href="'.URL_PAYMENTS_CHECKOUT.'exam/'.$records->slug.'">'.$records->title.'</a>';
-            }
-
-            return '<a onClick="showInstructions(\''.URL_STUDENT_TAKE_EXAM.$records->slug.'\')" href="javascript:void(0);">'.$records->title.'</a>';
-        })
-        ->removeColumn('tags')
-        ->removeColumn('id')
-        ->removeColumn('slug')
-        ->removeColumn('validity')
-        ->removeColumn('cost')
-
-        ->make();
+            ->make(false);
     }
 
     public function isValidRecord($record)
@@ -1065,11 +1063,11 @@ class StudentQuizController extends Controller
 
         if (!$exam_slug) {
             $marks = App\QuizResult::where('user_id', '=', $user->id)
-             ->orderBy('updated_at', 'desc')->get();
+                ->orderBy('updated_at', 'desc')->get();
         } else {
             $marks = App\QuizResult::where('user_id', '=', $user->id)
-            ->where('quiz_id', '=', $exam_record->id)
-               ->orderBy('updated_at', 'desc')->get();
+                ->where('quiz_id', '=', $exam_record->id)
+                ->orderBy('updated_at', 'desc')->get();
         }
 
         $chartSettings = new App\ChartSettings();
@@ -1080,6 +1078,7 @@ class StudentQuizController extends Controller
         $dataset_label = [];
         $bgcolor = [];
         $border_color = [];
+
         foreach ($marks as $record) {
             $quiz_record = $record->quizName;
             $labels[] = $quiz_record->title.' '.$record->updated_at;
@@ -1100,7 +1099,7 @@ class StudentQuizController extends Controller
             'dataset_label'     => getPhrase('percentage').' (%)',
             'bgcolor'           => $bgcolor,
             'border_color'      => $border_color
-            );
+        );
 
         $data['chart_data'] = (object)$chart_data;
 
@@ -1129,7 +1128,9 @@ class StudentQuizController extends Controller
         if ($exam_slug) {
             $exam_record = Quiz::getRecordWithSlug($exam_slug);
         }
+
         $records = array();
+
         if (!$exam_slug) {
             $records = Quiz::join('quizresults', 'quizzes.id', '=', 'quizresults.quiz_id')
             ->select(['title','is_paid' , 'marks_obtained', 'exam_status','quizresults.created_at', 'quizzes.total_marks','quizzes.slug', 'quizresults.slug as resultsslug','user_id' ])
@@ -1146,56 +1147,52 @@ class StudentQuizController extends Controller
         }
 
         return Datatables::of($records)
-         ->addColumn('action', function ($records) {
-             $options = '<div class="dropdown more">
-                        <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="mdi mdi-dots-vertical"></i>
-                        </a>
+            ->escapeColumns([])
+            ->addColumn('action', function ($records) {
+                $options = '<div class="dropdown more">
+                            <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="mdi mdi-dots-vertical"></i>
+                            </a>
 
-                        <ul class="dropdown-menu" aria-labelledby="dLabel">
-                           <li><a href="'.URL_RESULTS_VIEW_ANSWERS.$records->slug.'/'.$records->resultsslug.'"><i class="fa fa-pencil"></i>'.getPhrase("view_answers").'</a></li>';
+                            <ul class="dropdown-menu" aria-labelledby="dLabel">
+                               <li><a href="'.URL_RESULTS_VIEW_ANSWERS.$records->slug.'/'.$records->resultsslug.'"><i class="fa fa-pencil"></i>'.getPhrase("view_answers").'</a></li>';
 
-             $certificate_link = '';
-             if (checkRole(getUserGrade(5))) {
-                 if (getSetting('certificate', 'module')) {
-                     $certificate_link = '<li><a href="'.URL_GENERATE_CERTIFICATE.$records->resultsslug.'" target="_blank"><i class="fa fa-certificate"></i>'. getPhrase("generate_certificate").'</a></li>';
-                 }
-             }
+                $certificate_link = '';
+                if (checkRole(getUserGrade(5))) {
+                    if (getSetting('certificate', 'module')) {
+                        $certificate_link = '<li><a href="'.URL_GENERATE_CERTIFICATE.$records->resultsslug.'" target="_blank"><i class="fa fa-certificate"></i>'. getPhrase("generate_certificate").'</a></li>';
+                    }
+                }
 
+                $tail = '</ul> </div>';
+                return $options.$certificate_link.$tail;
+            })
+            ->editColumn('title', function ($records) {
+                $user = User::where('id', '=', $records->user_id)->get()->first();
+                return '<a href="'.URL_STUDENT_EXAM_ANALYSIS_BYSUBJECT.$user->slug.'/'.$records->slug.'/'.$records->resultsslug.'">'.ucfirst($records->title).'</a>';
+            })
+            ->editColumn('marks_obtained', function ($records) {
+                return $records->marks_obtained.' / '.$records->total_marks;
+            })
+            ->editColumn('is_paid', function ($records) {
+                return ($records->is_paid) ? '<span class="label label-primary">'.getPhrase('paid') .'</span>' : '<span class="label label-success">'.getPhrase('free').'</span>';
+            })
+            ->editColumn('exam_status', function ($records) {
+                $result = ucfirst($records->exam_status);
+                return ($result=='Pass') ? '<span class="label label-success">'.$result.'</span>' : '<span class="label label-danger">'.$result.'</span>';
+            })
+            ->removeColumn('total_marks')
+            ->removeColumn('total_marks')
+            ->removeColumn('slug')
+            ->removeColumn('quiz_id')
+            ->removeColumn('created_at')
+            ->removeColumn('user_id')
+            ->removeColumn('resultsslug')
+            ->removeColumn('grade_title')
+            ->removeColumn('grade_points')
+            ->removeColumn('quizzes.total_marks')
 
-
-             $tail = '</ul> </div>';
-             return $options.$certificate_link.$tail;
-         })
-        ->editColumn('title', function ($records) {
-            $user = User::where('id', '=', $records->user_id)->get()->first();
-            return '<a href="'.URL_STUDENT_EXAM_ANALYSIS_BYSUBJECT.$user->slug.'/'.$records->slug.'/'.$records->resultsslug.'">'.ucfirst($records->title).'</a>';
-        })
-        ->editColumn('marks_obtained', function ($records) {
-            return $records->marks_obtained.' / '.$records->total_marks;
-        })
-        ->editColumn('is_paid', function ($records) {
-            return ($records->is_paid) ? '<span class="label label-primary">'.getPhrase('paid') .'</span>' : '<span class="label label-success">'.getPhrase('free').'</span>';
-        })
-        ->editColumn('exam_status', function ($records) {
-            $result = ucfirst($records->exam_status);
-            return ($result=='Pass') ? '<span class="label label-success">'.$result.'</span>' : '<span class="label label-danger">'.$result.'</span>';
-        })
-
-
-
-        ->removeColumn('total_marks')
-        ->removeColumn('total_marks')
-        ->removeColumn('slug')
-        ->removeColumn('quiz_id')
-        ->removeColumn('created_at')
-        ->removeColumn('user_id')
-        ->removeColumn('resultsslug')
-        ->removeColumn('grade_title')
-        ->removeColumn('grade_points')
-        ->removeColumn('quizzes.total_marks')
-
-        ->make();
+            ->make(false);
     }
 
     /**
@@ -1277,28 +1274,27 @@ class StudentQuizController extends Controller
         $records = array();
 
         $records = Quiz::join('quizresults', 'quizzes.id', '=', 'quizresults.quiz_id')
-        ->select(['title','is_paid' ,'dueration', 'quizzes.total_marks',  \DB::raw('count(quizresults.user_id) as attempts, quizzes.slug, user_id') ])
-        ->where('user_id', '=', $user->id)
-        ->groupBy('quizresults.quiz_id')
-        ->get();
+            ->select(['title','is_paid' ,'dueration', 'quizzes.total_marks',  DB::raw('count(quizresults.user_id) as attempts, quizzes.slug, user_id') ])
+            ->where('user_id', '=', $user->id)
+            ->groupBy('quizresults.quiz_id')
+            ->get();
 
         return Datatables::of($records)
-
-         ->editColumn('title', function ($records) {
-             $user = User::where('id', '=', $records->user_id)->get()->first();
-             return '<a href="'.URL_STUDENT_EXAM_ATTEMPTS.$user->slug.'/'.$records->slug.'"">'.$records->title.'</a>';
-         })
-        ->editColumn('is_paid', function ($records) {
-            return ($records->is_paid) ? '<span class="label label-primary">'.getPhrase('paid') .'</span>' : '<span class="label label-success">'.getPhrase('free').'</span>';
-        })
-
-        ->editColumn('dueration', function ($records) {
-            return $records->dueration.' '.getPhrase('mins');
-        })
-        ->removeColumn('quizzes.total_marks')
-         ->removeColumn('slug')
-         ->removeColumn('user_id')
-        ->make();
+            ->escapeColumns([])
+            ->editColumn('title', function ($records) {
+                $user = User::where('id', '=', $records->user_id)->get()->first();
+                return '<a href="'.URL_STUDENT_EXAM_ATTEMPTS.$user->slug.'/'.$records->slug.'"">'.$records->title.'</a>';
+            })
+            ->editColumn('is_paid', function ($records) {
+                return ($records->is_paid) ? '<span class="label label-primary">'.getPhrase('paid') .'</span>' : '<span class="label label-success">'.getPhrase('free').'</span>';
+            })
+            ->editColumn('dueration', function ($records) {
+                return $records->dueration.' '.getPhrase('mins');
+            })
+            ->removeColumn('quizzes.total_marks')
+            ->removeColumn('slug')
+            ->removeColumn('user_id')
+            ->make(false);
     }
 
     /**
