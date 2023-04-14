@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App;
 use App\Quiz;
+use App\Paypal;
+use App\Payment;
 use App\Subject;
 use App\QuestionBank;
 use App\QuizCategory;
@@ -14,23 +16,27 @@ use App\ExamSeries;
 use App\LmsSeries;
 use App\Package;
 use App\EmailTemplate;
+
 use Razorpay\Api\Api;
 use Yajra\Datatables\Datatables;
-use DB;
-use Auth;
-use App\Paypal;
-use App\Payment;
+
 use App\Services\MidtransService;
 use App\Utils\MidtransNotification;
-use Input;
-use Softon\Indipay\Facades\Indipay;
-use Excel;
+
 use Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Input;
+use Softon\Indipay\Facades\Indipay;
+
 use Exception;
 
 class PaymentsController extends Controller
 {
     public $payment_records = [];
+
     public function __construct()
     {
         $this->middleware('auth')->except('midtransCallback');
@@ -50,7 +56,7 @@ class PaymentsController extends Controller
 
         $user = getUserWithSlug($slug);
 
-        $data['is_parent']           = 0;
+        $data['is_parent'] = 0;
         $user = getUserWithSlug($slug);
 
         if (getRoleData($user->role_id)=='parent') {
@@ -60,10 +66,11 @@ class PaymentsController extends Controller
         $data['user']       		= $user;
         $data['active_class']       = 'subscriptions';
         $data['title']              = getPhrase('subscriptions_list');
-        $data['layout']              = getLayout();
+        $data['layout']             = getLayout();
 
         $payment = new Payment();
         $records = $payment->updateTransactionRecords($user->id);
+
         foreach ($records as $record) {
             $rec = Payment::where('id', $record->id)->first();
             $this->isExpired($rec);
@@ -83,8 +90,22 @@ class PaymentsController extends Controller
             $childs_list = App\User::where('parent_id', '=', $user->id)->get();
 
             $records = Payment::join('users', 'users.id', '=', 'payments.user_id')
-            ->where('users.parent_id', '=', $user->id)
-     ->select(['users.image', 'users.name',  'item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway','payments.updated_at','payment_status','payments.cost', 'payments.after_discount', 'payments.paid_amount','payments.id' ]);
+                ->where('users.parent_id', '=', $user->id)
+                ->select([
+                    'users.image',
+                    'users.name',
+                    'item_name',
+                    'plan_type',
+                    'start_date',
+                    'end_date',
+                    'payment_gateway',
+                    'payments.updated_at',
+                    'payment_status',
+                    'payments.cost',
+                    'payments.after_discount',
+                    'payments.paid_amount',
+                    'payments.id'
+                ]);
 
             $ind = 0;
             foreach ($childs_list as $child) {
@@ -100,57 +121,57 @@ class PaymentsController extends Controller
         } else {
             $records = Payment::select(['item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway', 'updated_at','payment_status','id','cost', 'after_discount', 'paid_amount'])
                 ->where('user_id', '=', $user->id)
-                   ->orderBy('updated_at', 'desc');
+                ->orderBy('updated_at', 'desc');
         }
 
         $dta = Datatables::of($records)
+            ->escapeColumns([])
+            ->addColumn('action', function ($records) {
+                if (!($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING)) {
+                    $link_data = ' <a >View More</a>';
+                    return $link_data;
+                }
+                return;
+            })
+            ->editColumn('payment_status', function ($records) {
+                $rec = '';
+                if ($records->payment_status==PAYMENT_STATUS_CANCELLED) {
+                    $rec = '<span class="label label-danger">'.ucfirst($records->payment_status).'</span>';
+                } elseif ($records->payment_status==PAYMENT_STATUS_PENDING) {
+                    $rec = '<span class="label label-info">'.ucfirst($records->payment_status).'</span>';
+                } elseif ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
+                    $view_invoice = '&nbsp;|&nbsp;<a href="'.route('payments.view_invoice', [ 'invoice_id' => $records->id]).'" class="btn btn-xs btn-success button">'.getPhrase('invoice').'</a>';
+                    $rec = '<span class="label label-success">'.ucfirst($records->payment_status).'</span>' . $view_invoice;
+                }
+                return $rec;
+            })
+            ->editColumn('plan_type', function ($records) {
+                return ucfirst($records->plan_type);
+            })
+            ->editColumn('start_date', function ($records) {
+                if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
+                    return '-';
+                }
+                return $records->start_date;
+            })
+            ->editColumn('end_date', function ($records) {
+                if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
+                    return '-';
+                }
+                return $records->end_date;
+            })
+            ->editColumn('payment_gateway', function ($records) {
+                $text =  ucfirst($records->payment_gateway);
 
-        ->addColumn('action', function ($records) {
-            if (!($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING)) {
-                $link_data = ' <a >View More</a>';
-                return $link_data;
-            }
-            return ;
-        })
-        ->editColumn('payment_status', function ($records) {
-            $rec = '';
-            if ($records->payment_status==PAYMENT_STATUS_CANCELLED) {
-                $rec = '<span class="label label-danger">'.ucfirst($records->payment_status).'</span>';
-            } elseif ($records->payment_status==PAYMENT_STATUS_PENDING) {
-                $rec = '<span class="label label-info">'.ucfirst($records->payment_status).'</span>';
-            } elseif ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                $view_invoice = '&nbsp;|&nbsp;<a href="'.route('payments.view_invoice', [ 'invoice_id' => $records->id]).'" class="btn btn-xs btn-success button">'.getPhrase('invoice').'</a>';
-                $rec = '<span class="label label-success">'.ucfirst($records->payment_status).'</span>' . $view_invoice;
-            }
-            return $rec;
-        })
-        ->editColumn('plan_type', function ($records) {
-            return ucfirst($records->plan_type);
-        })
-        ->editColumn('start_date', function ($records) {
-            if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
-                return '-';
-            }
-            return $records->start_date;
-        })
-        ->editColumn('end_date', function ($records) {
-            if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
-                return '-';
-            }
-            return $records->end_date;
-        })
-        ->editColumn('payment_gateway', function ($records) {
-            $text =  ucfirst($records->payment_gateway);
-
-            if ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                $extra = '<ul class="list-unstyled payment-col clearfix"><li>'.$text.'</li>';
-                $extra .='<li><p>Cost:'.$records->cost.'</p><p>Aftr Dis.:'.$records->after_discount.'</p><p>Paid:'.$records->paid_amount.'</p></li></ul>';
-                return $extra;
-            }
-            return $text;
-        })
-        ->removeColumn('id')
-        ->removeColumn('action');
+                if ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
+                    $extra = '<ul class="list-unstyled payment-col clearfix"><li>'.$text.'</li>';
+                    $extra .='<li><p>Cost:'.$records->cost.'</p><p>Aftr Dis.:'.$records->after_discount.'</p><p>Paid:'.$records->paid_amount.'</p></li></ul>';
+                    return $extra;
+                }
+                return $text;
+            })
+            ->removeColumn('id')
+            ->removeColumn('action');
 
         if ($is_parent) {
             $dta = $dta->editColumn('image', function ($records) {
@@ -161,7 +182,7 @@ class PaymentsController extends Controller
             });
         }
 
-        return $dta->make();
+        return $dta->make(false);
     }
 
     /**

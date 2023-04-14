@@ -11,7 +11,11 @@
 |
 */
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Artisan;
 
 if (env('DB_DATABASE')=='') {
     Route::get('/', 'InstallatationController@index');
@@ -70,6 +74,9 @@ Route::post('login', 'Auth\LoginController@postLogin');
 
 Route::get('logout', function () {
     if (Auth::check()) {
+        /**
+         * @var App\User;
+         */
         $user = Auth::user();
         $user->is_loggedin = 'no';
         $user->save();
@@ -83,6 +90,9 @@ Route::get('logout', function () {
 
 Route::get('parent-logout', function () {
     if (Auth::check()) {
+        /**
+         * @var App\User;
+         */
         $user = Auth::user();
         $user->is_loggedin = 'no';
         $user->save();

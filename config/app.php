@@ -194,8 +194,8 @@ return [
         App\Providers\RouteServiceProvider::class,
 
 
-		Maatwebsite\Excel\ExcelServiceProvider::class,
-		Softon\Indipay\IndipayServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+        Softon\Indipay\IndipayServiceProvider::class,
 
         LaravelFCM\FCMServiceProvider::class,
         //Dompdf\Dompdf::class,
@@ -252,15 +252,15 @@ return [
         'Image' => Intervention\Image\Facades\Image::class,
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
         'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
-		'Input' => Illuminate\Support\Facades\Input::class,
+        'Input' => Illuminate\Support\Facades\Input::class,
         'SMS' => SimpleSoftwareIO\SMS\Facades\SMS::class,
 
-		'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-		'Zipper' => 'Chumper\Zipper\Zipper',
-		 'Indipay' => Softon\Indipay\Facades\Indipay::class,
-		'Share' => 'Chencha\Share\ShareFacade',
-		'Newsletter' => Spatie\Newsletter\NewsletterFacade::class,
-		'ImageSettings' => App\ImageSettings::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Zipper' => 'Chumper\Zipper\Zipper',
+        'Indipay' => Softon\Indipay\Facades\Indipay::class,
+        'Share' => 'Chencha\Share\ShareFacade',
+        'Newsletter' => Spatie\Newsletter\NewsletterFacade::class,
+        'ImageSettings' => App\ImageSettings::class,
         'Charts' => ConsoleTVs\Charts\Facades\Charts::class,
         'Theme' => Shipu\Themevel\Facades\Theme::class,
 
