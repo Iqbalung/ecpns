@@ -79,11 +79,12 @@ class FrontendExamsController extends Controller
      */
     public function startExam($slug)
     {
-
-        $quiz = Quiz::getRecordWithSlug($slug);
+       $quiz = Quiz::getRecordWithSlug($slug);
 
         $prepared_records   = (object) $quiz->prepareQuestions($quiz->getQuestions(),'front_examstarted');
         $final_questions    = $prepared_records->questions;
+        
+
         $final_subjects     = $prepared_records->subjects;
         $data['questions']          = $final_questions;
 

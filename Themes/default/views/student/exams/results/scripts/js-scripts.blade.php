@@ -74,7 +74,7 @@ app.controller('angExamScript', function($scope, $http) {
 var EFFECT                          = 'bounceInDown';
 var DURATION                        = 500;
 var DIV_REFERENCE                   = $(".question-ans-box");
-var MAXIMUM_QUESTIONS               = $(".question-ans-box").size();
+var MAXIMUM_QUESTIONS               = $(".question-ans-box").length;
 var VISIBLE_ELEMENT                 = ".question-ans-box:visible";
 var HINTS                           = 0;
 var ANSWERED                        = ' answered';

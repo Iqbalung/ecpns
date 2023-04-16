@@ -468,19 +468,6 @@ function resumeSetup(current_question_id) {
  */
 
 
-document.onmousedown=disableclick;
-    status="right_clickdisabled";
-    function disableclick(event)
-    {
-      if(event.button==2)
-       {
-         
-         return false;    
-       }
-    } 
-  
-
-
     function languageChanged(language_value)
     {
       if(language_value=='language_l2')

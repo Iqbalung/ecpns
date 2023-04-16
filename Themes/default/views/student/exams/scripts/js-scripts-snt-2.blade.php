@@ -235,14 +235,14 @@ var DURATION                        = 500;
 
 var DIV_REFERENCE                   = $("#questions_list .question_div");
 
-var MAXIMUM_QUESTIONS               = $("#questions_list .question_div").size();
+var MAXIMUM_QUESTIONS               = $("#questions_list .question_div").length;
 
 var VISIBLE_ELEMENT                 = "#questions_list .question_div:visible";
 
 
 PARA_DIV_REFERENCE                  = $("#para_questions_1 .question_para");
 
-PARA_MAXIMUM_QUESTIONS              = $("#para_questions_1 .question_para").size();
+PARA_MAXIMUM_QUESTIONS              = $("#para_questions_1 .question_para").length;
 
 PARA_VISIBLE_ELEMENT                = "#para_questions_1 .question_para:visible";
 
@@ -538,7 +538,7 @@ function viewParaQuestion(current_para){
 
         PARA_DIV_REFERENCE      = $("#"+current_para+" .question_para");
 
-        PARA_MAXIMUM_QUESTIONS  = $("#"+current_para+" .question_para").size();
+        PARA_MAXIMUM_QUESTIONS  = $("#"+current_para+" .question_para").length;
 
         PARA_VISIBLE_ELEMENT    = "#"+current_para+" .question_para:visible";
 
@@ -551,7 +551,7 @@ function viewPrevParaQuestion(current_para){
 
         PARA_DIV_REFERENCE      = $("#"+current_para+" .question_para");
 
-        PARA_MAXIMUM_QUESTIONS  = $("#"+current_para+" .question_para").size();
+        PARA_MAXIMUM_QUESTIONS  = $("#"+current_para+" .question_para").length;
 
         PARA_VISIBLE_ELEMENT    = "#"+current_para+" .question_para:visible";
 
@@ -1038,7 +1038,7 @@ function viewSpecificeParaQuestion(current_para){
 
         PARA_DIV_REFERENCE      = $("#"+current_para+" .question_para");
 
-        PARA_MAXIMUM_QUESTIONS  = $("#"+current_para+" .question_para").size();
+        PARA_MAXIMUM_QUESTIONS  = $("#"+current_para+" .question_para").length;
 
         PARA_VISIBLE_ELEMENT    = "#"+current_para+" .question_para:visible";
 

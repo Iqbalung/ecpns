@@ -42,7 +42,7 @@ class ExamSeriesController extends Controller
 
         $data['active_class']       = 'exams';
         $data['title']              = getPhrase('exam_series');
-       $view_name = getTheme().'::exams.examseries.list';
+        $view_name = getTheme().'::exams.examseries.list';
         return view($view_name, $data);
     }
 
@@ -54,67 +54,71 @@ class ExamSeriesController extends Controller
     public function getDatatable()
     {
 
-      if(!checkRole(getUserGrade(2)))
-      {
-        prepareBlockUserMessage();
-        return back();
-      }
+        if(!checkRole(getUserGrade(2))){
+            prepareBlockUserMessage();
+            return back();
+        }
 
         $records = array();
 
-
-            $records = ExamSeries::select(['title', 'image', 'is_paid', 'cost', 'validity',  'total_exams','total_questions','slug', 'id', 'updated_at'])
-            ->orderBy('updated_at', 'desc');
+        $records = ExamSeries::select([
+            'title',
+            'image', 
+            'is_paid', 
+            'cost', 
+            'validity', 
+            'total_exams',
+            'total_questions',
+            'slug', 
+            'id', 
+            'updated_at']
+        )->orderBy('updated_at', 'desc');
 
         return Datatables::of($records)
         ->addColumn('action', function ($records) {
 
-          $link_data = '<div class="dropdown more">
-                        <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="mdi mdi-dots-vertical"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dLabel">
-                           <li><a href="'.URL_EXAM_SERIES_UPDATE_SERIES.$records->slug.'"><i class="fa fa-spinner"></i>'.getPhrase("update_quizzes").'</a></li>
-                            <li><a href="'.URL_EXAM_SERIES_EDIT.$records->slug.'"><i class="fa fa-pencil"></i>'.getPhrase("edit").'</a></li>';
-
-                           $temp = '';
-                           if(checkRole(getUserGrade(1))) {
+            $link_data = '<div class="dropdown more">
+            <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="mdi mdi-dots-vertical"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dLabel">
+                <li><a href="'.URL_EXAM_SERIES_UPDATE_SERIES.$records->slug.'"><i class="fa fa-spinner"></i>'.getPhrase("update_quizzes").'</a></li>
+                <li><a href="'.URL_EXAM_SERIES_EDIT.$records->slug.'"><i class="fa fa-pencil"></i>'.getPhrase("edit").'</a></li>';
+                $temp = '';
+                if(checkRole(getUserGrade(1))) {
                     $temp .= ' <li><a href="javascript:void(0);" onclick="deleteRecord(\''.$records->slug.'\');"><i class="fa fa-trash"></i>'. getPhrase("delete").'</a></li>';
-                      }
+                }
+                
+                $temp .='</ul></div>';
+                $link_data .=$temp;
+                return $link_data;
 
-                    $temp .='</ul></div>';
+        })->editColumn('title', function($records){
 
-
-                    $link_data .=$temp;
-            return $link_data;
-            })
-        ->editColumn('title', function($records)
-        {
         	return '<a href="'.URL_EXAM_SERIES_UPDATE_SERIES.$records->slug.'">'.$records->title.'</a>';
-        })
-        ->editColumn('cost', function($records)
-        {
-          return ($records->is_paid) ? $records->cost : '-';
-        })
+        
+        })->editColumn('cost', function($records){
 
-        ->editColumn('validity', function($records)
-        {
-          return ($records->is_paid) ? $records->validity : '-';
-        })
+            return ($records->is_paid) ? $records->cost : '-';
 
-        ->editColumn('image', function($records)
-        {
+        })->editColumn('validity', function($records){
+            
+            return ($records->is_paid) ? $records->validity : '-';
+
+        })->editColumn('image', function($records){
+
           $image_path = IMAGE_PATH_UPLOAD_LMS_DEFAULT;
-          if($records->image)
+
+          if($records->image){
             $image_path = IMAGE_PATH_UPLOAD_SERIES.$records->image;
             return '<img src="'.$image_path.'" height="60" width="60"  />';
-        })
-        ->editColumn('is_paid', function($records)
-        {
-            return ($records->is_paid) ? '<span class="label label-primary">'.getPhrase('paid') .'</span>' : '<span class="label label-success">'.getPhrase('free').'</span>';
-        })
+          }
+        
+        })->editColumn('is_paid', function($records){
 
-        ->removeColumn('id')
+            return ($records->is_paid) ? '<span class="label label-primary">'.getPhrase('paid') .'</span>' : '<span class="label label-success">'.getPhrase('free').'</span>';
+        
+        })->removeColumn('id')
         ->removeColumn('slug')
         ->removeColumn('updated_at')
         ->make();

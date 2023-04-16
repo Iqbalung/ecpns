@@ -255,7 +255,7 @@ var DURATION                        = 500;
 
 var DIV_REFERENCE                   = $("#questions_list .question_div");
 
-var MAXIMUM_QUESTIONS               = $("#questions_list .question_div").size();
+var MAXIMUM_QUESTIONS               = $("#questions_list .question_div").length;
 
 var VISIBLE_ELEMENT                 = "#questions_list .question_div:visible";
 

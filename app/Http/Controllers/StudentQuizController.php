@@ -38,6 +38,7 @@ class StudentQuizController extends Controller
         if (checkRole(getUserGrade(2))) {
             return back();
         }
+        
 
         $data['active_class']       = 'exams';
         $data['title']              = getPhrase('quiz_categories');
@@ -45,18 +46,21 @@ class StudentQuizController extends Controller
         $user = Auth::user();
         $interested_categories      = null;
 
+        
         if ($user->settings) {
             $interested_categories =  json_decode($user->settings)->user_preferences;
         }
-
+        
         if ($interested_categories) {
             if (count($interested_categories->quiz_categories)) {
                 $data['categories'] = QuizCategory::whereIn('id', (array) $interested_categories->quiz_categories)
-                                        ->paginate(getRecordsPerPage());
+                ->paginate(getRecordsPerPage());
             }
         }
+        dd("tes",$interested_categories);
+        exit;
 
-        $data['layout']              = getLayout();
+        $data['layout'] = getLayout();
         $user = Auth::user();
 
 
@@ -77,6 +81,7 @@ class StudentQuizController extends Controller
 
         $interested_categories = null;
 
+        
         if ($slug) {
             if ($slug!='all') {
                 $category = QuizCategory::getRecordWithSlug($slug);
@@ -123,6 +128,8 @@ class StudentQuizController extends Controller
             }
         }
 
+        dd("tes",$interested_categories);
+        exit;
 
 
         $data['category']         = $category;
@@ -172,6 +179,8 @@ class StudentQuizController extends Controller
             prepareBlockUserMessage();
             return redirect($this->getReturnUrl());
         }
+
+        
 
         $data['record']           = $record;
         $data['active_class']     = 'exams';
@@ -429,6 +438,7 @@ class StudentQuizController extends Controller
                     $view_name = getTheme().'::student.exams.section-timer-exam';
                 }
 
+               
 
                 return view($view_name, $data);
             }
