@@ -59,6 +59,7 @@ class SettingsController extends Controller
 
 
         return Datatables::of($records)
+        ->escapeColumns([])
         ->addColumn('action', function ($records) {
            $link_data = '<div class="dropdown more">
                         <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -82,7 +83,7 @@ class SettingsController extends Controller
         ->removeColumn('id')
         ->removeColumn('slug')
         ->removeColumn('updated_at')
-        ->make();
+        ->make(false);
     }
 
     /**

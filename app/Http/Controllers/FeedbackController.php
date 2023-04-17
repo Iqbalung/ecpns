@@ -61,6 +61,7 @@ class FeedbackController extends Controller
             ->orderBy('updated_at', 'desc');
 
         return Datatables::of($records)
+        ->escapeColumns([])
         ->addColumn('action', function ($records) {
 
           $link_data = '<div class="dropdown more">
@@ -113,7 +114,7 @@ class FeedbackController extends Controller
 
         ->removeColumn('id')
         ->removeColumn('slug')
-        ->make();
+        ->make(false);
     }
 
     /**

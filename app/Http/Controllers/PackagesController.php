@@ -55,6 +55,7 @@ class PackagesController extends Controller
             			->orderBy('updated_at', 'desc');
 
         return Datatables::of($records)
+        ->escapeColumns([])
         ->addColumn('action', function ($records) {
 
           $link_data = '<div class="dropdown more">
@@ -88,7 +89,7 @@ class PackagesController extends Controller
         })
         ->removeColumn('slug')
         ->removeColumn('validity_type')
-        ->make();
+        ->make(false);
 
     }
 
