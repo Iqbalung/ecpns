@@ -81,6 +81,7 @@ class UsersController extends Controller
         }
 
         return Datatables::of($records)
+        ->escapeColumns([])
         ->addColumn('action', function ($records) {
 
           $link_data = '<div class="dropdown more">
@@ -136,7 +137,7 @@ class UsersController extends Controller
         ->removeColumn('updated_at')
 
 
-        ->make();
+        ->make(false);
     }
 
 

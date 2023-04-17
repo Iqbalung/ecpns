@@ -55,6 +55,7 @@ class PagesController extends Controller
 
 
         return Datatables::of($records)
+        ->escapeColumns([])
         ->addColumn('action', function ($records) {
 
           $link_data = '<div class="dropdown more">
@@ -79,7 +80,7 @@ class PagesController extends Controller
             return ($records->status == 1) ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>';
         })
         ->removeColumn('slug')
-        ->make();
+        ->make(false);
 
     }
 

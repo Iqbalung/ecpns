@@ -57,6 +57,7 @@ class LanguageController extends Controller
          $records = Language::select([ 'language', 'code','is_rtl','is_default','id','slug'])->orderBy('updated_at','desc');
 
         return Datatables::of($records)
+        ->escapeColumns([])
         ->addColumn('action', function ($records) {
            $link_data = '<div class="dropdown more">
                         <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -91,7 +92,7 @@ class LanguageController extends Controller
         })
         ->removeColumn('id')
         ->removeColumn('slug')
-        ->make();
+        ->make(false);
     }
 
     /**
