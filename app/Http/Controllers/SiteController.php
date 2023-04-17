@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use \App;
 use \App\UserSubscription;
 use \App\Quiz;
+use \App\ExamSeries;
 use \App\LmsSeries;
 use Response;
 use Exception;
@@ -196,18 +197,11 @@ class SiteController extends Controller
 
             if ($search_term) {
 
-              $quizzes  = Quiz::where('category_id', $firstOne->id)
-                             ->where('show_in_front',1)
-                             ->where('total_marks','>',0)
-                             ->where('title','LIKE','%'.$search_term.'%')
-                             ->paginate(9);
+              $quizzes  = ExamSeries::paginate(9);
 
             } else {
 
-              $quizzes  = Quiz::where('category_id', $firstOne->id)
-                             ->where('show_in_front',1)
-                             ->where('total_marks','>',0)
-                             ->paginate(9);
+              $quizzes  = ExamSeries::paginate(9);
             }
 
           $data['title']  = ucfirst($firstOne->category);
