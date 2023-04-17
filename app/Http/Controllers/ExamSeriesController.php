@@ -75,6 +75,7 @@ class ExamSeriesController extends Controller
         )->orderBy('updated_at', 'desc');
 
         return Datatables::of($records)
+        ->escapeColumns([])
         ->addColumn('action', function ($records) {
 
             $link_data = '<div class="dropdown more">
@@ -121,7 +122,7 @@ class ExamSeriesController extends Controller
         })->removeColumn('id')
         ->removeColumn('slug')
         ->removeColumn('updated_at')
-        ->make();
+        ->make(false);
     }
 
     /**

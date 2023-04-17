@@ -11,7 +11,7 @@ class QuizCategory extends Model
 
     public static function getRecordWithSlug($slug)
     {
-        return QuizCategory::where('slug', '=', $slug)->first();
+        return ExamSeries::where('slug', '=', $slug)->first();
     }
 
     /**
@@ -36,21 +36,16 @@ class QuizCategory extends Model
     public static function getShowFrontCategories($limit=0)
     {
         if ($limit>0) {
-            $list   = Quiz::where('show_in_front', 1)
-                             ->groupby('category_id')
-                             ->limit(6)
-                             ->get();
+            $list   = ExamSeries::get();
         } else {
-            $list   = Quiz::where('show_in_front', 1)
-                             ->groupby('category_id')
-                             ->get();
+            $list   = ExamSeries::get();
         }
 
         $cat_ids  = array_pluck($list, 'category_id');
 
         $categories = [];
         foreach ($cat_ids as $key => $value) {
-            $categories[]  = QuizCategory::where('id', $value)->first();
+            $categories[]  = ExamSeries::where('id', $value)->first();
         }
         return $categories;
     }
@@ -66,21 +61,17 @@ class QuizCategory extends Model
    public static function getPracticeExamsCategories($limit='')
    {
        if ($limit>0) {
-           $list   = Quiz::where('show_in_front', 1)
-                         ->groupby('category_id')
-                         ->limit($limit)
+           $list   = ExamSeries::limit($limit)
                          ->get();
        } else {
-           $list   = Quiz::where('show_in_front', 1)
-                         ->groupby('category_id')
-                         ->get();
+           $list   = ExamSeries::get();
        }
 
        $cat_ids  = array_pluck($list, 'category_id');
 
        $categories = [];
        foreach ($cat_ids as $key => $value) {
-           $categories[]  = QuizCategory::where('id', $value)->first();
+           $categories[]  = ExamSeries::where('id', $value)->first();
        }
        return $categories;
    }
