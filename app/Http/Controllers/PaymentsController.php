@@ -1033,6 +1033,10 @@ class PaymentsController extends Controller
             $record = \App\Package::where('slug', $slug)->first();
         } else {
             $record = $this->getModelName($type, $slug);
+    
+            if ($type === 'exam' && !$record) {
+                $record = $this->getModelName('combo', $slug);
+            }
         }
 
         if ($isValid = $this->isValidRecord($record)) {

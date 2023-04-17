@@ -15,6 +15,7 @@ use App\LmsSeries;
 use Response;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Input;
 
 use App\Feedback;
 use App\User;
@@ -45,16 +46,7 @@ class SiteController extends Controller
 
                 $data['categories']   = $categories;
 
-                if (count($categories) > 0) {
-                    $firstOne        = $categories[0];
-                    $quizzes         = Quiz::where('category_id', $firstOne->id)
-                                           ->where('show_in_front', 1)
-                                           ->where('total_marks', '>', 0)
-                                           ->limit(6)
-                                           ->get();
-
-                    $data['quizzes'] = $quizzes;
-                }
+                $data['exam_series']   = ExamSeries::all();
 
                 $lms_cates  = LmsSeries::getFreeSeries(8);
 
@@ -152,8 +144,7 @@ class SiteController extends Controller
      */
     public function frontAllExamCats($slug='')
     {
-        $search_term = \Input::get('search_term');
-
+        $search_term = Input::get('search_term');
 
         $data['key'] = 'home';
 
@@ -162,34 +153,35 @@ class SiteController extends Controller
         $data['categories']   = $categories;
         $quizzes  = array();
 
-        if ($categories && !$slug) {
-            $firstOne = $categories[0];
+        if ($categories) {
+            if ($slug) {
+                $category  = App\QuizCategory::where('slug', $slug)->first();
 
-            if ($search_term) {
-                $quizzes  = ExamSeries::paginate(9);
+                if ($search_term) {
+                    $quizzes   = Quiz::where('category_id', $category->id)
+                                   ->where('show_in_front', 1)
+                                   ->where('total_marks', '>', 0)
+                                   ->where('title', 'LIKE', '%'.$search_term.'%')
+                                   ->paginate(9);
+                } else {
+                    $quizzes   = Quiz::where('category_id', $category->id)
+                                   ->where('show_in_front', 1)
+                                   ->where('total_marks', '>', 0)
+                                   ->paginate(9);
+                }
+
+                $data['title']  = ucfirst($category->category);
             } else {
-                $quizzes  = ExamSeries::paginate(9);
+                $firstOne = $categories[0];
+
+                if ($search_term) {
+                    $quizzes  = ExamSeries::paginate(9);
+                } else {
+                    $quizzes  = ExamSeries::paginate(9);
+                }
+
+                $data['title']  = ucfirst($firstOne->category);
             }
-
-            $data['title']  = ucfirst($firstOne->category);
-        }
-        if ($categories && $slug) {
-            $category  = App\QuizCategory::where('slug', $slug)->first();
-
-            if ($search_term) {
-                $quizzes   = Quiz::where('category_id', $category->id)
-                               ->where('show_in_front', 1)
-                               ->where('total_marks', '>', 0)
-                               ->where('title', 'LIKE', '%'.$search_term.'%')
-                               ->paginate(9);
-            } else {
-                $quizzes   = Quiz::where('category_id', $category->id)
-                               ->where('show_in_front', 1)
-                               ->where('total_marks', '>', 0)
-                               ->paginate(9);
-            }
-
-            $data['title']  = ucfirst($category->category);
         }
 
         $data['quizzes']   = $quizzes;

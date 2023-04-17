@@ -23,8 +23,9 @@
     
         if ($time2 == $time1 || $time3 > $time2) {
             $exam_id = session()->get('exam_id');
-            $quiz_data = App\Quiz::where('id', '=', $exam_id)->first();
+            $quiz_data = App\ExamSeries::where('id', '=', $exam_id)->first();
             // $is_purchased = isItemPurchased($quiz_data->id, 'exam', $user->id);
+            // dd($exam_id);
             $is_purchased = App\UserExam::isItemPurchased($quiz_data->id, $user->id);
     
             if (!$is_purchased && $quiz_data->is_paid == 1) {
