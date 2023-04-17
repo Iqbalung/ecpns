@@ -500,8 +500,8 @@ class ExamSeriesController extends Controller
         if ($interested_categories) {
             if (count($interested_categories->quiz_categories)) {
                 $data['series'] = ExamSeries::join('user_exams', 'examseries.id', '=', 'user_exams.exam_series_id')
-                    ->where('start_date', '<=', date('Y-m-d'))
-                    ->where('end_date', '>=', date('Y-m-d'))
+                    // ->where('start_date', '<=', date('Y-m-d'))
+                    // ->where('end_date', '>=', date('Y-m-d'))
                     ->whereIn('category_id', (array) $interested_categories->quiz_categories)
                     ->paginate(getRecordsPerPage());
             }
@@ -521,9 +521,13 @@ class ExamSeriesController extends Controller
      * @param  [type] $slug [description]
      * @return [type]       [description]
      */
-    public function viewItem($slug)
+    public function viewItem(Request $request, $slug)
     {
         $record = ExamSeries::getRecordWithSlug($slug);
+
+        if (!$request->user()->isPurchasedExamSeries($record)) {
+            return redirect()->to('/payments/checkout/exam-series/' . $record->slug);
+        }
 
         if ($isValid = $this->isValidRecord($record)) {
             return redirect($isValid);

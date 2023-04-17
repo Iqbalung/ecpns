@@ -436,6 +436,7 @@ Route::get('learning-management/content/show/{slug}', 'StudentLmsController@show
 Route::get('payments/list/{slug}', 'PaymentsController@index');
 Route::get('payments/getList/{slug}', 'PaymentsController@getDatatable');
 
+Route::get('payments/checkout/exam-series/{slug}', 'PaymentsController@checkoutExamSeries');
 Route::get('payments/checkout/{type}/{slug}', 'PaymentsController@checkout');
 Route::get('payments/paynow/{slug}', 'DashboardController@index');
 Route::post('payments/paynow/{slug}', 'PaymentsController@paynow');

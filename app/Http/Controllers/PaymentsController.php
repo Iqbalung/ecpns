@@ -257,6 +257,7 @@ class PaymentsController extends Controller
             return view($view_name, $data);
         }
 
+
         $type = $request->type;
 
         /**
@@ -274,13 +275,13 @@ class PaymentsController extends Controller
 
         $other_details = array();
         $other_details['is_coupon_applied'] = $request->is_coupon_applied;
-        $other_details['actual_cost'] 		  = $request->actual_cost;
+        $other_details['actual_cost'] 		= $request->actual_cost;
         $other_details['discount_availed'] 	= $request->discount_availed;
         $other_details['after_discount']    = $request->after_discount;
         $other_details['coupon_id']         = $request->coupon_id;
 
         $other_details['paid_by_parent']    = $request->parent_user;
-        $other_details['child_id'] 		      = $request->selected_child_id;
+        $other_details['child_id'] 		    = $request->selected_child_id;
 
         /**
          * If the total amount is 0 after coupon code is applied,
@@ -406,7 +407,7 @@ class PaymentsController extends Controller
                 return back();
             }
 
-            $url =  PREFIX . 'payments/checkout/exam/' . $item->slug . '?md_snap_token=' . $snapToken . '&oid=' . $token;
+            $url =  PREFIX . 'payments/checkout/' . $request->type . '/' . $item->slug . '?md_snap_token=' . $snapToken . '&oid=' . $token;
 
             return redirect($url);
         }
@@ -1021,6 +1022,59 @@ class PaymentsController extends Controller
     }
 
 
+    public function checkoutExamSeries(Request $request, $slug)
+    {
+        $record = ExamSeries::getRecordWithSlug($slug);
+
+        if (!$record) {
+            flash('Ooops...!', 'Terjadi kesalahan saat memproses data.', 'error');
+            return redirect()->to('/dashboard');
+        }
+
+        $user = $request->user();
+
+        if ($user->isPurchasedExamSeries($record)) {
+            flash('Hey ' . $user->name, 'you_already_purchased_this_item', 'overlay');
+            return redirect()->to('/exams/student-exam-series/' . $record->slug);
+        }
+
+        if ($user->role_id == 6) {
+            // TODO: Check if parent already purchased series for their childs
+            //       Redirect to item view if already purchased
+        }
+
+        $data['active_class']     = 'exams';
+        $data['pay_by']           = '';
+        $data['title']            = $record->title;
+        $data['item_type']        = 'combo';
+        $data['item']             = $record;
+        $current_theme            = getDefaultTheme();
+
+        if ($current_theme == 'default') {
+            $data['right_bar']          = false;
+            $data['right_bar_class']   	= 'order-user-details';
+            $data['right_bar_path']     = 'student.payments.billing-address-right-bar';
+            $data['right_bar_data']     = array(
+                'item' => $record,
+            );
+        }
+
+        $data['layout'] = getLayout();
+        $data['parent_user'] = false;
+
+        if (checkRole(getUserGrade(7))) {
+            $data['parent_user'] = true;
+            $data['children'] = App\User::where('parent_id', '=', $user->id)->get();
+        }
+
+        $data['use_razorpay']   = false;
+
+        $view_name = getTheme().'::student.payments.checkout';
+
+        return view($view_name, $data);
+    }
+
+
     /**
      * This method handles the request before payment page
      * It shows the checkout page and gives an option for coupon codes
@@ -1033,10 +1087,6 @@ class PaymentsController extends Controller
             $record = \App\Package::where('slug', $slug)->first();
         } else {
             $record = $this->getModelName($type, $slug);
-    
-            if ($type === 'exam' && !$record) {
-                $record = $this->getModelName('combo', $slug);
-            }
         }
 
         if ($isValid = $this->isValidRecord($record)) {
@@ -1115,7 +1165,7 @@ class PaymentsController extends Controller
     {
         if ($record === null) {
             flash('Ooops...!', getPhrase("page_not_found"), 'error');
-            return $this->getRedirectUrl();
+            abort(404);
         }
 
         return false;

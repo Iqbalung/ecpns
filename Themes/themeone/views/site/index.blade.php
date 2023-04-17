@@ -97,23 +97,27 @@
 
                                             </ul>
 
-
-                                            <div class="text-center mt-2">
-
-                                                @if ($exam->is_paid == 1)
-                                                    <a href="{{ URL_START_EXAM_AFTER_LOGIN . $exam->id }}"
-                                                        class="btn btn-blue btn-sm btn-radius">{{ getPhrase('start_exam') }}</a>
-                                                    @if ($exam->is_paid)
-                                                        <a href="#" class="hhfr">{{ getPhrase('price') }} :
-                                                            {{ getCurrencyCode() }} {{ idrFormat((int) $exam->cost) }}
-                                                        </a>
-                                                    @endif
-                                                @else
-                                                    <a href="{{ URL_FRONTEND_START_EXAM . $exam->slug }}"
-                                                        class="btn btn-blue btn-sm btn-radius">{{ getPhrase('start_exam') }}</a>
-                                                @endif
+                                            <div class="text-center" style="margin-top: 12px; margin-bottom: 12px;">
+                                                <span style="color: #4183BC;">
+                                                    {{ getCurrencyCode() }} {{ idrFormat((int) $exam->cost) }}
+                                                </span>
                                             </div>
 
+
+
+                                            {{-- <div class="text-center" style="margin-top: 30px">
+                                                <a href="#" class="hhfr">{{ getPhrase('price') }} :
+                                                    {{ getCurrencyCode() }} {{ idrFormat((int) $exam->cost) }}
+                                                </a>
+                                            </div> --}}
+
+
+                                            <div class="text-center mt-2">
+                                                <a href="{{ url('exams/student-exam-series/' . $exam->slug) }}"
+                                                    class="btn btn-blue btn-sm btn-block btn-radius">
+                                                    {{ getPhrase('start_exam') }}
+                                                </a>
+                                            </div>
 
                                         </div>
 

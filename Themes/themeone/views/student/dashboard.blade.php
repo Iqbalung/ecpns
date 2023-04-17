@@ -23,7 +23,7 @@
     
         if ($time2 == $time1 || $time3 > $time2) {
             $exam_id = session()->get('exam_id');
-            $quiz_data = App\ExamSeries::where('id', '=', $exam_id)->first();
+            $quiz_data = App\Quiz::where('id', '=', $exam_id)->first();
             // $is_purchased = isItemPurchased($quiz_data->id, 'exam', $user->id);
             // dd($exam_id);
             $is_purchased = App\UserExam::isItemPurchased($quiz_data->id, $user->id);
@@ -176,9 +176,6 @@
                     <div class="col-md-6">
                         <div class="panel panel-primary dsPanel">
                             <div class="panel-body">
-
-
-
                                 <canvas id="{{ $newid }}" width="100" height="60"></canvas>
                             </div>
                         </div>
