@@ -57,8 +57,6 @@ class StudentQuizController extends Controller
                 ->paginate(getRecordsPerPage());
             }
         }
-        dd("tes",$interested_categories);
-        exit;
 
         $data['layout'] = getLayout();
         $user = Auth::user();

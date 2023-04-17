@@ -21,6 +21,7 @@ use Razorpay\Api\Api;
 use Yajra\Datatables\Datatables;
 
 use App\Services\MidtransService;
+use App\UserExam;
 use App\Utils\MidtransNotification;
 
 use Carbon;
@@ -610,6 +611,14 @@ class PaymentsController extends Controller
             $this->couponcodes_usage($payment_record);
         }
 
+        $userExam = new UserExam();
+
+        $userExam->user_id = $payment_record->user_id;
+        $userExam->payment_id = $payment_record->id;
+        $userExam->exam_series_id = $payment_record->item_id;
+
+        UserExam::safeSave($userExam);
+
         // Ignore for now (unhandled error :v)
         // $this->sendEmail($payment_record->user_id, $payment_record->id);
 
@@ -1054,7 +1063,8 @@ class PaymentsController extends Controller
             }
         }
 
-        if (Payment::isItemPurchased($record->id, $type, $user->id)) {
+        // if (Payment::isItemPurchased($record->id, $type, $user->id)) {
+        if (UserExam::isItemPurchased($record->id, $user->id)) {
             //User already purchased this item and it is valid
             //Return the user to back by the message
             flash('Hey '.$user->name, 'you_already_purchased_this_item', 'overlay');

@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App\User;
-
+use App\UserExam;
 use SMS;
 use DB;
 use Artisan;
@@ -17,7 +17,7 @@ class DashboardController extends Controller
 {
     public function __construct()
     {
-    	$this->middleware('auth');
+        $this->middleware('auth');
     }
 
     public function index()
@@ -29,27 +29,24 @@ class DashboardController extends Controller
          */
 
         $user = getUserRecord();
-        $data['layout']         = getLayout();
-        $data['title']          = getPhrase('dashboard');
+        $data['layout'] = getLayout();
+        $data['title']  = getPhrase('dashboard');
         $role = getRole();
+
         if ($role=='admin' || $role=='owner') {
+            $roles = App\Role::get()->pluck('id');
+            $dataset = [];
+            $labels = [];
+            $bgcolor = [];
+            $border_color = [];
 
-            
-
-             $roles = App\Role::get()->pluck('id');
-             $dataset = [];
-             $labels = [];
-             $bgcolor = [];
-             $border_color = [];
-             foreach($roles as $key => $value)
-             {
-                $color_number = rand(0,999);
+            foreach ($roles as $key => $value) {
+                $color_number = rand(0, 999);
                 $labels[] = ucfirst(getRoleData($value));
                 $dataset[] = App\User::where('role_id', '=', $value)->get()->count();
-                $bgcolor[] = getColor('',$color_number);
-                $border_color[] = getColor('background',$color_number);
-             }
-
+                $bgcolor[] = getColor('', $color_number);
+                $border_color[] = getColor('background', $color_number);
+            }
 
             $dataset_label[] = 'lbl';
 
@@ -63,55 +60,48 @@ class DashboardController extends Controller
                     'border_color'      => $border_color
                     );
 
-           $data['chart_data'][] = (object)$chart_data;
-           $data['chart_heading']         = getPhrase('user_statistics');
+            $data['chart_data'][] = (object)$chart_data;
+            $data['chart_heading']         = getPhrase('user_statistics');
 
-           $data['payments_chart_data'] = (object)$this->getPaymentStats();
-           $data['payments_monthly_data'] = (object)$this->getPaymentMonthlyStats();
-           $data['demanding_quizzes'] = (object)$this->getDemandingQuizzes();
-           $data['demanding_paid_quizzes'] = (object)$this->getDemandingQuizzes('paid');
+            $data['payments_chart_data'] = (object)$this->getPaymentStats();
+            $data['payments_monthly_data'] = (object)$this->getPaymentMonthlyStats();
+            $data['demanding_quizzes'] = (object)$this->getDemandingQuizzes();
+            $data['demanding_paid_quizzes'] = (object)$this->getDemandingQuizzes('paid');
 
-        $data['layout']        = getLayout();
+            $data['layout']        = getLayout();
 
-      $data['right_bar_data']     = array('chart_data' => $data['chart_data'] );
-           $data['ids'] = array('myChart0' );
+            $data['right_bar_data']     = array('chart_data' => $data['chart_data'] );
+            $data['ids'] = array('myChart0' );
 
             $view_name = getTheme().'::admin.dashboard';
 
             return view($view_name, $data);
-        }
-         else if($role == 'parent')
-        {
+        } elseif ($role == 'parent') {
+            $user                   = getUserWithSlug();
+            $data['user']           = $user;
+            $data['latest_quizzes'] = $this->getLatestQuizzes();
+            $data['latest_series'] = $this->getLatestLmsSeries();
 
-           $user                   = getUserWithSlug();
-           $data['user']           = $user;
-           $data['latest_quizzes'] = $this->getLatestQuizzes();
-           $data['latest_series'] = $this->getLatestLmsSeries();
-
-           $view_name = getTheme().'::parent.dashboard';
+            $view_name = getTheme().'::parent.dashboard';
             return view($view_name, $data);
-        }
-        else if($role == 'student' )
-        {
-
+        } elseif ($role == 'student') {
             $user = Auth::user();
             //Overall performance Report
             $resultObject = new App\QuizResult();
             $records = $resultObject->getOverallSubjectsReport($user);
-            $color_correct          = getColor('background', rand(0,999));
-            $color_wrong            = getColor('background', rand(0,999));
-            $color_not_attempted    = getColor('background', rand(0,999));
+            $color_correct          = getColor('background', rand(0, 999));
+            $color_wrong            = getColor('background', rand(0, 999));
+            $color_not_attempted    = getColor('background', rand(0, 999));
             $correct_answers        = 0;
             $wrong_answers          = 0;
             $not_answered           = 0;
 
-            foreach($records as $record) {
+            foreach ($records as $record) {
                 $record = (object)$record;
                 $correct_answers    += $record->correct_answers;
                 $wrong_answers      += $record->wrong_answers;
                 $not_answered       += $record->not_answered;
-
-           }
+            }
 
             $labels = [getPhrase('correct'), getPhrase('wrong'), getPhrase('not_answered')];
             $dataset = [$correct_answers, $wrong_answers, $not_answered];
@@ -139,14 +129,14 @@ class DashboardController extends Controller
             $bgcolor = [];
             $bordercolor = [];
 
-            foreach($records as $record) {
-                $color_number = rand(0,999);
+            foreach ($records as $record) {
+                $color_number = rand(0, 999);
                 $record = (object)$record;
                 $labels[] = $record->title;
                 $dataset[] = $record->percentage;
-                $bgcolor[] = getColor('background',$color_number);
+                $bgcolor[] = getColor('background', $color_number);
                 $bordercolor[] = getColor('border', $color_number);
-           }
+            }
 
             $labels = $labels;
             $dataset = $dataset;
@@ -170,91 +160,90 @@ class DashboardController extends Controller
             $view_name = getTheme().'::student.dashboard';
             return view($view_name, $data);
         }
-
     }
 
      public function getLatestQuizzes()
-    {
-        $user = Auth::user();
-        $interested_categories      = null;
-        if($user->settings)
-        {
-          $interested_categories =  json_decode($user->settings)->user_preferences;
-        }
-        $quizzes = [];
+     {
+         $user = Auth::user();
+         $interested_categories      = null;
+         if ($user->settings) {
+             $interested_categories =  json_decode($user->settings)->user_preferences;
+         }
+         $quizzes = [];
 
-        if($interested_categories) {
-        if(count($interested_categories->quiz_categories))
+         if ($interested_categories) {
+             if (count($interested_categories->quiz_categories)) {
+                 $quizzes         = App\Quiz::whereIn(
+                     'category_id',
+                     (array) $interested_categories->quiz_categories
+                 )
+      ->where('start_date', '<=', date('Y-m-d'))
+      ->where('end_date', '>=', date('Y-m-d'))
+                                         ->orderBy('created_at', 'desc')
+                                         ->limit(5)
+                                         ->get();
+             }
+         } else {
+             $quizzes         = App\Quiz::orderBy('created_at', 'desc')
+                                   ->limit(5)
+                                   ->get();
+         }
 
-        $quizzes         = App\Quiz::whereIn('category_id',
-                                          (array) $interested_categories->quiz_categories)
-      ->where('start_date','<=', date('Y-m-d'))
-      ->where('end_date','>=', date('Y-m-d'))
-                                ->orderBy('created_at','desc')
-                                ->limit(5)
-                                ->get();
-        }
-        else {
-          $quizzes         = App\Quiz::orderBy('created_at','desc')
-                                ->limit(5)
-                                ->get();
-        }
-
-        return $quizzes;
-    }
+         return $quizzes;
+     }
 
       public function getLatestLmsSeries()
-    {
-        $user = Auth::user();
-        $interested_categories      = null;
-        if($user->settings)
-        {
-          $interested_categories =  json_decode($user->settings)->user_preferences;
-        }
-        $series = [];
+      {
+          $user = Auth::user();
+          $interested_categories      = null;
+          if ($user->settings) {
+              $interested_categories =  json_decode($user->settings)->user_preferences;
+          }
+          $series = [];
 
-        if($interested_categories) {
-        if(count($interested_categories->lms_categories))
+          if ($interested_categories) {
+              if (count($interested_categories->lms_categories)) {
+                  $series         = App\LmsSeries::whereIn(
+                      'lms_category_id',
+                      (array) $interested_categories->lms_categories
+                  )
+                                          ->orderBy('created_at', 'desc')
+                                          ->limit(5)
+                                          ->get();
+              }
+          } else {
+              $series         = App\LmsSeries::orderBy('created_at', 'desc')
+                                    ->limit(5)
+                                    ->get();
+          }
 
-        $series         = App\LmsSeries::whereIn('lms_category_id',
-                                          (array) $interested_categories->lms_categories)
-                                ->orderBy('created_at','desc')
-                                ->limit(5)
-                                ->get();
-        }
-        else {
-          $series         = App\LmsSeries::orderBy('created_at','desc')
-                                ->limit(5)
-                                ->get();
-        }
-
-        return $series;
-    }
+          return $series;
+      }
 
     public function getPaymentStats()
     {
         $paymentObject = new App\Payment();
-            $payment_data = (object)$paymentObject->getSuccessFailedCount();
+        $payment_data = (object)$paymentObject->getSuccessFailedCount();
 
 
-            $payment_dataset = [$payment_data->success_count, $payment_data->cancelled_count, $payment_data->pending_count];
-            $payment_labels = [getPhrase('success'), getPhrase('cancelled'), getPhrase('pending')];
-            $payment_dataset_labels = [getPhrase('total')];
+        $payment_dataset = [$payment_data->success_count, $payment_data->cancelled_count, $payment_data->pending_count];
+        $payment_labels = [getPhrase('success'), getPhrase('cancelled'), getPhrase('pending')];
+        $payment_dataset_labels = [getPhrase('total')];
 
-            $payment_bgcolor = [getColor('',4),getColor('',9),getColor('',18)];
-            $payment_border_color = [getColor('background',4),getColor('background',9),getColor('background',18)];
+        $payment_bgcolor = [getColor('', 4),getColor('', 9),getColor('', 18)];
+        $payment_border_color = [getColor('background', 4),getColor('background', 9),getColor('background', 18)];
 
-          $payments_stats['data']    = (object) array(
-                                        'labels'            => $payment_labels,
-                                        'dataset'           => $payment_dataset,
-                                        'dataset_label'     => $payment_dataset_labels,
-                                        'bgcolor'           => $payment_bgcolor,
-                                        'border_color'      => $payment_border_color
-                                        );
-           $payments_stats['type'] = 'bar';
-             $payments_stats['title'] = getPhrase('overall_statistics');
+        $payments_stats['data']    = (object) array(
+                                      'labels'            => $payment_labels,
+                                      'dataset'           => $payment_dataset,
+                                      'dataset_label'     => $payment_dataset_labels,
+                                      'bgcolor'           => $payment_bgcolor,
+                                      'border_color'      => $payment_border_color
+                                      );
+        $payments_stats['type'] = 'bar';
+        $payments_stats['title'] = getPhrase('overall_statistics');
 
-           return $payments_stats;
+        return $payments_stats;
     }
     /**
      * This method returns the overall monthly summary of the payments made with status success
@@ -262,88 +251,83 @@ class DashboardController extends Controller
      */
     public function getPaymentMonthlyStats()
     {
-
-          $paymentObject = new App\Payment();
-            $payment_data = (object)$paymentObject->getSuccessMonthlyData();
-
-
-            $payment_dataset = [];
-            $payment_labels = [];
-            $payment_dataset_labels = [getPhrase('total')];
-            $payment_bgcolor = [];
-            $payment_border_color = [];
+        $paymentObject = new App\Payment();
+        $payment_data = (object)$paymentObject->getSuccessMonthlyData();
 
 
-            foreach($payment_data as $record)
-            {
-              $color_number = rand(0,999);;
-              $payment_dataset[] = $record->total;
-              $payment_labels[]  = $record->month;
-              $payment_bgcolor[] = getColor('',$color_number);
-              $payment_border_color[] = getColor('background', $color_number);
+        $payment_dataset = [];
+        $payment_labels = [];
+        $payment_dataset_labels = [getPhrase('total')];
+        $payment_bgcolor = [];
+        $payment_border_color = [];
 
-            }
 
-          $payments_stats['data']    = (object) array(
-                                        'labels'            => $payment_labels,
-                                        'dataset'           => $payment_dataset,
-                                        'dataset_label'     => $payment_dataset_labels,
-                                        'bgcolor'           => $payment_bgcolor,
-                                        'border_color'      => $payment_border_color
-                                        );
-           $payments_stats['type'] = 'line';
-           $payments_stats['title'] = getPhrase('payments_reports_in').' '.getCurrencyCode();
+        foreach ($payment_data as $record) {
+            $color_number = rand(0, 999);
+            ;
+            $payment_dataset[] = $record->total;
+            $payment_labels[]  = $record->month;
+            $payment_bgcolor[] = getColor('', $color_number);
+            $payment_border_color[] = getColor('background', $color_number);
+        }
 
-           return $payments_stats;
+        $payments_stats['data']    = (object) array(
+                                      'labels'            => $payment_labels,
+                                      'dataset'           => $payment_dataset,
+                                      'dataset_label'     => $payment_dataset_labels,
+                                      'bgcolor'           => $payment_bgcolor,
+                                      'border_color'      => $payment_border_color
+                                      );
+        $payments_stats['type'] = 'line';
+        $payments_stats['title'] = getPhrase('payments_reports_in').' '.getCurrencyCode();
+
+        return $payments_stats;
     }
 
     public function getDemandingQuizzes($type='')
     {
-      $quizResultObject = new App\QuizResult();
-      $usage = $quizResultObject->getQuizzesUsage($type);
+        $quizResultObject = new App\QuizResult();
+        $usage = $quizResultObject->getQuizzesUsage($type);
 
         $summary_dataset = [];
-            $summary_labels = [];
-            $summary_dataset_labels = [getPhrase('total')];
-            $summary_bgcolor = [];
-            $summary_border_color = [];
+        $summary_labels = [];
+        $summary_dataset_labels = [getPhrase('total')];
+        $summary_bgcolor = [];
+        $summary_border_color = [];
 
 
-            foreach($usage as $record)
-            {
-              $color_number = rand(0,999);;
-              $summary_dataset[] = $record->total;
-              $summary_labels[]  = $record->quiz_title;
-              $summary_bgcolor[] = getColor('',$color_number);
-              $summary_border_color[] = getColor('background', $color_number);
+        foreach ($usage as $record) {
+            $color_number = rand(0, 999);
+            ;
+            $summary_dataset[] = $record->total;
+            $summary_labels[]  = $record->quiz_title;
+            $summary_bgcolor[] = getColor('', $color_number);
+            $summary_border_color[] = getColor('background', $color_number);
+        }
 
-            }
+        $quiz_stats['data']    = (object) array(
+                                      'labels'            => $summary_labels,
+                                      'dataset'           => $summary_dataset,
+                                      'dataset_label'     => $summary_dataset_labels,
+                                      'bgcolor'           => $summary_bgcolor,
+                                      'border_color'      => $summary_border_color
+                                      );
+        $quiz_stats['type'] = 'doughnut';
+        $quiz_stats['title'] = getPhrase('demanding_quizzes');
+        if ($type!='') {
+            $quiz_stats['title'] = getPhrase('demanding').' '.$type.' '.getPhrase('quizzes');
+        }
 
-          $quiz_stats['data']    = (object) array(
-                                        'labels'            => $summary_labels,
-                                        'dataset'           => $summary_dataset,
-                                        'dataset_label'     => $summary_dataset_labels,
-                                        'bgcolor'           => $summary_bgcolor,
-                                        'border_color'      => $summary_border_color
-                                        );
-           $quiz_stats['type'] = 'doughnut';
-           $quiz_stats['title'] = getPhrase('demanding_quizzes');
-           if($type!='')
-           $quiz_stats['title'] = getPhrase('demanding').' '.$type.' '.getPhrase('quizzes');
-
-           return $quiz_stats;
+        return $quiz_stats;
     }
 
     public function testLanguage($value='')
     {
+        dd($language_phrases = (array) session('language_phrases'));
 
-      dd( $language_phrases = (array) session('language_phrases'));
-
-      $tr = new TranslateClient(); // Default is from 'auto' to 'en'
-      $tr->setSource('en'); // Translate from English
-      $tr->setTarget('te'); // Translate to Georgian
-      echo $tr->translate('Hello World');
+        $tr = new TranslateClient(); // Default is from 'auto' to 'en'
+        $tr->setSource('en'); // Translate from English
+        $tr->setTarget('te'); // Translate to Georgian
+        echo $tr->translate('Hello World');
     }
-
-
 }

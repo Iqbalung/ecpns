@@ -7,109 +7,94 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Symfony\Component\HttpFoundation\Cookie;
 
-use \App;
-use \App\UserSubscription;
-use \App\Quiz;
-use \App\ExamSeries;
-use \App\LmsSeries;
+use App;
+use App\UserSubscription;
+use App\Quiz;
+use App\ExamSeries;
+use App\LmsSeries;
 use Response;
 use Exception;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 use App\Feedback;
 use App\User;
 use App\Page;
+use App\UserExam;
 
 class SiteController extends Controller
 {
-
     public function index()
     {
-
-
-      if (env('DB_DATABASE')!='') {
-
-        try {
-
-         $current_theme            = getDefaultTheme();
-         $data['home_title']       = getThemeSetting('home_page_title',$current_theme);
-         $data['home_link']        = getThemeSetting('home_page_link',$current_theme);
-         $data['home_image']       = getThemeSetting('home_page_image',$current_theme);
-         $data['home_back_image']  = getThemeSetting('home_page_background_image',$current_theme);
+        if (env('DB_DATABASE')!='') {
+            try {
+                $current_theme            = getDefaultTheme();
+                $data['home_title']       = getThemeSetting('home_page_title', $current_theme);
+                $data['home_link']        = getThemeSetting('home_page_link', $current_theme);
+                $data['home_image']       = getThemeSetting('home_page_image', $current_theme);
+                $data['home_back_image']  = getThemeSetting('home_page_background_image', $current_theme);
 
 
 
-        $data['key'] = 'home';
+                $data['key'] = 'home';
 
-        $data['active_class'] = 'home';
-
-
-        $categories           = App\QuizCategory::getPracticeExamsCategories(8);
+                $data['active_class'] = 'home';
 
 
-        $data['categories']   = $categories;
-
-        if(count($categories) > 0 ){
-
-          $firstOne        = $categories[0];
-          $quizzes         = Quiz::where('category_id',$firstOne->id)
-                                 ->where('show_in_front',1)
-                                 ->where('total_marks','>',0)
-                                 ->limit(6)
-                                 ->get();
-
-          $data['quizzes'] = $quizzes;
-        }
-
-         $lms_cates  = LmsSeries::getFreeSeries(8);
-
-         if(count($lms_cates) > 0){
-
-            $firstlmsOne  = $lms_cates[0];
-
-            $firstSeries  = LmsSeries::where('lms_category_id',$firstlmsOne->id)
-                                       ->where('show_in_front',1)
-                                       ->where('total_items','>',0)
-                                       ->orderby('created_at','desc')
-                                       ->limit(4)
-                                       ->get();
-
-            $data['lms_cates']  = $lms_cates;
-            $data['lms_series'] = $firstSeries;
-         }
+                $categories           = App\QuizCategory::getPracticeExamsCategories(8);
 
 
-        //testimonies
-        $data['testimonies'] = Feedback::join('users', 'users.id','=','feedbacks.user_id')
-                                        ->select(['feedbacks.title','feedbacks.description','users.name','users.image'])
-                                        ->where('feedbacks.read_status', 1)
-                                        ->orderBy('feedbacks.updated_at', 'desc')
-                                        ->get();
+                $data['categories']   = $categories;
 
+                if (count($categories) > 0) {
+                    $firstOne        = $categories[0];
+                    $quizzes         = Quiz::where('category_id', $firstOne->id)
+                                           ->where('show_in_front', 1)
+                                           ->where('total_marks', '>', 0)
+                                           ->limit(6)
+                                           ->get();
 
-
-
-        $view_name = getTheme().'::site.index';
-        return view($view_name, $data);
-
-          }catch (Exception $e) {
-
-               if(env('DB_DATABASE')=='') {
-                return redirect( URL_INSTALL_SYSTEM );
-                } else {
-                return redirect( URL_UPDATE_DATABASE );
+                    $data['quizzes'] = $quizzes;
                 }
-           }
 
-      }
+                $lms_cates  = LmsSeries::getFreeSeries(8);
 
-      else {
+                if (count($lms_cates) > 0) {
+                    $firstlmsOne  = $lms_cates[0];
 
-        return redirect('/install');
-      }
+                    $firstSeries  = LmsSeries::where('lms_category_id', $firstlmsOne->id)
+                                               ->where('show_in_front', 1)
+                                               ->where('total_items', '>', 0)
+                                               ->orderby('created_at', 'desc')
+                                               ->limit(4)
+                                               ->get();
+
+                    $data['lms_cates']  = $lms_cates;
+                    $data['lms_series'] = $firstSeries;
+                }
+
+
+                //testimonies
+                $data['testimonies'] = Feedback::join('users', 'users.id', '=', 'feedbacks.user_id')
+                                                ->select(['feedbacks.title','feedbacks.description','users.name','users.image'])
+                                                ->where('feedbacks.read_status', 1)
+                                                ->orderBy('feedbacks.updated_at', 'desc')
+                                                ->get();
 
 
 
+
+                $view_name = getTheme().'::site.index';
+                return view($view_name, $data);
+            } catch (Exception $e) {
+                if (env('DB_DATABASE')=='') {
+                    return redirect(URL_INSTALL_SYSTEM);
+                } else {
+                    return redirect(URL_UPDATE_DATABASE);
+                }
+            }
+        } else {
+            return redirect('/install');
+        }
     }
     /**
      * This method will load the static pages
@@ -118,33 +103,25 @@ class SiteController extends Controller
      */
     public function sitePages($key='privacy-policy')
     {
-
         $available_pages = ['privacy-policy', 'terms-conditions','about-us','courses','pattren','pricing','syllabus'];
-        if(!in_array($key, $available_pages))
-        {
+        if (!in_array($key, $available_pages)) {
             pageNotFound();
             return back();
         }
         $data['title']        = ucfirst(getPhrase($key));
-        if($key == 'about-us'){
-
-        $data['title']        = getPhrase('about_us');
-        }
-        elseif($key == 'privacy-policy'){
-        $data['title']        = getPhrase('privacy_policy');
-
-        }
-        elseif($key == 'terms-conditions'){
-        $data['title']        = getPhrase('terms_conditions');
-
+        if ($key == 'about-us') {
+            $data['title']        = getPhrase('about_us');
+        } elseif ($key == 'privacy-policy') {
+            $data['title']        = getPhrase('privacy_policy');
+        } elseif ($key == 'terms-conditions') {
+            $data['title']        = getPhrase('terms_conditions');
         }
         $data['key']          = $key;
         $data['active_class'] = $key;
 
 
-         $view_name = getTheme().'::site.dynamic-view';
+        $view_name = getTheme().'::site.dynamic-view';
         return view($view_name, $data);
-
     }
 
 
@@ -155,20 +132,16 @@ class SiteController extends Controller
      */
     public function saveSubscription(Request $request)
     {
-
-
-       $email  = $request->useremail;
-       $record   = UserSubscription::where('email',$email)->first();
-       if(!$record){
-           $new_record   = new UserSubscription();
-           $new_record->email  = $email;
-           $new_record->save();
-           echo json_encode(array('status'=>'ok'));
-       }
-       else{
-        echo json_encode(array('status'=>'existed'));
-       }
-
+        $email  = $request->useremail;
+        $record   = UserSubscription::where('email', $email)->first();
+        if (!$record) {
+            $new_record   = new UserSubscription();
+            $new_record->email  = $email;
+            $new_record->save();
+            echo json_encode(array('status'=>'ok'));
+        } else {
+            echo json_encode(array('status'=>'existed'));
+        }
     }
 
     /**
@@ -179,7 +152,6 @@ class SiteController extends Controller
      */
     public function frontAllExamCats($slug='')
     {
-
         $search_term = \Input::get('search_term');
 
 
@@ -190,54 +162,43 @@ class SiteController extends Controller
         $data['categories']   = $categories;
         $quizzes  = array();
 
-        if($categories && !$slug)
-        {
-
-          $firstOne = $categories[0];
+        if ($categories && !$slug) {
+            $firstOne = $categories[0];
 
             if ($search_term) {
-
-              $quizzes  = ExamSeries::paginate(9);
-
+                $quizzes  = ExamSeries::paginate(9);
             } else {
-
-              $quizzes  = ExamSeries::paginate(9);
+                $quizzes  = ExamSeries::paginate(9);
             }
 
-          $data['title']  = ucfirst($firstOne->category);
+            $data['title']  = ucfirst($firstOne->category);
         }
-        if($categories && $slug){
-
-           $category  = App\QuizCategory::where('slug',$slug)->first();
+        if ($categories && $slug) {
+            $category  = App\QuizCategory::where('slug', $slug)->first();
 
             if ($search_term) {
-
-              $quizzes   = Quiz::where('category_id', $category->id)
-                             ->where('show_in_front',1)
-                             ->where('total_marks','>',0)
-                             ->where('title','LIKE','%'.$search_term.'%')
-                             ->paginate(9);
+                $quizzes   = Quiz::where('category_id', $category->id)
+                               ->where('show_in_front', 1)
+                               ->where('total_marks', '>', 0)
+                               ->where('title', 'LIKE', '%'.$search_term.'%')
+                               ->paginate(9);
             } else {
-
-              $quizzes   = Quiz::where('category_id', $category->id)
-                             ->where('show_in_front',1)
-                             ->where('total_marks','>',0)
-                             ->paginate(9);
+                $quizzes   = Quiz::where('category_id', $category->id)
+                               ->where('show_in_front', 1)
+                               ->where('total_marks', '>', 0)
+                               ->paginate(9);
             }
 
             $data['title']  = ucfirst($category->category);
-
         }
 
-          $data['quizzes']   = $quizzes;
-          $data['quiz_slug'] = $slug;
+        $data['quizzes']   = $quizzes;
+        $data['quiz_slug'] = $slug;
 
-          $data['search_term'] = $search_term;
+        $data['search_term'] = $search_term;
 
         $view_name = getTheme().'::site.allexam_categories';
         return view($view_name, $data);
-
-
     }
 
     /**
@@ -247,8 +208,7 @@ class SiteController extends Controller
      */
     public function forntAllLMSCats($slug='')
     {
-
-       $search_term = \Input::get('search_term');
+        $search_term = \Input::get('search_term');
 
         $data['key'] = 'home';
 
@@ -258,64 +218,52 @@ class SiteController extends Controller
         $data['lms_cates']    = $lms_cates;
         $all_series           = array();
 
-        if(count($lms_cates) && !$slug)
-        {
+        if (count($lms_cates) && !$slug) {
+            $firstOne        = $lms_cates[0];
 
-          $firstOne        = $lms_cates[0];
-
-          if ($search_term) {
-
-            $all_series = LmsSeries::where('lms_category_id', $firstOne->id)
-                                    ->where('show_in_front',1)
-                                    ->where('total_items','>',0)
-                                    ->where('title','LIKE','%'.$search_term.'%')
-                                    ->paginate(9);
-
-          } else {
-
-            $all_series = LmsSeries::where('lms_category_id', $firstOne->id)
-                                   ->where('show_in_front',1)
-                                   ->where('total_items','>',0)
-                                   ->paginate(9);
-          }
+            if ($search_term) {
+                $all_series = LmsSeries::where('lms_category_id', $firstOne->id)
+                                        ->where('show_in_front', 1)
+                                        ->where('total_items', '>', 0)
+                                        ->where('title', 'LIKE', '%'.$search_term.'%')
+                                        ->paginate(9);
+            } else {
+                $all_series = LmsSeries::where('lms_category_id', $firstOne->id)
+                                       ->where('show_in_front', 1)
+                                       ->where('total_items', '>', 0)
+                                       ->paginate(9);
+            }
 
 
-           $data['title']  = ucfirst($firstOne->category);
-
+            $data['title']  = ucfirst($firstOne->category);
         }
 
-        if($lms_cates && $slug)
-        {
-           $category     = App\LmsCategory::where('slug',$slug)->first();
+        if ($lms_cates && $slug) {
+            $category     = App\LmsCategory::where('slug', $slug)->first();
 
 
-           if ($search_term) {
+            if ($search_term) {
+                $all_series   = LmsSeries::where('lms_category_id', $category->id)
+                                        ->where('show_in_front', 1)
+                                        ->where('total_items', '>', 0)
+                                        ->where('title', 'LIKE', '%'.$search_term.'%')
+                                        ->paginate(9);
+            } else {
+                $all_series   = LmsSeries::where('lms_category_id', $category->id)
+                                        ->where('show_in_front', 1)
+                                        ->where('total_items', '>', 0)
+                                        ->paginate(9);
+            }
 
-              $all_series   = LmsSeries::where('lms_category_id',$category->id)
-                                      ->where('show_in_front',1)
-                                      ->where('total_items','>',0)
-                                      ->where('title','LIKE','%'.$search_term.'%')
-                                      ->paginate(9);
-
-           } else {
-
-              $all_series   = LmsSeries::where('lms_category_id',$category->id)
-                                      ->where('show_in_front',1)
-                                      ->where('total_items','>',0)
-                                      ->paginate(9);
-           }
-
-          $data['title']  = ucfirst($category->category);
+            $data['title']  = ucfirst($category->category);
         }
-          $data['all_series']   = $all_series;
-          $data['lms_cat_slug'] = $slug;
+        $data['all_series']   = $all_series;
+        $data['lms_cat_slug'] = $slug;
 
-          $data['search_term'] = $search_term;
+        $data['search_term'] = $search_term;
 
-            $view_name = getTheme().'::site.alllms_categories';
+        $view_name = getTheme().'::site.alllms_categories';
         return view($view_name, $data);
-
-
     }
 
     /**
@@ -325,13 +273,12 @@ class SiteController extends Controller
      */
     public function forntLMSContents($slug)
     {
-
         $data['key'] = 'home';
 
         $data['active_class'] = 'lms';
 
-        $lms_series   = LmsSeries::where('slug',$slug)->first();
-        $lms_category = App\LmsCategory::where('id',$lms_series->lms_category_id)->first();
+        $lms_series   = LmsSeries::where('slug', $slug)->first();
+        $lms_category = App\LmsCategory::where('id', $lms_series->lms_category_id)->first();
         $contents     = $lms_series->viewContents(9);
 
 
@@ -344,31 +291,26 @@ class SiteController extends Controller
         $data['lms_cates']    = $lms_cates;
         $data['lms_cat_slug'] = $lms_category->slug;
 
-            $view_name = getTheme().'::site.lms-contents';
+        $view_name = getTheme().'::site.lms-contents';
         return view($view_name, $data);
-
     }
 
     /**
      * Downlaod lms file type contents
      * @return [type] [description]
      */
-    public function downloadLMSContent($content_slug){
+    public function downloadLMSContent($content_slug)
+    {
         $content_record = App\LmsContent::getRecordWithSlug($content_slug);
 
         try {
+            $pathToFile= "public/uploads/lms/content"."/".$content_record->file_path;
 
-           $pathToFile= "public/uploads/lms/content"."/".$content_record->file_path;
-
-           return Response::download($pathToFile);
-
+            return Response::download($pathToFile);
         } catch (Exception $e) {
-
-           flash('Ooops','file_is_not_found','error');
-           return back();
+            flash('Ooops', 'file_is_not_found', 'error');
+            return back();
         }
-
-
     }
 
     /**
@@ -376,7 +318,7 @@ class SiteController extends Controller
      * @param  [type] $content_slug [description]
      * @return [type]               [description]
      */
-    public function viewVideo($content_slug,$series_id='')
+    public function viewVideo($content_slug, $series_id='')
     {
         $content_record = App\LmsContent::getRecordWithSlug($content_slug);
 
@@ -387,20 +329,20 @@ class SiteController extends Controller
         $data['title']           = ucfirst($content_record->title);
         $data['content_record']  = $content_record;
         $data['video_src']       =  $video_src = $content_record->file_path;
-        if($series_id!=''){
-           $first_series   = LmsSeries::where('id',$series_id)->first();
+        if ($series_id!='') {
+            $first_series   = LmsSeries::where('id', $series_id)->first();
 
-             $all_series   = LmsSeries::where('lms_category_id',$first_series->lms_category_id)
-                                         ->where('id','!=',$first_series->id)
-                                         ->where('show_in_front',1)
-                                         ->where('total_items','>',0)
-                                         ->get();
+            $all_series   = LmsSeries::where('lms_category_id', $first_series->lms_category_id)
+                                        ->where('id', '!=', $first_series->id)
+                                        ->where('show_in_front', 1)
+                                        ->where('total_items', '>', 0)
+                                        ->get();
         }
 
-         $data['first_series']  = $first_series;
-         $data['all_series']    = $all_series;
+        $data['first_series']  = $first_series;
+        $data['all_series']    = $all_series;
 
-          $view_name = getTheme().'::site.lms-content-video';
+        $view_name = getTheme().'::site.lms-content-video';
         return view($view_name, $data);
     }
 
@@ -410,38 +352,34 @@ class SiteController extends Controller
      */
     public function ContactUs(Request $request)
     {
-       $data  = array();
-       $data['name']     = $request->name;
-       $data['email']    = $request->email;
-       $data['number']   = $request->phone;
-       $data['subject']  = $request->subject;
-       $data['message']  = $request->message;
+        $data  = array();
+        $data['name']     = $request->name;
+        $data['email']    = $request->email;
+        $data['number']   = $request->phone;
+        $data['subject']  = $request->subject;
+        $data['message']  = $request->message;
 
         try {
-
-            $super_admin  = App\User::where('role_id',1)->first();
+            $super_admin  = App\User::where('role_id', 1)->first();
 
             $super_admin->notify(new \App\Notifications\UserContactUs($super_admin, $data));
 
             sendEmail('usercontactus', array('name'=> $request->name,
                       'to_email' => $request->email ));
+        } catch (Exception $e) {
+        }
 
-         } catch (Exception $e) {
-         }
-
-        flash('congratulations','our_team_will_contact_you_soon','success');
+        flash('congratulations', 'our_team_will_contact_you_soon', 'success');
         return redirect(URL_SITE_CONTACTUS);
-
     }
 
 
     public function getSeriesContents(Request $request)
     {
-       $lms_series   = LmsSeries::find($request->lms_series_id);
-       $contents     = $lms_series->viewContents();
+        $lms_series   = LmsSeries::find($request->lms_series_id);
+        $contents     = $lms_series->viewContents();
 
-       return json_encode(array('contents'=>$contents));
-
+        return json_encode(array('contents'=>$contents));
     }
 
 
@@ -449,15 +387,14 @@ class SiteController extends Controller
 
     public function takeExamLogin($quiz_id)
     {
-       session()->put('exam_id',$quiz_id);
-       session()->put('active_time',time());
+        session()->put('exam_id', $quiz_id);
+        session()->put('active_time', time());
 
-
-        if(Auth::check()){
-
-           return redirect( PREFIX );
+        if (Auth::check()) {
+            return redirect(PREFIX);
         }
-       return redirect( URL_USERS_LOGIN );
+
+        return redirect(URL_USERS_LOGIN);
     }
 
 
@@ -471,32 +408,28 @@ class SiteController extends Controller
      */
     public function page($slug)
     {
-
-        if (!$slug)
-          return redirect( PREFIX );
+        if (!$slug) {
+            return redirect(PREFIX);
+        }
 
         $page = Page::where('slug', $slug)->first();
-        if (!$page)
-            return redirect( PREFIX );
+        if (!$page) {
+            return redirect(PREFIX);
+        }
 
         $data['page']   = $page;
         $data['title']  = $page->name;
         $data['active_class'] = 'pages';
 
 
-         $view_name = getTheme().'::site.page';
+        $view_name = getTheme().'::site.page';
         return view($view_name, $data);
-
     }
 
 
     public function setLayout($layout_color='')
     {
-
-
-
-         if(Auth::check())
-        {
+        if (Auth::check()) {
             $code     = $layout_color;
             $response = new Response();
             return redirect('dashboard')->withCookie(cookie('layout_color', $code));
@@ -510,21 +443,15 @@ class SiteController extends Controller
 
     public function setTheme($theme_name='')
     {
-
-        if(Auth::check())
-        {
+        if (Auth::check()) {
             $code     = $theme_name;
             $response = new Response();
             return redirect('dashboard')->withCookie(cookie('theme_name', $code));
         }
 
-        $code     = $theme_name;
-
-
+        $code = $theme_name;
         $response = new Response();
 
         return redirect(URL_HOME)->withCookie(cookie('theme_name', $code));
     }
-
-
 }
