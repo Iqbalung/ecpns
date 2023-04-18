@@ -34,17 +34,8 @@ Route::get('/', function () {
 });
 
 
-Route::post('/support/facebook/deletion', function (Request $request) {
-    logger(json_encode($request->all()));
-
-    return response()->json([
-        'url' => url('/support/facebook/deletion?id=del1293'),
-        'confirmation_code' => 'del1293',
-    ]);
-});
-
-Route::get('/support/facebook/deletion', function (Request $request) {
-});
+Route::get('/support/facebook/deletion', 'FacebookAccountController@deletion');
+Route::post('/support/facebook/deletion', 'FacebookAccountController@deletionCallback');
 
 
 if (env('DEMO_MODE')) {
