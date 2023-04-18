@@ -19,6 +19,7 @@ class VerifyCsrfToken extends BaseVerifier
        'paynow/fee/pau-cancel',
        'paynow/fee/paypal-success',
        'paynow/fee/paypal-cancel',
-       '/mdtxs/fdxs' // Midtrans Callback
+       '/mdtxs/fdxs', // Midtrans Callback
+       '/support/facebook/deletion' // Facebook Callback
     ];
 }
