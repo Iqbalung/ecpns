@@ -49,6 +49,8 @@ class FacebookAccountController extends Controller
         $signed_request = $request->get('signed_request');
         $data = $this->parseSignedRequest($signed_request);
 
+        logger($data);
+
         if ($data) {
             $param['name'] = null;
             $param['email'] = null;
