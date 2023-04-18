@@ -42,6 +42,7 @@ class FacebookAccountController extends Controller
      */
     public function deletionCallback(Request $request)
     {
+        logger($request->all());
         $request->validate([
             'signed_request' => 'required'
         ]);
