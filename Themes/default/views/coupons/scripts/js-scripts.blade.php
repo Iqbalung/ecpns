@@ -8,19 +8,14 @@
 
 var app = angular.module('academia', ['ngMessages']);
 
-app.controller('couponsController', function( $scope, $http) {
-
-    
+app.controller('couponsController', function( $scope, $http) {    
 
     $scope.intilizeData = function(data){
 
-       
-
         $scope.ngdiscount = 0;
 
-        $scope.ngtotal = {{$item->cost}};
-
-         $scope.isApplied = false;
+        $scope.ngtotal = {{ idrFormat($item->cost) }};
+        $scope.isApplied = false;
 
         return;
 

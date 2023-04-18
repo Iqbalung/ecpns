@@ -618,7 +618,7 @@ class PaymentsController extends Controller
         $userExam->payment_id = $payment_record->id;
         $userExam->exam_series_id = $payment_record->item_id;
 
-        UserExam::safeSave($userExam);
+        UserExam::purchaseExamSeries($userExam);
 
         // Ignore for now (unhandled error :v)
         // $this->sendEmail($payment_record->user_id, $payment_record->id);

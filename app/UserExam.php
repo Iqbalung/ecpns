@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 class UserExam extends Model
@@ -10,7 +11,7 @@ class UserExam extends Model
 
     public $timestamps = false;
 
-    public static function safeSave(UserExam $param)
+    public static function purchaseExamSeries(UserExam $param)
     {
         if (!static::where(['user_id' => $param->user_id, 'exam_series_id' => $param->exam_series_id])->first()) {
             return $param->save();

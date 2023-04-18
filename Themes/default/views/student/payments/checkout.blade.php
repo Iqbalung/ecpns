@@ -254,7 +254,7 @@
 
 											<p class="pull-right ">{{ getCurrencyCode()}}
 
-											<span contenteditable="false" ng-bind="ngtotal">{{$item->cost}}</span></p>
+											<span contenteditable="false" ng-bind="ngtotal">{{ idrFormat($item->cost) }}</span></p>
 
 
 

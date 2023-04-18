@@ -11,6 +11,7 @@
 |
 */
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,17 @@ Route::get('/', function () {
 });
 
 
+Route::post('/support/facebook/deletion', function (Request $request) {
+    logger(json_encode($request->all()));
+
+    return response()->json([
+        'url' => url('/support/facebook/deletion?id=del1293'),
+        'confirmation_code' => 'del1293',
+    ]);
+});
+
+Route::get('/support/facebook/deletion', function (Request $request) {
+});
 
 
 if (env('DEMO_MODE')) {
