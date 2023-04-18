@@ -42,10 +42,12 @@ class FacebookAccountController extends Controller
      */
     public function deletionCallback(Request $request)
     {
+        $request->validate([
+            'signed_request' => 'required'
+        ]);
+
         $signed_request = $request->get('signed_request');
         $data = $this->parseSignedRequest($signed_request);
-
-        logger($data);
 
         if ($data) {
             $param['name'] = null;
