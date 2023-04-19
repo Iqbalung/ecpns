@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dev": "tailwindcss -i ./src/css/tailwind.css -o ./dist/yapresindo.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.1"
+  }
+}
