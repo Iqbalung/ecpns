@@ -221,7 +221,7 @@ Buttons & Links #STYLING
 /* Primary Button */
 
 .btn-primary {
-    background-color: #4786ff;
+    background-color: #d11616;
     color: #ffffff;
 }
 
@@ -230,7 +230,7 @@ Buttons & Links #STYLING
 }
 
 .btn-primary:hover {
-    background: #4786ff;
+    background: #d11616;
     color: #ffffff;
 }
 
@@ -403,8 +403,8 @@ input[type="number"]:focus,
 input[type="search"]:focus,
 input[type="email"]:focus,
 .form-control:focus {
-    box-shadow: 0px 0px 0px 1px #4786ff;
-    border-color: #4786ff;
+    box-shadow: 0px 0px 0px 1px #d11616;
+    border-color: #d11616;
 }
 
 .styled-select {
@@ -487,9 +487,9 @@ Pagination & Breadcrumbs #STYLING
 .cs-pagination.pagination>.active>span,
 .cs-pagination.pagination>.active>span:focus,
 .cs-pagination.pagination>.active>span:hover {
-    background-color: #4786ff;
+    background-color: #d11616;
     color: #ffffff;
-    border-color: #4786ff;
+    border-color: #d11616;
 }
 
 
@@ -603,7 +603,7 @@ Top Bar
 
 .navbar-brand {
     font-size: 20px;
-    color: #4786ff;
+    color: #d11616;
     height: auto;
     padding: 10px 15px;
 }
@@ -684,14 +684,14 @@ ul.nav li:hover>ul.dropdown-menu {
     transition: 0s max-height 0.15s linear, 0.1s opacity cubic-bezier(0.39, 0.575, 0.565, 1), 0.15s transform cubic-bezier(0.1, 1.26, 0.83, 1), 0.15s -webkit-transform cubic-bezier(0.1, 1.26, 0.83, 1);
     left: 0;
     top: 0;
-    background: #4786ff;
+    background: #d11616;
     width: 3px;
     height: 35px;
     content: "";
 }
 
 .dropdown-menu>li>a:hover {
-    color: #4786ff;
+    color: #d11616;
 }
 
 
@@ -722,7 +722,7 @@ ul.nav li:hover>ul.dropdown-menu {
     font-weight: 500;
     font-size: 13px;
     border-radius: 2px;
-    background-color:#4786ff;
+    background-color:#d11616;
     margin-left: 3px;
 }
 
@@ -755,13 +755,13 @@ Main Navigation Bar
 ---------------------------------------- */
 
 .navbar-default.pw-navbar-default {
-    background:#4786ff;
+    background: url('https://indonesia.go.id/assets/frontend/images/npatt.png') #e90e09;
     -webkit-transition: all .3s ease;
     transition: all .3s ease;
 }
 
 .navbar-default.pw-navbar-default.navbar-fixed-top {
-     background:#4786ff;
+     background:#d11616;
    /* box-shadow: 0px 2px 5px -1px rgba(0, 0, 0, 0.15);*/
 }
 .navbar-default .navbar-nav>.active>a{
@@ -791,7 +791,7 @@ Main Navigation Bar
 .navbar-default.pw-navbar-default .navbar-nav>.open>a,
 .navbar-default.pw-navbar-default .navbar-nav>.open>a:focus,
 .navbar-default.pw-navbar-default .navbar-nav>.open>a:hover {
-    background-color:  #4786ff;
+    background-color:  #d11616;
     color:  #fff;
 }
 
@@ -1148,7 +1148,7 @@ footer {
 }
 
 .cs-footer-links>li>a:hover {
-    color: #4786ff;
+    color: #d11616;
 }
 
 .cs-copyright {
@@ -1807,7 +1807,7 @@ Icon List #COMPONENT
 }
 
 .cs-icon-list>li>a:hover {
-   background: #4786ff;
+   background: #d11616;
     color: #fff;
 }
 
@@ -1855,7 +1855,7 @@ Contact Item Chip #COMPONENT
 
 .cs-item-chip .cs-font-icon {
     font-size: 25px;
-    color: #4786ff;
+    color: #d11616;
     margin-top: -2px;
 }
 
@@ -1931,7 +1931,7 @@ Price Tables #COMPONENT
 
 .cs-price-card-features>li i {
     margin-right: 10px;
-    color: #4786ff;
+    color: #d11616;
 }
 
 .cs-price-card-features>li+li {
@@ -2411,7 +2411,7 @@ Widgets
 
 .cs-tags>li>a {
     display: inline-block;
-    color: #4786ff;
+    color: #d11616;
     font-size: 14px;
     font-weight: 400;
     padding: 4px 0px;
@@ -2739,7 +2739,7 @@ Product Single Item View
 }
 
 .cs-item-details ul>li>a {
-    color: #4786ff;
+    color: #d11616;
 }
 
 
@@ -3335,7 +3335,7 @@ Google Maps
 }
 .cs-icon-list li.active a{
    
-   background: #4786ff;
+   background: #d11616;
    color: #fff;
 }
 
@@ -3562,15 +3562,15 @@ Home page nav bar tablet size
 ****************************/
 @media(max-width:768px) {
     .navbar-default.pw-navbar-default .navbar-nav>li>a {
-        background: #4786ff;
+        background: #d11616;
     }
 
     .navbar-default .navbar-toggle .icon-bar {
-        background-color: #4786ff;
+        background-color: #d11616;
     }
 
     .navbar-default.pw-navbar-default .navbar-nav>li>a {
-        background: #4786ff;
+        background: #d11616;
     }
 }
 

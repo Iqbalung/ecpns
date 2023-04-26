@@ -29,30 +29,20 @@ class SiteController extends Controller
         if (env('DB_DATABASE')!='') {
             try {
                 $current_theme            = getDefaultTheme();
-                $data['home_title']       = getThemeSetting('home_page_title', $current_theme);
+                $data['home_title']       = 'tes'.getThemeSetting('home_page_title', $current_theme);
                 $data['home_link']        = getThemeSetting('home_page_link', $current_theme);
                 $data['home_image']       = getThemeSetting('home_page_image', $current_theme);
                 $data['home_back_image']  = getThemeSetting('home_page_background_image', $current_theme);
-
-
-
                 $data['key'] = 'home';
-
                 $data['active_class'] = 'home';
-
-
-                $categories           = App\QuizCategory::getPracticeExamsCategories(8);
-
-
+                $categories = App\QuizCategory::getPracticeExamsCategories(8);
                 $data['categories']   = $categories;
-
-                $data['exam_series']   = ExamSeries::all();
+                $data['exam_series']  = ExamSeries::all();
 
                 $lms_cates  = LmsSeries::getFreeSeries(8);
 
                 if (count($lms_cates) > 0) {
                     $firstlmsOne  = $lms_cates[0];
-
                     $firstSeries  = LmsSeries::where('lms_category_id', $firstlmsOne->id)
                                                ->where('show_in_front', 1)
                                                ->where('total_items', '>', 0)
@@ -71,9 +61,6 @@ class SiteController extends Controller
                                                 ->where('feedbacks.read_status', 1)
                                                 ->orderBy('feedbacks.updated_at', 'desc')
                                                 ->get();
-
-
-
 
                 $view_name = getTheme().'::site.index';
                 return view($view_name, $data);
