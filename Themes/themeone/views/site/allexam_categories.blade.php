@@ -13,35 +13,13 @@
         <div class="container">
             <div class="row cs-row">
                 <!-- Side Bar -->
-                <div class="col-md-3">
-                    <!-- Icon List  -->
-                    <ul class="cs-icon-list">
-
-                    @if(count($categories))
-
-                         @foreach($categories as $category)
-
-                          <li id={{$category->slug}}><a href="{{URL_VIEW_ALL_EXAM_CATEGORIES.'/'.$category->slug}}">{{$category->category}}</a></li>
-
-                          @endforeach
-
-	                   @else
-
-	                     <h4>No Exams Are Available</h4> 
-
-	               @endif 
-                       
-                    </ul>
-                    <!-- /Icon List  -->
-                </div>
-
-
+               
 
 
                 <!-- Main Section -->
             @if(count($quizzes))
 
-                <div class="col-md-9">
+                <div class="col-md-12">
 
                     <!--search-->
                     <div class="row">
@@ -60,11 +38,6 @@
                         </div>
                     </div>
                     <!--search-->
-
-
-
-
-
 
 
                     <!-- Product Filter Bar -->
