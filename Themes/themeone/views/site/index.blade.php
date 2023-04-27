@@ -14,17 +14,18 @@
     <header class="hero-header hhbimg">
         <div class="container">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-12">
                     <div class="hero-content">
-                        <h1 class="cs-hero-title">{{ $home_title }}</h1>
+                        <center>
+                            <br><br><br><br>
+                        <h1 class="cs-hero-title">Berbagung Bersama</h1>
+                        <h2 class="cs-hero-title">Komunitas Belajar Terbesar</h2>
                         <div><a href="{{ $home_link }}" class="btn btn-primary btn-hero" target="_blank">Get Started</a>
-                        </div>
+                        </center>    
+                    </div>
                     </div>
                 </div>
-                <div class="col-md-7">
-                    <img src="{{ IMAGE_PATH_SETTINGS . $home_image }}" alt=""
-                        class="animated fadeInUp img-responsive wow" data-wow-duration="900ms" data-wow-delay="300ms">
-                </div>
+              
             </div>
         </div>
     </header>

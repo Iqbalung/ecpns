@@ -85,7 +85,7 @@
                             class="page-scroll"
                         @endif
 
-                        href="{{PREFIX}}">Home</a>
+                        href="{{PREFIX}}">Home 11</a>
                     </li>
 
 

@@ -29,7 +29,7 @@ class SiteController extends Controller
         if (env('DB_DATABASE')!='') {
             try {
                 $current_theme            = getDefaultTheme();
-                $data['home_title']       = 'tes'.getThemeSetting('home_page_title', $current_theme);
+                $data['home_title']       = getThemeSetting('home_page_title', $current_theme);
                 $data['home_link']        = getThemeSetting('home_page_link', $current_theme);
                 $data['home_image']       = getThemeSetting('home_page_image', $current_theme);
                 $data['home_back_image']  = getThemeSetting('home_page_background_image', $current_theme);
