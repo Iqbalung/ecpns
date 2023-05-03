@@ -234,7 +234,7 @@ Route::get(
     'QuestionBankController@getQuestions'
 );
 Route::get('exams/questionbank/import', 'QuestionBankController@import');
-Route::post('exams/questionbank/import', 'QuestionBankController@readExcel');
+Route::post('exams/questionbank/import', 'ImportExcelController@import');
 
 
 //Quiz Categories

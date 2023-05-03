@@ -18,13 +18,17 @@
     $set_answers = array();
     if($record) {
         $set_answers = json_decode($record->answers);
-        if(count($set_answers))
-        {
-            if(isset($set_answers[0]->total_options))
-            $total_answers = $set_answers[0]->total_options;
+        if (is_array($set_answers) || is_object($set_answers)) {
+            if (count($set_answers)) {
+                if (isset($set_answers[0]->total_options)) {
+                    $total_answers = $set_answers[0]->total_options;
+                }
+            }
         }
     }
          
+    
+    
     ?>
     <fieldset class="form-group col-md-6">
         {{ Form::label('total_options', getphrase('total_options')) }}

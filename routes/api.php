@@ -87,6 +87,8 @@ Route::group([ 'prefix' => 'v1/'], function () {
     Route::group(['prefix' => 'public'], function() {
         Route::get('/home-data', 'API\PublicController@getHomeData');
         Route::get('/exam-categories', 'API\PublicController@getExamCategories');
+        Route::post('/exam-questions', 'API\PublicController@readExcel');
+        Route::post('/excel-questions', 'ImportExcelController@import');
         Route::get('/testimonies', 'API\PublicController@getTestimonies');
     });
 

@@ -57,6 +57,7 @@ class TopicsController extends Controller
          ->orderBy('updated_at','desc');
 
         return Datatables::of($records)
+        ->escapeColumns([])
         ->addColumn('action', function ($records) {
            $link_data = '<div class="dropdown more">
                         <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -76,6 +77,7 @@ class TopicsController extends Controller
 
             return $link_data;
             })
+            
         ->editColumn('topic_name', function($records)
         {
           return $records->topic_name.' ('.$records->id.')';
@@ -86,7 +88,7 @@ class TopicsController extends Controller
         ->editColumn('parent_id', function($records){
         	return ($records->parent_id == 0) ? '<i class="fa fa-check text-success"></i>' : $records->topic_name;
         })
-        ->make();
+        ->make(false);    
     }
 
     /**
