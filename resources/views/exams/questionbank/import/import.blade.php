@@ -41,7 +41,9 @@
 					<a href="{{DOWNLOAD_LINK_QUESTION_IMPORT_EXCEL}}questions_blanks_template.xlsx" class="btn btn-info">{{getPhrase('fill_the_blanks')}}
 					</a>
 				 
-							<?php $button_name = getPhrase('upload'); ?>
+							<?php 
+							print_r(array('url' => URL_QUESTIONBAMK_IMPORT, 'method' => 'POST', 'novalidate'=>'','name'=>'formUsers ', 'files'=>'true'));
+							$button_name = getPhrase('upload'); ?>
 					
 						{!! Form::open(array('url' => URL_QUESTIONBAMK_IMPORT, 'method' => 'POST', 'novalidate'=>'','name'=>'formUsers ', 'files'=>'true')) !!}
 					<?php $button_name = getPhrase('upload'); 

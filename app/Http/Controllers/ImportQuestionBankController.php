@@ -16,9 +16,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Input;
 use Excel;
-use Exception;
 
-class QuestionBankController extends Controller
+class ImportQuestionBankController extends Controller
 {
     public $excel_data = array();
     public $columns = '';
@@ -1011,65 +1010,8 @@ class QuestionBankController extends Controller
 
      public function readExcel(Request $request)
      {
-         if (!checkRole(getUserGrade(2))) {
-             prepareBlockUserMessage();
-             return back();
-         }
-         $success_list = [];
-         $failed_list = [];
-         $summary = [];
-       
-             if (Input::hasFile('excel')) {
-                 $path = Input::file('excel')->getRealPath();
-                 $data = Excel::load($path, function ($reader) {
-                 })->get();
-                 dd($data);
-
-                 $all_records  = array();
-                 $excel_record = array();
-                 $final_records =array();
-                 $isHavingDuplicate = 0;
-                 if (!empty($data) && $data->count()) {
-                     foreach ($data as $key => $value) {
-                         if (array_has($value, 'subject_id')) {
-                             $all_records[] = $value;
-                         } else {
-                             foreach ($value as $record) {
-                                 $all_records[] = $record;
-                             }
-                         }
-                     }
-
-                     $questionbank = new QuestionBank();
-
-                     $summary = (object)$this->processExcelQuestions($request, $all_records);
-                 }
-             }
-
-             if (isset($summary->failed_list) || isset($summary->success_list)) {
-                 $data['failed_list']   =   $summary->failed_list;
-                 $data['success_list']  =    $summary->success_list;
-
-                 $this->excel_data['failed'] = $summary->failed_list;
-                 $this->excel_data['success'] = $summary->success_list;
-                 $this->excel_data['columns'] = $summary->columns_list;
-
-                 $this->downloadExcel();
-             } else {
-                 flash('oops...!', 'improper_sheet_uploaded', 'error');
-             }
-        
-
-          $data['failed_list']   =   $failed_list;
-         $data['success_list']  =    $success_list;
-         $data['records']      = false;
-         $data['layout']       = getLayout();
-         $data['active_class'] = 'exams';
-         $data['heading']      = getPhrase('upload_questions');
-         $data['title']        = getPhrase('report');
-
-         //$view_name = getTheme().'::exams.questionbank.import.import-result';
-         //return view($view_name, $data);
+         
+        dd("tes");
      }
 
 public function getFailedData()
