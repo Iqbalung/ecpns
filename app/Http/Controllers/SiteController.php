@@ -21,6 +21,7 @@ use App\Feedback;
 use App\User;
 use App\Page;
 use App\UserExam;
+use App\Package;
 
 class SiteController extends Controller
 {
@@ -37,7 +38,7 @@ class SiteController extends Controller
                 $data['active_class'] = 'home';
                 $categories = App\QuizCategory::getPracticeExamsCategories(8);
                 $data['categories']   = $categories;
-                $data['exam_series']  = ExamSeries::all();
+                $data['exam_series']  = Package::all();
 
                 $lms_cates  = LmsSeries::getFreeSeries(8);
 
@@ -63,6 +64,7 @@ class SiteController extends Controller
                                                 ->get();
 
                 $view_name = getTheme().'::site.index';
+                
                 return view($view_name, $data);
             } catch (Exception $e) {
                 if (env('DB_DATABASE')=='') {

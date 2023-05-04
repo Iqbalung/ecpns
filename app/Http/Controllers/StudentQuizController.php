@@ -159,8 +159,10 @@ class StudentQuizController extends Controller
             return redirect($isValid);
         }
 
+       
         if ($record->instructions_page_id) {
             $instruction_page = App\Instruction::where('id', $record->instructions_page_id)->first();
+           
         }
 
         $data['instruction_data'] = '';
@@ -185,7 +187,6 @@ class StudentQuizController extends Controller
         $data['layout']           = getLayout();
         $data['title']          = $record->title;
         $data['block_navigation']          = true;
-
         $view_name = getTheme().'::student.exams.instructions';
         return view($view_name, $data);
     }

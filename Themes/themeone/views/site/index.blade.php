@@ -79,7 +79,7 @@
 
                                         <div class="cs-product-content">
                                             <a href=""
-                                                class="cs-product-title text-center">{{ ucfirst($exam->title) }}</a>
+                                                class="cs-product-title text-center">{{ ucfirst($exam->name) }}</a>
 
 
                                             <ul class="cs-card-actions mt-0">
@@ -91,7 +91,7 @@
 
 
                                                 <li class="cs-right">
-                                                    <a href="#">{{ $exam->dueration }} mins</a>
+                                                    <a href="#">{{ $exam->validity_type }}</a>
 
                                                 </li>
 
@@ -100,7 +100,7 @@
 
                                             <div class="text-center" style="margin-top: 12px; margin-bottom: 12px;">
                                                 <span style="color: #4183BC;">
-                                                    {{ getCurrencyCode() }} {{ idrFormat((int) $exam->cost) }}
+                                                    {{ getCurrencyCode() }} {{ idrFormat((int) $exam->amount) }}
                                                 </span>
                                             </div>
 

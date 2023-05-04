@@ -9,6 +9,7 @@ use App\Quiz;
 use App\Subject;
 use App\QuestionBank;
 use App\QuizCategory;
+use App\Package;
 use App\ExamSeries;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
@@ -523,20 +524,20 @@ class ExamSeriesController extends Controller
      */
     public function viewItem(Request $request, $slug)
     {
-        $record = ExamSeries::getRecordWithSlug($slug);
+        $record = Package::getRecordWithSlug($slug);
 
-        if (!$request->user()->isPurchasedExamSeries($record)) {
+        /* if (!$request->user()->isPurchasedExamSeries($record)) {
             return redirect()->to('/payments/checkout/exam-series/' . $record->slug);
         }
 
         if ($isValid = $this->isValidRecord($record)) {
             return redirect($isValid);
-        }
+        } */
 
         $data['active_class']       = 'exams';
         $data['pay_by']             = '';
         $data['content_record']     = false;
-        $data['title']              = $record->title;
+        $data['title']              = $record->name;
         $data['item']               = $record;
         $data['right_bar']          = true;
         $data['right_bar_path']     = 'student.exams.exam-series-item-view-right-bar';
