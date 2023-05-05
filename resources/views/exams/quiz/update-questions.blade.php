@@ -92,9 +92,7 @@
 								<option value="hard">{{getPhrase('hard')}}</option>	
 
 								</select>
-
 								</fieldset>
-
 
 
 								<fieldset class="form-group col-md-6">
@@ -121,8 +119,7 @@
 								</select>
 
 								</fieldset>
-
-								<!-- <fieldset class="form-group col-md-6">
+							<!-- <fieldset class="form-group col-md-6">
 
 								{{ Form::label('show_in_front_end', getphrase('show_in_front_end')) }}
 

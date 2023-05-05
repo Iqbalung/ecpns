@@ -323,6 +323,7 @@ class QuestionBank extends Model
             if ($record->total_answers=='') {
                 continue;
             }
+            dd($record->total_answers);
             if (!$this->isAllAnswersAvailable($record)) {
                 $message = 'insufficient_answers';
                 $this->moveToFailedList($record, $message, $key);

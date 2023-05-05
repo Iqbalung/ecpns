@@ -57,6 +57,7 @@ class SubjectsController extends Controller
          ->orderBy('updated_at','desc');
 
         return Datatables::of($records)
+        ->escapeColumns([])
         ->addColumn('action', function ($records) {
 
 
@@ -81,7 +82,7 @@ class SubjectsController extends Controller
         ->removeColumn('pass_marks')
         ->removeColumn('maximum_marks')
         ->removeColumn('updated_at')
-        ->make();
+        ->make(false);
     }
 
     /**

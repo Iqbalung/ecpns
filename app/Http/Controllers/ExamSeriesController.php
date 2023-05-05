@@ -109,6 +109,7 @@ class ExamSeriesController extends Controller
         ->removeColumn('slug')
         ->removeColumn('updated_at')
         ->make(false);
+        dd($records->is_paid);
     }
 
     /**
@@ -534,6 +535,8 @@ class ExamSeriesController extends Controller
             return redirect($isValid);
         } */
 
+       
+
         $data['active_class']       = 'exams';
         $data['pay_by']             = '';
         $data['content_record']     = false;
@@ -544,9 +547,11 @@ class ExamSeriesController extends Controller
         $data['right_bar_data']     = array(
                                             'item' => $record,
                                             );
+                                           
         $data['layout']              = getLayout();
 
         $view_name = getTheme().'::student.exams.series.series-view-item';
+
         return view($view_name, $data);
     }
 }

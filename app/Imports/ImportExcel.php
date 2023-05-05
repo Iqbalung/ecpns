@@ -15,7 +15,17 @@ class ImportExcel implements ToModel
     */
     public function model(array $row)
     {
-        if(!empty($row[0])){
+        if(!empty($row[0]) && $row[9] > 0 ){
+
+
+            $answer_json = [];
+            for ($i=0; $i < $row[9] ; $i++) { 
+                $answer_json[]['option_value'] = $row[$i+12];
+            };
+            
+            
+           
+
             return new QuestionBank([
                 //
                 'subject_id' => @$row[0],
@@ -30,10 +40,7 @@ class ImportExcel implements ToModel
                 'total_answers'=> @$row[9],
                 'total_correct_answers' => @$row[10],
                 'correct_answer' => @$row[11],
-                'answer1' => @$row[12],
-                'answer2' => @$row[13],
-                'answer3' => @$row[14],
-                'answer4' => @$row[15],
+                'answers' => json_encode($answer_json,true),
                 'slug' => Uuid::uuid4()
 
             ]);

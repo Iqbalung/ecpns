@@ -519,9 +519,11 @@ class QuizController extends Controller
 
 
         $data['subjects']     = array_pluck(App\Subject::all(), 'subject_title', 'id');
+        
         $data['title']        = getPhrase('update_questions_for').' '.$record->title;
 
         $view_name = getTheme().'::exams.quiz.update-questions';
+       
         return view($view_name, $data);
     }
 

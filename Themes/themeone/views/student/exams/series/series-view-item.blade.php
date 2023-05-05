@@ -3,7 +3,7 @@
 @section('content')
 
 
-<div id="page-wrapper">
+<div id="page-wrapper"> 
 
             <div class="container-fluid">
 
@@ -38,7 +38,6 @@
                 ?>
 
                 <div class="panel panel-custom">
-
 
                     <div class="panel-body">
 
