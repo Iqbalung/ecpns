@@ -18,7 +18,7 @@
                     <div class="hero-content">
                         <center>
                             <br><br><br><br>
-                        <h1 class="cs-hero-title">Berbagung Bersama</h1>
+                        <h1 class="cs-hero-title">Bergabung Bersama</h1>
                         <h2 class="cs-hero-title">Komunitas Belajar Terbesar</h2>
                         <div><a href="{{ $home_link }}" class="btn btn-primary btn-hero" target="_blank">Get Started</a>
                         </center>    
@@ -45,105 +45,68 @@
                     </div>
                 </div>
 
+               
+
+
+
                 @if (!empty($exam_series))
-                    <div class="row">
-
-
+                    <div class="row ">
                         @foreach ($exam_series as $exam)
-                            <div class="col-md-3 col-sm-6">
-
-                                <!--Single EXAM-->
-                                <div class="cs-product cs-animate">
-
-
-                                    <div class="info-box ribbon_box same_height">
-                                        @if ($exam->is_paid)
-                                            <div class="ribbon green"><span> Premium Exam </span></div>
-                                        @else
-                                            <div class="ribbon yellow"><span> Free Exam </span></div>
-                                        @endif
-
-
-                                        <a href="">
-                                            <div class="cs-product-img">
-                                                @if ($exam->image)
-                                                    <img src="{{ IMAGE_PATH_EXAMS . $exam->image }}" alt="exam"
-                                                        class="img-responsive">
+                            <div class="col-md-3 col-sm-6 princing-item yellow">
+                                <div class="pricing-divider m-auto text-center w-75">
+                                            <h3 class="text-light">
+                                                @if ($exam->is_paid)
+                                                    <div class="ribbon green"><span> Premium Exam </span></div>
                                                 @else
-                                                    <img src="{{ IMAGE_PATH_EXAMS_DEFAULT }}" alt="exam"
-                                                        class="img-responsive">
+                                                    <div class="ribbon yellow"><span> Free Exam </span></div>
                                                 @endif
-                                            </div>
-                                        </a>
-
-
-                                        <div class="cs-product-content">
-                                            <a href=""
-                                                class="cs-product-title text-center">{{ ucfirst($exam->name) }}</a>
-
-
-                                            <ul class="cs-card-actions mt-0">
-                                                <li>
-                                                    <a href="#">Marks : {{ (int) $exam->total_marks }}</a>
-                                                </li>
-
-                                                <li> </li>
-
-
-                                                <li class="cs-right">
-                                                    <a href="#">{{ $exam->validity_type }}</a>
-
-                                                </li>
-
-
-                                            </ul>
-
-                                            <div class="text-center" style="margin-top: 12px; margin-bottom: 12px;">
-                                                <span style="color: #4183BC;">
-                                                    {{ getCurrencyCode() }} {{ idrFormat((int) $exam->amount) }}
-                                                </span>
-                                            </div>
-
-
-
-                                            {{-- <div class="text-center" style="margin-top: 30px">
-                                                <a href="#" class="hhfr">{{ getPhrase('price') }} :
-                                                    {{ getCurrencyCode() }} {{ idrFormat((int) $exam->cost) }}
-                                                </a>
-                                            </div> --}}
-
-
-                                            <div class="text-center mt-2">
-                                                <a href="{{ url('exams/student-exam-series/' . $exam->slug) }}"
-                                                    class="btn btn-blue btn-sm btn-block btn-radius">
-                                                    {{ getPhrase('start_exam') }}
-                                                </a>
-                                            </div>
-
-                                        </div>
-
-
-                                    </div>
-
+                                            </h3>
+                                                        <h4 class="my-0 display-4 text-light font-weight-normal mb-3"><span class="h3"></span>  {{ getCurrencyCode() }} {{ idrFormat((int) $exam->amount) }} 
+                                                        <svg class='pricing-divider-img' enable-background='new 0 0 300 100' height='100px' id='Layer_1' preserveAspectRatio='none' version='1.1' viewBox='0 0 300 100' width='300px' x='0px' xml:space='preserve' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg' y='0px'>
+                                                    <path class='deco-layer deco-layer--1' d='M30.913,43.944c0,0,42.911-34.464,87.51-14.191c77.31,35.14,113.304-1.952,146.638-4.729
+                                                c48.654-4.056,69.94,16.218,69.94,16.218v54.396H30.913V43.944z' fill='#FFFFFF' opacity='0.6'></path>
+                                                    <path class='deco-layer deco-layer--2' d='M-35.667,44.628c0,0,42.91-34.463,87.51-14.191c77.31,35.141,113.304-1.952,146.639-4.729
+                                                c48.653-4.055,69.939,16.218,69.939,16.218v54.396H-35.667V44.628z' fill='#FFFFFF' opacity='0.6'></path>
+                                                    <path class='deco-layer deco-layer--3' d='M43.415,98.342c0,0,48.283-68.927,109.133-68.927c65.886,0,97.983,67.914,97.983,67.914v3.716
+                                                H42.401L43.415,98.342z' fill='#FFFFFF' opacity='0.7'></path>
+                                                    <path class='deco-layer deco-layer--4' d='M-34.667,62.998c0,0,56-45.667,120.316-27.839C167.484,57.842,197,41.332,232.286,30.428
+                                                c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.998z' fill='#FFFFFF'></path>
+                                                    </svg>
                                 </div>
-                                <!--Single EXAM-->
+
+                                    <div class="card-body bg-white mt-0 shadow">
+                                        <ul class="list-unstyled mb-5 position-relative list-group">
+                                            
+                                            <a href="" class="cs-product-title text-center">{{ ucfirst($exam->name) }}
+                                           
+                                            </a>
+                                            <li class="text-center"> {!! $exam->description !!}<li>
+                                            <li>
+                                                <a href="#">Marks : {{ (int) $exam->total_marks }}</a>
+                                            </li>
+
+                                            <li >
+                                                <a class="text-right" href="#">{{ $exam->validity_type }}</a>
+                                            </li>
 
 
-
-
-
+                                        </ul>
+                                        <div class="text-center mt-2 btn btn-sm btn-block  btn-custom  ">
+                                        <button type="button" class="btn btn-lg btn-block  btn-custom ">Sign up for free</button>
+                                        <a href="{{ url('exams/student-exam-series/' . $exam->slug) }}">
+                                                {{ getPhrase('start_exam') }}
+                                            </a>
+                                        </div>
+                                    </div>
                             </div>
                         @endforeach
 
-
                     </div>
                 @endif
+       
 
 
-
-
-
-
+                                            
 
 
                 @if (count($categories))

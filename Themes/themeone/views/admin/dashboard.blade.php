@@ -2,6 +2,7 @@
 @section('content')
 
 <div id="page-wrapper">
+	AAA
 			<div class="container-fluid">
 			<div class="row">
 					<div class="col-lg-12">
@@ -178,10 +179,7 @@
 				</div>
 
 				
- 
-
- 
-				
+				AAAAAAAA
 	</div>
 </div>
 		<!-- /#page-wrapper -->

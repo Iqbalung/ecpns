@@ -36,6 +36,8 @@
 									<th>{{ getPhrase('validity')}}</th>
 									<th>{{ getPhrase('amount')}}</th>
 									<th>{{ getPhrase('status')}}</th>
+									<th>{{ getPhrase('cost')}}</th>
+									<th>{{ getPhrase('level')}}</th>
 									<th>{{ getPhrase('action')}}</th>
 								</tr>
 							</thead>

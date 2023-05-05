@@ -60,14 +60,14 @@ class PaymentsController extends Controller
         $data['is_parent'] = 0;
         $user = getUserWithSlug($slug);
 
-        if (getRoleData($user->role_id)=='parent') {
-            $data['is_parent']           = 1;
+        if (getRoleData($user->role_id) == 'parent') {
+            $data['is_parent'] = 1;
         }
 
-        $data['user']       		= $user;
-        $data['active_class']       = 'subscriptions';
-        $data['title']              = getPhrase('subscriptions_list');
-        $data['layout']             = getLayout();
+        $data['user'] = $user;
+        $data['active_class'] = 'subscriptions';
+        $data['title'] = getPhrase('subscriptions_list');
+        $data['layout'] = getLayout();
 
         $payment = new Payment();
         $records = $payment->updateTransactionRecords($user->id);
@@ -77,7 +77,7 @@ class PaymentsController extends Controller
             $this->isExpired($rec);
         }
 
-        $view_name = getTheme().'::student.payments.list';
+        $view_name = getTheme() . '::student.payments.list';
         return view($view_name, $data);
     }
 
@@ -86,7 +86,7 @@ class PaymentsController extends Controller
         $is_parent = 0;
         $user = getUserWithSlug($slug);
 
-        if (getRoleData($user->role_id)=='parent') {
+        if (getRoleData($user->role_id) == 'parent') {
             $is_parent = 1;
             $childs_list = App\User::where('parent_id', '=', $user->id)->get();
 
@@ -110,7 +110,7 @@ class PaymentsController extends Controller
 
             $ind = 0;
             foreach ($childs_list as $child) {
-                if ($ind++ ==0) {
+                if ($ind++ == 0) {
                     $records->where('user_id', '=', $child->id);
                     continue;
                 }
@@ -120,7 +120,7 @@ class PaymentsController extends Controller
 
             $records->orderBy('updated_at', 'desc');
         } else {
-            $records = Payment::select(['item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway', 'updated_at','payment_status','id','cost', 'after_discount', 'paid_amount'])
+            $records = Payment::select(['item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway', 'updated_at', 'payment_status', 'id', 'cost', 'after_discount', 'paid_amount'])
                 ->where('user_id', '=', $user->id)
                 ->orderBy('updated_at', 'desc');
         }
@@ -128,7 +128,7 @@ class PaymentsController extends Controller
         $dta = Datatables::of($records)
             ->escapeColumns([])
             ->addColumn('action', function ($records) {
-                if (!($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING)) {
+                if (!($records->payment_status == PAYMENT_STATUS_CANCELLED || $records->payment_status == PAYMENT_STATUS_PENDING)) {
                     $link_data = ' <a >View More</a>';
                     return $link_data;
                 }
@@ -136,13 +136,13 @@ class PaymentsController extends Controller
             })
             ->editColumn('payment_status', function ($records) {
                 $rec = '';
-                if ($records->payment_status==PAYMENT_STATUS_CANCELLED) {
-                    $rec = '<span class="label label-danger">'.ucfirst($records->payment_status).'</span>';
-                } elseif ($records->payment_status==PAYMENT_STATUS_PENDING) {
-                    $rec = '<span class="label label-info">'.ucfirst($records->payment_status).'</span>';
-                } elseif ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                    $view_invoice = '&nbsp;|&nbsp;<a href="'.route('payments.view_invoice', [ 'invoice_id' => $records->id]).'" class="btn btn-xs btn-success button">'.getPhrase('invoice').'</a>';
-                    $rec = '<span class="label label-success">'.ucfirst($records->payment_status).'</span>' . $view_invoice;
+                if ($records->payment_status == PAYMENT_STATUS_CANCELLED) {
+                    $rec = '<span class="label label-danger">' . ucfirst($records->payment_status) . '</span>';
+                } elseif ($records->payment_status == PAYMENT_STATUS_PENDING) {
+                    $rec = '<span class="label label-info">' . ucfirst($records->payment_status) . '</span>';
+                } elseif ($records->payment_status == PAYMENT_STATUS_SUCCESS) {
+                    $view_invoice = '&nbsp;|&nbsp;<a href="' . route('payments.view_invoice', ['invoice_id' => $records->id]) . '" class="btn btn-xs btn-success button">' . getPhrase('invoice') . '</a>';
+                    $rec = '<span class="label label-success">' . ucfirst($records->payment_status) . '</span>' . $view_invoice;
                 }
                 return $rec;
             })
@@ -150,23 +150,23 @@ class PaymentsController extends Controller
                 return ucfirst($records->plan_type);
             })
             ->editColumn('start_date', function ($records) {
-                if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
+                if ($records->payment_status == PAYMENT_STATUS_CANCELLED || $records->payment_status == PAYMENT_STATUS_PENDING) {
                     return '-';
                 }
                 return $records->start_date;
             })
             ->editColumn('end_date', function ($records) {
-                if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
+                if ($records->payment_status == PAYMENT_STATUS_CANCELLED || $records->payment_status == PAYMENT_STATUS_PENDING) {
                     return '-';
                 }
                 return $records->end_date;
             })
             ->editColumn('payment_gateway', function ($records) {
-                $text =  ucfirst($records->payment_gateway);
+                $text = ucfirst($records->payment_gateway);
 
-                if ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                    $extra = '<ul class="list-unstyled payment-col clearfix"><li>'.$text.'</li>';
-                    $extra .='<li><p>Cost:'.$records->cost.'</p><p>Aftr Dis.:'.$records->after_discount.'</p><p>Paid:'.$records->paid_amount.'</p></li></ul>';
+                if ($records->payment_status == PAYMENT_STATUS_SUCCESS) {
+                    $extra = '<ul class="list-unstyled payment-col clearfix"><li>' . $text . '</li>';
+                    $extra .= '<li><p>Cost:' . $records->cost . '</p><p>Aftr Dis.:' . $records->after_discount . '</p><p>Paid:' . $records->paid_amount . '</p></li></ul>';
                     return $extra;
                 }
                 return $text;
@@ -176,11 +176,11 @@ class PaymentsController extends Controller
 
         if ($is_parent) {
             $dta = $dta->editColumn('image', function ($records) {
-                return '<img src="'.getProfilePath($records->image).'"  /> ';
+                return '<img src="' . getProfilePath($records->image) . '"  /> ';
             })
-            ->editColumn('name', function ($records) {
-                return ucfirst($records->name);
-            });
+                ->editColumn('name', function ($records) {
+                    return ucfirst($records->name);
+                });
         }
 
         return $dta->make(false);
@@ -198,44 +198,44 @@ class PaymentsController extends Controller
      */
     public function paynow(Request $request, $slug)
     {
-        if ($request->gateway  == 'razorpay') {
-            $type   = $request->type;
+        if ($request->gateway == 'razorpay') {
+            $type = $request->type;
 
 
-            if ($request->after_discount==0) {
+            if ($request->after_discount == 0) {
                 $item = $this->getPackageDetails($type, $slug);
 
                 $other_details = array();
                 $other_details['is_coupon_applied'] = $request->is_coupon_applied;
-                $other_details['actual_cost']       = $request->actual_cost;
-                $other_details['discount_availed']  = $request->discount_availed;
-                $other_details['after_discount']    = $request->after_discount;
-                $other_details['coupon_id']         = $request->coupon_id;
-                $other_details['paid_by_parent']    = $request->parent_user;
-                $other_details['child_id']          = $request->selected_child_id;
+                $other_details['actual_cost'] = $request->actual_cost;
+                $other_details['discount_availed'] = $request->discount_availed;
+                $other_details['after_discount'] = $request->after_discount;
+                $other_details['coupon_id'] = $request->coupon_id;
+                $other_details['paid_by_parent'] = $request->parent_user;
+                $other_details['child_id'] = $request->selected_child_id;
 
                 $token = $this->preserveBeforeSave($item, $type, $request->gateway, $other_details, 1);
                 if ($this->validateAndApproveZeroDiscount($token, $request)) {
                     //Valid
                     flash('success', 'your_subscription_was_successfull', 'overlay');
                     $user = Auth::user();
-                    return redirect(URL_PAYMENTS_LIST.$user->slug);
+                    return redirect(URL_PAYMENTS_LIST . $user->slug);
                 } else {
                     //Cheat
                     flash('Ooops...!', 'invalid_payment_or_coupon_code', 'overlay');
                     $user = Auth::user();
-                    return redirect(URL_PAYMENTS_LIST.$user->slug);
+                    return redirect(URL_PAYMENTS_LIST . $user->slug);
                 }
 
                 return back();
             }
 
 
-            $data['layout']        = getLayout();
+            $data['layout'] = getLayout();
 
             $active_class = 'lms';
 
-            if ($type == 'combo' || $type=='exams'|| $type=='exam' || $type == 'subscribe') {
+            if ($type == 'combo' || $type == 'exams' || $type == 'exam' || $type == 'subscribe') {
                 $active_class = 'exams';
             }
 
@@ -245,15 +245,15 @@ class PaymentsController extends Controller
                 $record = $this->getModelName($type, $slug);
             }
 
-            $data['active_class']   = $active_class;
-            $data['type']           = $type;
-            $data['slug']           = $slug;
-            $data['request']        = $request;
-            $data['title']          = $record->title;
-            $data['user']           = Auth::user();
+            $data['active_class'] = $active_class;
+            $data['type'] = $type;
+            $data['slug'] = $slug;
+            $data['request'] = $request;
+            $data['title'] = $record->title;
+            $data['user'] = Auth::user();
 
 
-            $view_name = getTheme().'::payments.razorpayform';
+            $view_name = getTheme() . '::payments.razorpayform';
             return view($view_name, $data);
         }
 
@@ -261,12 +261,12 @@ class PaymentsController extends Controller
         $type = $request->type;
 
         /**
-    	 * Get the Item Details based on Type supplied type
-    	 * If item is valid, prepare the data to save after successfull payment
-    	 * Preserve the data
-    	 * Redirect to payment
-    	 * @var [type]
-    	 */
+         * Get the Item Details based on Type supplied type
+         * If item is valid, prepare the data to save after successfull payment
+         * Preserve the data
+         * Redirect to payment
+         * @var [type]
+         */
         $item = $this->getPackageDetails($type, $slug);
 
         if (!$item) {
@@ -275,13 +275,13 @@ class PaymentsController extends Controller
 
         $other_details = array();
         $other_details['is_coupon_applied'] = $request->is_coupon_applied;
-        $other_details['actual_cost'] 		= $request->actual_cost;
-        $other_details['discount_availed'] 	= $request->discount_availed;
-        $other_details['after_discount']    = $request->after_discount;
-        $other_details['coupon_id']         = $request->coupon_id;
+        $other_details['actual_cost'] = $request->actual_cost;
+        $other_details['discount_availed'] = $request->discount_availed;
+        $other_details['after_discount'] = $request->after_discount;
+        $other_details['coupon_id'] = $request->coupon_id;
 
-        $other_details['paid_by_parent']    = $request->parent_user;
-        $other_details['child_id'] 		    = $request->selected_child_id;
+        $other_details['paid_by_parent'] = $request->parent_user;
+        $other_details['child_id'] = $request->selected_child_id;
 
         /**
          * If the total amount is 0 after coupon code is applied,
@@ -289,18 +289,18 @@ class PaymentsController extends Controller
          * then give subscription for the package
          * @var [type]
          */
-        if ($request->after_discount==0) {
+        if ($request->after_discount == 0) {
             $token = $this->preserveBeforeSave($item, $type, $request->gateway, $other_details, 1);
             if ($this->validateAndApproveZeroDiscount($token, $request)) {
                 //Valid
                 flash('success', 'your_subscription_was_successfull', 'overlay');
                 $user = Auth::user();
-                return redirect(URL_PAYMENTS_LIST.$user->slug);
+                return redirect(URL_PAYMENTS_LIST . $user->slug);
             } else {
                 //Cheat
                 flash('Ooops...!', 'invalid_payment_or_coupon_code', 'overlay');
                 $user = Auth::user();
-                return redirect(URL_PAYMENTS_LIST.$user->slug);
+                return redirect(URL_PAYMENTS_LIST . $user->slug);
             }
 
             return back();
@@ -319,25 +319,25 @@ class PaymentsController extends Controller
             $config = config();
             $payumoney = $config['indipay']['payumoney'];
 
-            $payumoney['successUrl'] = URL_PAYU_PAYMENT_SUCCESS.'?token='.$token;
-            $payumoney['failureUrl'] = URL_PAYU_PAYMENT_CANCEL.'?token='.$token;
+            $payumoney['successUrl'] = URL_PAYU_PAYMENT_SUCCESS . '?token=' . $token;
+            $payumoney['failureUrl'] = URL_PAYU_PAYMENT_CANCEL . '?token=' . $token;
 
 
             $user = Auth::user();
             $parameters = [
-                             'tid'       => $token,
-                             'order_id'  => '',
-                             'firstname' => $user->name,
-                             'email'     =>$user->email,
-                             'phone'     => ($user->phone) ? $user->phone : '45612345678',
-                             'productinfo' => $request->item_name,
-                             'amount'    => $request->after_discount,
-                             'surl'      => URL_PAYU_PAYMENT_SUCCESS.'?token='.$token,
-                             'furl'      => URL_PAYU_PAYMENT_CANCEL.'?token='.$token,
-                          ];
+                'tid' => $token,
+                'order_id' => '',
+                'firstname' => $user->name,
+                'email' => $user->email,
+                'phone' => ($user->phone) ? $user->phone : '45612345678',
+                'productinfo' => $request->item_name,
+                'amount' => $request->after_discount,
+                'surl' => URL_PAYU_PAYMENT_SUCCESS . '?token=' . $token,
+                'furl' => URL_PAYU_PAYMENT_CANCEL . '?token=' . $token,
+            ];
 
             return Indipay::purchase($parameters);
-        } elseif ($payment_gateway=='paypal') {
+        } elseif ($payment_gateway == 'paypal') {
             if (!getSetting('paypal', 'module')) {
                 flash('Ooops...!', 'this_payment_gateway_is_not_available', 'error');
                 return back();
@@ -347,12 +347,12 @@ class PaymentsController extends Controller
 
 
             $paypal = new Paypal();
-            $paypal->config['return'] 		= URL_PAYPAL_PAYMENT_SUCCESS.'?token='.$token;
-            $paypal->config['cancel_return'] 	= URL_PAYPAL_PAYMENT_CANCEL.'?token='.$token;
+            $paypal->config['return'] = URL_PAYPAL_PAYMENT_SUCCESS . '?token=' . $token;
+            $paypal->config['cancel_return'] = URL_PAYPAL_PAYMENT_CANCEL . '?token=' . $token;
             $paypal->invoice = $token;
             $paypal->add($item->title, $request->after_discount); //ADD  item
             $paypal->pay(); //Proccess the payment
-        } elseif ($payment_gateway=='offline') {
+        } elseif ($payment_gateway == 'offline') {
             if (!getSetting('offline_payment', 'module')) {
                 flash('Ooops...!', 'this_payment_gateway_is_not_available', 'error');
                 return back();
@@ -360,7 +360,7 @@ class PaymentsController extends Controller
 
             $payment_data = [];
             foreach (Input::all() as $key => $value) {
-                if ($key=='_token') {
+                if ($key == '_token') {
                     continue;
                 }
                 $payment_data[$key] = $value;
@@ -368,36 +368,38 @@ class PaymentsController extends Controller
 
             $data['active_class'] = 'feedback';
             $data['payment_data'] = json_encode($payment_data);
-            $data['layout']       = getLayout();
-            $data['title']        = getPhrase('offline_payment');
+            $data['layout'] = getLayout();
+            $data['title'] = getPhrase('offline_payment');
 
-            $view_name = getTheme().'::payments.offline-payment';
+            $view_name = getTheme() . '::payments.offline-payment';
             return view($view_name, $data);
         } elseif ($payment_gateway == 'midtrans') {
             // if(!getSetting('midtrans', 'module'))
             // {
-        //     flash('Ooops...!', 'this_payment_gateway_is_not_available', 'error');
-        //     return back();
+            //     flash('Ooops...!', 'this_payment_gateway_is_not_available', 'error');
+            //     return back();
             // }
 
 
             $token = $this->preserveBeforeSave($item, $type, $payment_gateway, $other_details);
 
             $transaction_details = array(
-              'order_id' => $token,
-              'gross_amount' => intval($request->after_discount), //
+                'order_id' => $token,
+                'gross_amount' => intval($request->after_discount), //
             );
 
-            $item_details = array([
-              'id' => $item->id,
-              'price' => $item->cost,
-              'quantity' => 1,
-              'name' => $item->title
-            ]);
+            $item_details = array(
+                [
+                    'id' => $item->id,
+                    'price' => $item->cost,
+                    'quantity' => 1,
+                    'name' => $item->title
+                ]
+            );
 
             $transaction = array(
-              'transaction_details' => $transaction_details,
-              'item_details' => $item_details,
+                'transaction_details' => $transaction_details,
+                'item_details' => $item_details,
             );
 
             $snapToken = MidtransService::getSnapToken($transaction);
@@ -407,7 +409,7 @@ class PaymentsController extends Controller
                 return back();
             }
 
-            $url =  PREFIX . 'payments/checkout/' . $request->type . '/' . $item->slug . '?md_snap_token=' . $snapToken . '&oid=' . $token;
+            $url = PREFIX . 'payments/checkout/' . $request->type . '/' . $item->slug . '?md_snap_token=' . $snapToken . '&oid=' . $token;
 
             return redirect($url);
         }
@@ -423,7 +425,7 @@ class PaymentsController extends Controller
             $token = $request->get('order_id');
 
             if ($token && MidtransService::isValidCallback($token)) {
-                $notif   = MidtransService::parseNotification($request);
+                $notif = MidtransService::parseNotification($request);
                 $payment = Payment::where('slug', $notif->order_id)->first();
 
                 if (!$payment) {
@@ -442,14 +444,14 @@ class PaymentsController extends Controller
                             // TODO merchant should decide whether this transaction is authorized or not in MAP
                             return response()->json([
                                 'message' => "Transaction order_id: " . $notif->order_id . " is challenged by FDS.",
-                                'status'  => $notif->transaction_status
+                                'status' => $notif->transaction_status
                             ]);
                         } else {
                             // Payment success
                             $this->processMidtransSuccessPayment($payment, $notif);
                             return response()->json([
-                                'message' => "Transaction order_id: " . $notif->order_id ." successfully captured using " . $notif->payment_type,
-                                'status'  => $notif->transaction_status
+                                'message' => "Transaction order_id: " . $notif->order_id . " successfully captured using " . $notif->payment_type,
+                                'status' => $notif->transaction_status
                             ]);
                         }
                     }
@@ -457,32 +459,32 @@ class PaymentsController extends Controller
                     // Payment success
                     $this->processMidtransSuccessPayment($payment, $notif);
                     return response()->json([
-                        'message' => "Transaction order_id: " . $notif->order_id ." successfully transfered using " . $notif->payment_type,
-                        'status'  => $notif->transaction_status
+                        'message' => "Transaction order_id: " . $notif->order_id . " successfully transfered using " . $notif->payment_type,
+                        'status' => $notif->transaction_status
                     ]);
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_PENDING) {
                     // Payment status already pending
                     return response()->json([
                         'message' => "Waiting customer to finish transaction order_id: " . $notif->order_id . " using " . $notif->payment_type,
-                        'status'  => $notif->transaction_status,
+                        'status' => $notif->transaction_status,
                     ]);
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_DENY) {
                     $this->processMidtransFailedPayment($payment, $notif);
                     return response()->json([
                         'message' => "Payment using " . $notif->payment_type . " for transaction order_id: " . $notif->order_id . " is denied.",
-                        'status'  => $notif->transaction_status
+                        'status' => $notif->transaction_status
                     ]);
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_EXPIRE) {
                     $this->processMidtransFailedPayment($payment, $notif);
                     return response()->json([
                         'message' => "Payment using " . $notif->payment_type . " for transaction order_id: " . $notif->order_id . " is expired.",
-                        'status'  => $notif->transaction_status,
+                        'status' => $notif->transaction_status,
                     ]);
                 } elseif ($notif->transaction_status == MidtransNotification::TRANSACTION_CANCEL) {
                     $this->processMidtransFailedPayment($payment, $notif);
                     return response()->json([
                         'message' => "Payment using " . $notif->payment_type . " for transaction order_id: " . $notif->order_id . " is denied.",
-                        'status'  => $notif->transaction_status
+                        'status' => $notif->transaction_status
                     ]);
                 } else {
                     return response()->json([
@@ -544,22 +546,22 @@ class PaymentsController extends Controller
                     $days = $validity * 365;
                     break;
             }
-            $daysToAdd = '+'.$days.'days';
+            $daysToAdd = '+' . $days . 'days';
         } else {
-            $daysToAdd = '+'.$item_details->validity.'days';
+            $daysToAdd = '+' . $item_details->validity . 'days';
         }
 
         $payment_record->start_date = date('Y-m-d');
         $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
 
-        $details_before_payment         = (object)json_decode($payment_record->other_details);
+        $details_before_payment = (object) json_decode($payment_record->other_details);
         $payment_record->coupon_applied = $details_before_payment->is_coupon_applied;
-        $payment_record->coupon_id      = $details_before_payment->coupon_id;
-        $payment_record->actual_cost    = $details_before_payment->actual_cost;
-        $payment_record->discount_amount= $details_before_payment->discount_availed;
+        $payment_record->coupon_id = $details_before_payment->coupon_id;
+        $payment_record->actual_cost = $details_before_payment->actual_cost;
+        $payment_record->discount_amount = $details_before_payment->discount_availed;
         $payment_record->after_discount = $details_before_payment->after_discount;
         $payment_record->transaction_id = $notification->transaction_id ?? null;
-        $payment_record->paid_amount    = $notification->gross_amount;
+        $payment_record->paid_amount = $notification->gross_amount;
 
         //Capcture all the response from the payment.
         //In case want to view total details, we can fetch this record
@@ -595,13 +597,13 @@ class PaymentsController extends Controller
         $this->prepareMidtransPaymentRecord($payment_record, $notification);
 
         if ($notification->transaction_status == MidtransNotification::TRANSACTION_CAPTURE) {
-            $card_type   = $notification->card_type ?? "unknown card type";
+            $card_type = $notification->card_type ?? "unknown card type";
             $masked_card = $notification->masked_card ?? "unknown masked card";
             $payment_record->paid_by = $notification->payment_type . ' - ' . $card_type . ' - ' . $masked_card;
         } else {
             $va_numbers = $notification->va_numbers[0] ?? null;
-            $va_number  = $va_numbers['va_number'] ?? 'unknown va_number';
-            $va_bank    = $va_numbers['bank'] ?? 'unknown bank';
+            $va_number = $va_numbers['va_number'] ?? 'unknown va_number';
+            $va_bank = $va_numbers['bank'] ?? 'unknown bank';
 
             $payment_record->paid_by = $notification->payment_type . ' - ' . $va_bank . ' - ' . $va_number;
         }
@@ -652,7 +654,7 @@ class PaymentsController extends Controller
      */
     public function getModelName($type, $slug)
     {
-        switch($type) {
+        switch ($type) {
             case 'combo':
                 return ExamSeries::where('slug', '=', $slug)->first();
                 break;
@@ -683,7 +685,7 @@ class PaymentsController extends Controller
 
         //REDIRECT THE USER BY LOADING A VIEW
         $user = Auth::user();
-        return redirect(URL_PAYMENTS_LIST.$user->slug);
+        return redirect(URL_PAYMENTS_LIST . $user->slug);
     }
 
     public function paypal_success(Request $request)
@@ -700,7 +702,7 @@ class PaymentsController extends Controller
             } catch (Exception $e) {
             }
 
-               flash('success', 'your_subscription_was_successfull', 'success');
+            flash('success', 'your_subscription_was_successfull', 'success');
         } else {
             //PAYMENT RECORD IS NOT VALID
             //PREPARE METHOD FOR FAILED CASE
@@ -708,7 +710,7 @@ class PaymentsController extends Controller
         }
         //REDIRECT THE USER BY LOADING A VIEW
 
-        return redirect(URL_PAYMENTS_LIST.$user->slug);
+        return redirect(URL_PAYMENTS_LIST . $user->slug);
     }
 
     public function payu_success(Request $request)
@@ -734,7 +736,7 @@ class PaymentsController extends Controller
         }
         //REDIRECT THE USER BY LOADING A VIEW
 
-        return redirect(URL_PAYMENTS_LIST.$user->slug);
+        return redirect(URL_PAYMENTS_LIST . $user->slug);
     }
 
     public function payu_cancel(Request $request)
@@ -751,7 +753,7 @@ class PaymentsController extends Controller
 
         //REDIRECT THE USER BY LOADING A VIEW
         $user = Auth::user();
-        return redirect(URL_PAYMENTS_LIST.$user->slug);
+        return redirect(URL_PAYMENTS_LIST . $user->slug);
     }
 
 
@@ -763,27 +765,27 @@ class PaymentsController extends Controller
      * @param  [type] $payment_method [description]
      * @return [type]                 [description]
      */
-    public function preserveBeforeSave($item, $package_type, $payment_method, $other_details, $coupon_zero=0)
+    public function preserveBeforeSave($item, $package_type, $payment_method, $other_details, $coupon_zero = 0)
     {
         $user = getUserRecord();
         if ($other_details['paid_by_parent']) {
             $user = getUserRecord($other_details['child_id']);
         }
 
-        $payment 					  = new Payment();
-        $payment->item_id 		      = $item->id;
-        $payment->item_name 		  = $item->title;
-        $payment->plan_type 		  = $package_type;
-        $payment->payment_gateway     = $payment_method;
-        $payment->slug 			      = $payment::makeSlug(getHashCode());
-        $payment->cost 			      = $item->cost;
-        $payment->user_id             = $user->id;
-        $payment->paid_by_parent 	  = $other_details['paid_by_parent'];
-        $payment->payment_status 	  = PAYMENT_STATUS_PENDING;
-        $payment->other_details 	  = json_encode($other_details);
+        $payment = new Payment();
+        $payment->item_id = $item->id;
+        $payment->item_name = $item->title;
+        $payment->plan_type = $package_type;
+        $payment->payment_gateway = $payment_method;
+        $payment->slug = $payment::makeSlug(getHashCode());
+        $payment->cost = $item->cost;
+        $payment->user_id = $user->id;
+        $payment->paid_by_parent = $other_details['paid_by_parent'];
+        $payment->payment_status = PAYMENT_STATUS_PENDING;
+        $payment->other_details = json_encode($other_details);
 
         if (!$coupon_zero) {
-            if ($payment_method=='offline') {
+            if ($payment_method == 'offline') {
                 $payment->notes = $other_details['payment_details'];
             }
         }
@@ -801,7 +803,7 @@ class PaymentsController extends Controller
             return true;
         }
 
-        $params = explode('?token=', $_SERVER['REQUEST_URI']) ;
+        $params = explode('?token=', $_SERVER['REQUEST_URI']);
 
         if (!count($params)) {
             return false;
@@ -831,7 +833,7 @@ class PaymentsController extends Controller
             return true;
         }
 
-        $params = explode('?token=', $_SERVER['REQUEST_URI']) ;
+        $params = explode('?token=', $_SERVER['REQUEST_URI']);
 
         if (!count($params)) {
             return false;
@@ -883,21 +885,21 @@ class PaymentsController extends Controller
                         $days = $validity * 365;
                         break;
                 }
-                $daysToAdd = '+'.$days.'days';
+                $daysToAdd = '+' . $days . 'days';
             } else {
-                $daysToAdd = '+'.$item_details->validity.'days';
+                $daysToAdd = '+' . $item_details->validity . 'days';
             }
 
             $payment_record->start_date = date('Y-m-d');
             $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
 
-            $details_before_payment         = (object)json_decode($payment_record->other_details);
+            $details_before_payment = (object) json_decode($payment_record->other_details);
             $payment_record->coupon_applied = $details_before_payment->is_coupon_applied;
-            $payment_record->coupon_id      = $details_before_payment->coupon_id;
-            $payment_record->actual_cost    = $details_before_payment->actual_cost;
-            $payment_record->discount_amount= $details_before_payment->discount_availed;
+            $payment_record->coupon_id = $details_before_payment->coupon_id;
+            $payment_record->actual_cost = $details_before_payment->actual_cost;
+            $payment_record->discount_amount = $details_before_payment->discount_availed;
             $payment_record->after_discount = $details_before_payment->after_discount;
-            if ($payment_record->payment_gateway=='paypal') {
+            if ($payment_record->payment_gateway == 'paypal') {
                 $payment_record->paid_amount = $request->mc_gross;
                 $payment_record->transaction_id = $request->txn_id;
                 $payment_record->paid_by = $request->payer_email;
@@ -923,7 +925,7 @@ class PaymentsController extends Controller
     public function selectCustomPackage(Request $request)
     {
         $rules = [
-            'validity'      => 'required',
+            'validity' => 'required',
             'validity_type' => 'required',
         ];
 
@@ -931,19 +933,19 @@ class PaymentsController extends Controller
 
         $record = new \App\Package();
 
-        $name               = $request->validity_type;
-        $record->name       = $name;
-        $record->slug       = $record->makeSlug($name);
-        $record->validity   = $request->validity;
+        $name = $request->validity_type;
+        $record->name = $name;
+        $record->slug = $record->makeSlug($name);
+        $record->validity = $request->validity;
 
         $parts = explode('_', $name);
         $record->validity_type = $parts[0];
 
         $amount = $parts[1] * $request->validity;
-        $record->amount      = $amount;
+        $record->amount = $amount;
         $record->description = 'Custom Package';
-        $record->status      = 1;
-        $record->type        = 'temp';
+        $record->status = 1;
+        $record->type = 'temp';
         $record->save();
 
         return redirect(URL_PAYMENTS_CHECKOUT . 'subscribe/' . $record->slug);
@@ -958,7 +960,7 @@ class PaymentsController extends Controller
         $coupon_usage['total_invoice_amount'] = $payment_record->paid_amount;
         $coupon_usage['discount_amount'] = $payment_record->discount_amount;
         $coupon_usage['coupon_id'] = $payment_record->coupon_id;
-        $coupon_usage['updated_at'] =  new \DateTime();
+        $coupon_usage['updated_at'] = new \DateTime();
         DB::table('couponcodes_usage')->insert($coupon_usage);
         return true;
     }
@@ -972,7 +974,7 @@ class PaymentsController extends Controller
     {
         $valid = false;
         if ($payment_record) {
-            if ($payment_record->payment_status == PAYMENT_STATUS_PENDING || $payment_record->payment_gateway=='offline') {
+            if ($payment_record->payment_status == PAYMENT_STATUS_PENDING || $payment_record->payment_gateway == 'offline') {
                 $valid = true;
             }
         }
@@ -995,7 +997,7 @@ class PaymentsController extends Controller
         if ($difference_time > PAYMENT_RECORD_MAXTIME) {
             $payment_record->payment_status = PAYMENT_STATUS_CANCELLED;
             $payment_record->save();
-            return $is_expired =  true;
+            return $is_expired = true;
         }
         return $is_expired;
     }
@@ -1043,18 +1045,18 @@ class PaymentsController extends Controller
             //       Redirect to item view if already purchased
         }
 
-        $data['active_class']     = 'exams';
-        $data['pay_by']           = '';
-        $data['title']            = $record->title;
-        $data['item_type']        = 'combo';
-        $data['item']             = $record;
-        $current_theme            = getDefaultTheme();
+        $data['active_class'] = 'exams';
+        $data['pay_by'] = '';
+        $data['title'] = $record->title;
+        $data['item_type'] = 'combo';
+        $data['item'] = $record;
+        $current_theme = getDefaultTheme();
 
         if ($current_theme == 'default') {
-            $data['right_bar']          = false;
-            $data['right_bar_class']   	= 'order-user-details';
-            $data['right_bar_path']     = 'student.payments.billing-address-right-bar';
-            $data['right_bar_data']     = array(
+            $data['right_bar'] = false;
+            $data['right_bar_class'] = 'order-user-details';
+            $data['right_bar_path'] = 'student.payments.billing-address-right-bar';
+            $data['right_bar_data'] = array(
                 'item' => $record,
             );
         }
@@ -1067,9 +1069,9 @@ class PaymentsController extends Controller
             $data['children'] = App\User::where('parent_id', '=', $user->id)->get();
         }
 
-        $data['use_razorpay']   = false;
+        $data['use_razorpay'] = false;
 
-        $view_name = getTheme().'::student.payments.checkout';
+        $view_name = getTheme() . '::student.payments.checkout';
 
         return view($view_name, $data);
     }
@@ -1102,17 +1104,17 @@ class PaymentsController extends Controller
         //Check if user is already paid to the same item and the item is in valid date
 
         if ($user->role_id == 6) {
-            $children_ids  = App\User::where('parent_id', $user->id)->pluck('id')->toArray();
+            $children_ids = App\User::where('parent_id', $user->id)->pluck('id')->toArray();
 
-            $is_paid  = [];
+            $is_paid = [];
             foreach ($children_ids as $key => $value) {
-                $is_paid[]  = Payment::isParentPurchased($record->id, $type, $value);
+                $is_paid[] = Payment::isParentPurchased($record->id, $type, $value);
             }
 
-            $paid_staus  = in_array('notpurchased', $is_paid);
+            $paid_staus = in_array('notpurchased', $is_paid);
 
             if (!$paid_staus) {
-                flash('Hey '.$user->name, 'you_already_purchased_this_item', 'overlay');
+                flash('Hey ' . $user->name, 'you_already_purchased_this_item', 'overlay');
                 return back();
             }
         }
@@ -1121,27 +1123,27 @@ class PaymentsController extends Controller
         if (UserExam::isItemPurchased($record->id, $user->id)) {
             //User already purchased this item and it is valid
             //Return the user to back by the message
-            flash('Hey '.$user->name, 'you_already_purchased_this_item', 'overlay');
+            flash('Hey ' . $user->name, 'you_already_purchased_this_item', 'overlay');
             return back();
         }
 
         $active_class = 'lms';
-        if ($type == 'combo' || $type=='exams'|| $type=='exam') {
+        if ($type == 'combo' || $type == 'exams' || $type == 'exam') {
             $active_class = 'exams';
         }
 
-        $data['active_class']     = $active_class;
-        $data['pay_by']           = '';
-        $data['title']            = $record->title;
-        $data['item_type']        = $type;
-        $data['item']             = $record;
-        $current_theme            = getDefaultTheme();
+        $data['active_class'] = $active_class;
+        $data['pay_by'] = '';
+        $data['title'] = $record->title;
+        $data['item_type'] = $type;
+        $data['item'] = $record;
+        $current_theme = getDefaultTheme();
 
         if ($current_theme == 'default') {
-            $data['right_bar']          = false;
-            $data['right_bar_class']   	= 'order-user-details';
-            $data['right_bar_path']     = 'student.payments.billing-address-right-bar';
-            $data['right_bar_data']     = array(
+            $data['right_bar'] = false;
+            $data['right_bar_class'] = 'order-user-details';
+            $data['right_bar_path'] = 'student.payments.billing-address-right-bar';
+            $data['right_bar_data'] = array(
                 'item' => $record,
             );
         }
@@ -1154,9 +1156,9 @@ class PaymentsController extends Controller
             $data['children'] = App\User::where('parent_id', '=', $user->id)->get();
         }
 
-        $data['use_razorpay']   = false;
+        $data['use_razorpay'] = false;
 
-        $view_name = getTheme().'::student.payments.checkout';
+        $view_name = getTheme() . '::student.payments.checkout';
 
         return view($view_name, $data);
     }
@@ -1192,19 +1194,19 @@ class PaymentsController extends Controller
 
         $other_details = array();
         $other_details['is_coupon_applied'] = $payment_data->is_coupon_applied;
-        $other_details['actual_cost']       = $payment_data->actual_cost;
-        $other_details['discount_availed']  = $payment_data->discount_availed;
-        $other_details['after_discount']    = $payment_data->after_discount;
-        $other_details['coupon_id']         = $payment_data->coupon_id;
-        $other_details['paid_by_parent']    = $payment_data->parent_user;
-        $other_details['child_id']          = $payment_data->selected_child_id;
-        $other_details['payment_details']   = $request->payment_details;
+        $other_details['actual_cost'] = $payment_data->actual_cost;
+        $other_details['discount_availed'] = $payment_data->discount_availed;
+        $other_details['after_discount'] = $payment_data->after_discount;
+        $other_details['coupon_id'] = $payment_data->coupon_id;
+        $other_details['paid_by_parent'] = $payment_data->parent_user;
+        $other_details['child_id'] = $payment_data->selected_child_id;
+        $other_details['payment_details'] = $request->payment_details;
 
         $payment_gateway = $payment_data->gateway;
         $token = $this->preserveBeforeSave($item, $payment_data->type, $payment_gateway, $other_details);
 
         try {
-            $owner     = App\User::where('role_id', 1)->first();
+            $owner = App\User::where('role_id', 1)->first();
             $paid_user = getUserRecord();
             $owner->notify(new \App\Notifications\UserOfflinePaymentSubmit($owner, $paid_user, $item));
             $paid_user->notify(new \App\Notifications\PaidUserOfflinePayment($paid_user, $item));
@@ -1213,7 +1215,7 @@ class PaymentsController extends Controller
 
 
         flash('success', 'your_request_was_submitted_to_admin', 'overlay');
-        return redirect(URL_PAYMENTS_LIST.Auth::user()->slug);
+        return redirect(URL_PAYMENTS_LIST . Auth::user()->slug);
     }
 
     public function approveOfflinePayment(Request $request)
@@ -1233,14 +1235,16 @@ class PaymentsController extends Controller
 
 
 
-                $template    = new EmailTemplate();
-                $subject  = getPhrase('offline_subscription_failed');
-                $content_data =  $template->sendEmailNotification(
+                $template = new EmailTemplate();
+                $subject = getPhrase('offline_subscription_failed');
+                $content_data = $template->sendEmailNotification(
                     'offline_subscription_failed',
-                    array(   'username'      =>$user->name,
-                             'plan'          => $payment_record->plan_type,
-                             'to_email'      => $user->email,
-                             'admin_comment' =>$request->admin_comment)
+                    array(
+                        'username' => $user->name,
+                        'plan' => $payment_record->plan_type,
+                        'to_email' => $user->email,
+                        'admin_comment' => $request->admin_comment
+                    )
                 );
 
 
@@ -1251,11 +1255,11 @@ class PaymentsController extends Controller
             }
 
             flash('success', 'record_was_updated_successfully', 'success');
-        } catch(Exception $ex) {
+        } catch (Exception $ex) {
             $message = $ex->getMessage();
             flash('Oops..!', $message, 'warning');
         }
-          return redirect(URL_OFFLINE_PAYMENT_REPORTS);
+        return redirect(URL_OFFLINE_PAYMENT_REPORTS);
     }
 
     public function overallPayments($slug)
@@ -1265,15 +1269,15 @@ class PaymentsController extends Controller
         $payments = Payment::where('payment_status', '=', 'success')->get();
         $payments = Payment::all();
 
-        $data['active_class']       = 'analysis';
-        $data['title']              = getPhrase('quiz_attempts');
+        $data['active_class'] = 'analysis';
+        $data['title'] = getPhrase('quiz_attempts');
 
-        $data['exam_record']        = $exam_record;
+        $data['exam_record'] = $exam_record;
 
-        $data['layout']             = getLayout();
+        $data['layout'] = getLayout();
 
 
-        $view_name = getTheme().'::payments.reports.overall-analysis';
+        $view_name = getTheme() . '::payments.reports.overall-analysis';
         return view($view_name, $data);
     }
 
@@ -1292,15 +1296,15 @@ class PaymentsController extends Controller
             return back();
         }
 
-        $data['active_class']          = 'reports';
-        $data['title']                 = getPhrase('online_payments');
-        $data['payments']              = (object)$this->prepareSummaryRecord('online');
-        $data['payments_chart_data']   = (object)$this->getPaymentStats($data['payments']);
-        $data['payments_monthly_data'] = (object)$this->getPaymentMonthlyStats();
-        $data['payment_mode']          = 'online';
-        $data['layout']                = getLayout();
+        $data['active_class'] = 'reports';
+        $data['title'] = getPhrase('online_payments');
+        $data['payments'] = (object) $this->prepareSummaryRecord('online');
+        $data['payments_chart_data'] = (object) $this->getPaymentStats($data['payments']);
+        $data['payments_monthly_data'] = (object) $this->getPaymentMonthlyStats();
+        $data['payment_mode'] = 'online';
+        $data['layout'] = getLayout();
 
-        $view_name = getTheme().'::payments.reports.payments-report';
+        $view_name = getTheme() . '::payments.reports.payments-report';
 
         return view($view_name, $data);
     }
@@ -1316,7 +1320,7 @@ class PaymentsController extends Controller
             prepareBlockUserMessage();
             return back();
         }
-        if (!in_array($slug, ['all','pending', 'success','cancelled'])) {
+        if (!in_array($slug, ['all', 'pending', 'success', 'cancelled'])) {
             pageNotFound();
             return back();
         }
@@ -1324,24 +1328,24 @@ class PaymentsController extends Controller
         $payment = new Payment();
         $this->updatePaymentTransactionRecords($payment->updateTransactionRecords('online'));
 
-        $data['active_class']  = 'reports';
+        $data['active_class'] = 'reports';
         $data['payments_mode'] = getPhrase('online_payments');
 
-        if ($slug=='all') {
-            $data['title']              = getPhrase('all_payments');
-        } elseif ($slug=='success') {
-            $data['title']              = getPhrase('success_list');
-        } elseif ($slug=='pending') {
-            $data['title']              = getPhrase('pending_list');
-        } elseif ($slug='cancelled') {
-            $data['title']              = getPhrase('cancelled_list');
+        if ($slug == 'all') {
+            $data['title'] = getPhrase('all_payments');
+        } elseif ($slug == 'success') {
+            $data['title'] = getPhrase('success_list');
+        } elseif ($slug == 'pending') {
+            $data['title'] = getPhrase('pending_list');
+        } elseif ($slug = 'cancelled') {
+            $data['title'] = getPhrase('cancelled_list');
         }
 
-        $data['layout']             = getLayout();
-        $data['ajax_url']           = URL_ONLINE_PAYMENT_REPORT_DETAILS_AJAX.$slug;
-        $data['payment_mode']       = 'online';
+        $data['layout'] = getLayout();
+        $data['ajax_url'] = URL_ONLINE_PAYMENT_REPORT_DETAILS_AJAX . $slug;
+        $data['payment_mode'] = 'online';
 
-        $view_name = getTheme().'::payments.reports.payments-report-list';
+        $view_name = getTheme() . '::payments.reports.payments-report-list';
         return view($view_name, $data);
     }
 
@@ -1361,65 +1365,65 @@ class PaymentsController extends Controller
         }
 
         $records = Payment::join('users', 'users.id', '=', 'payments.user_id')
-            ->select(['users.image', 'users.name',  'item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway','payments.updated_at','payment_status','payments.cost', 'payments.after_discount', 'payments.paid_amount','payments.id' ])
+            ->select(['users.image', 'users.name', 'item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway', 'payments.updated_at', 'payment_status', 'payments.cost', 'payments.after_discount', 'payments.paid_amount', 'payments.id'])
             ->where('payment_gateway', '!=', 'offline')
             ->orderBy('updated_at', 'desc');
 
-        if ($slug!='all') {
+        if ($slug != 'all') {
             $records->where('payment_status', '=', $slug);
         }
 
         return Datatables::of($records)
+            ->escapeColumns([])
+            ->editColumn('payment_status', function ($records) {
+                $rec = '';
+                if ($records->payment_status == PAYMENT_STATUS_CANCELLED) {
+                    $rec = '<span class="label label-danger">' . ucfirst($records->payment_status) . '</span>';
+                } elseif ($records->payment_status == PAYMENT_STATUS_PENDING) {
+                    $rec = '<span class="label label-info">' . ucfirst($records->payment_status) . '</span>';
+                } elseif ($records->payment_status == PAYMENT_STATUS_SUCCESS) {
+                    $view_invoice = '&nbsp;|&nbsp;<a href="' . route('payments.view_invoice', $records->id) . '" class="btn btn-xs btn-success button">' . getPhrase('invoice') . '</a>';
+                    $rec = '<span class="label label-success">' . ucfirst($records->payment_status) . '</span>' . $view_invoice;
+                }
+                return $rec;
+            })
+            ->editColumn('image', function ($records) {
+                return '<img src="' . getProfilePath($records->image) . '"  /> ';
+            })
+            ->editColumn('name', function ($records) {
+                return ucfirst($records->name);
+            })
 
-          ->editColumn('payment_status', function ($records) {
-              $rec = '';
-              if ($records->payment_status==PAYMENT_STATUS_CANCELLED) {
-                  $rec = '<span class="label label-danger">'.ucfirst($records->payment_status).'</span>';
-              } elseif ($records->payment_status==PAYMENT_STATUS_PENDING) {
-                  $rec = '<span class="label label-info">'.ucfirst($records->payment_status).'</span>';
-              } elseif ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                  $view_invoice = '&nbsp;|&nbsp;<a href="'.route('payments.view_invoice', $records->id).'" class="btn btn-xs btn-success button">'.getPhrase('invoice').'</a>';
-                  $rec = '<span class="label label-success">'.ucfirst($records->payment_status).'</span>' . $view_invoice;
-              }
-              return $rec;
-          })
-          ->editColumn('image', function ($records) {
-              return '<img src="'.getProfilePath($records->image).'"  /> ';
-          })
-          ->editColumn('name', function ($records) {
-              return ucfirst($records->name);
-          })
+            ->editColumn('plan_type', function ($records) {
+                return ucfirst($records->plan_type);
+            })
+            ->editColumn('payment_gateway', function ($records) {
+                $text = ucfirst($records->payment_gateway);
 
-          ->editColumn('plan_type', function ($records) {
-              return ucfirst($records->plan_type);
-          })
-          ->editColumn('payment_gateway', function ($records) {
-              $text =  ucfirst($records->payment_gateway);
+                if ($records->payment_status == PAYMENT_STATUS_SUCCESS) {
+                    $extra = '<ul class="list-unstyled payment-col clearfix"><li>' . $text . '</li>';
+                    $extra .= '<li><p>Cost:' . $records->cost . '</p><p>Aftr Dis.:' . $records->after_discount . '</p><p>Paid:' . $records->paid_amount . '</p></li></ul>';
+                    return $extra;
+                }
+                return $text;
+            })
+            ->editColumn('start_date', function ($records) {
+                if ($records->payment_status == PAYMENT_STATUS_CANCELLED || $records->payment_status == PAYMENT_STATUS_PENDING) {
+                    return '-';
+                }
+                return $records->start_date;
+            })
+            ->editColumn('end_date', function ($records) {
+                if ($records->payment_status == PAYMENT_STATUS_CANCELLED || $records->payment_status == PAYMENT_STATUS_PENDING) {
+                    return '-';
+                }
+                return $records->end_date;
+            })
 
-              if ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                  $extra = '<ul class="list-unstyled payment-col clearfix"><li>'.$text.'</li>';
-                  $extra .='<li><p>Cost:'.$records->cost.'</p><p>Aftr Dis.:'.$records->after_discount.'</p><p>Paid:'.$records->paid_amount.'</p></li></ul>';
-                  return $extra;
-              }
-              return $text;
-          })
-          ->editColumn('start_date', function ($records) {
-              if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
-                  return '-';
-              }
-              return $records->start_date;
-          })
-          ->editColumn('end_date', function ($records) {
-              if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
-                  return '-';
-              }
-              return $records->end_date;
-          })
-
-          ->removeColumn('id')
-          ->removeColumn('users.image')
-          ->removeColumn('action')
-          ->make();
+            ->removeColumn('id')
+            ->removeColumn('users.image')
+            ->removeColumn('action')
+            ->make(false);
     }
 
 
@@ -1437,19 +1441,19 @@ class PaymentsController extends Controller
             return back();
         }
 
-        $data['active_class']       = 'reports';
-        $data['title']              = getPhrase('offline_payments');
-        $data['payments']           = (object)$this->prepareSummaryRecord('offline');
+        $data['active_class'] = 'reports';
+        $data['title'] = getPhrase('offline_payments');
+        $data['payments'] = (object) $this->prepareSummaryRecord('offline');
 
-        $data['payments_chart_data'] = (object)$this->getPaymentStats($data['payments']);
-        $data['payments_monthly_data'] = (object)$this->getPaymentMonthlyStats('offline', '=');
-        $data['payment_mode']       = 'offline';
-
-
-        $data['layout']             = getLayout();
+        $data['payments_chart_data'] = (object) $this->getPaymentStats($data['payments']);
+        $data['payments_monthly_data'] = (object) $this->getPaymentMonthlyStats('offline', '=');
+        $data['payment_mode'] = 'offline';
 
 
-        $view_name = getTheme().'::payments.reports.payments-report';
+        $data['layout'] = getLayout();
+
+
+        $view_name = getTheme() . '::payments.reports.payments-report';
         return view($view_name, $data);
     }
 
@@ -1460,30 +1464,30 @@ class PaymentsController extends Controller
      */
     public function listOfflinePaymentsReport($slug)
     {
-        if (!in_array($slug, ['all','pending', 'success','cancelled'])) {
+        if (!in_array($slug, ['all', 'pending', 'success', 'cancelled'])) {
             pageNotFound();
             return back();
         }
 
 
-        $data['active_class']       = 'reports';
-        $data['payments_mode']      = getPhrase('offline_payments');
-        if ($slug=='all') {
-            $data['title']              = getPhrase('all_payments');
-        } elseif ($slug=='success') {
-            $data['title']              = getPhrase('success_list');
-        } elseif ($slug=='pending') {
-            $data['title']              = getPhrase('pending_list');
-        } elseif ($slug='cancelled') {
-            $data['title']              = getPhrase('cancelled_list');
+        $data['active_class'] = 'reports';
+        $data['payments_mode'] = getPhrase('offline_payments');
+        if ($slug == 'all') {
+            $data['title'] = getPhrase('all_payments');
+        } elseif ($slug == 'success') {
+            $data['title'] = getPhrase('success_list');
+        } elseif ($slug == 'pending') {
+            $data['title'] = getPhrase('pending_list');
+        } elseif ($slug = 'cancelled') {
+            $data['title'] = getPhrase('cancelled_list');
         }
-        $data['layout']             = getLayout();
-        $data['ajax_url']           = URL_OFFLINE_PAYMENT_REPORT_DETAILS_AJAX.$slug;
-        $data['payment_mode']       = 'offline';
+        $data['layout'] = getLayout();
+        $data['ajax_url'] = URL_OFFLINE_PAYMENT_REPORT_DETAILS_AJAX . $slug;
+        $data['payment_mode'] = 'offline';
 
 
 
-        $view_name = getTheme().'::payments.reports.payments-report-list';
+        $view_name = getTheme() . '::payments.reports.payments-report-list';
         return view($view_name, $data);
     }
 
@@ -1501,62 +1505,62 @@ class PaymentsController extends Controller
 
         $records = Payment::join('users', 'users.id', '=', 'payments.user_id')
 
-        ->select(['users.image', 'users.name',  'item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway', 'payments.updated_at','payment_status','payments.id','payments.cost', 'payments.after_discount', 'payments.paid_amount'])
-        ->where('payment_gateway', '=', 'offline')
-        ->orderBy('updated_at', 'desc');
-        if ($slug!='all') {
+            ->select(['users.image', 'users.name', 'item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway', 'payments.updated_at', 'payment_status', 'payments.id', 'payments.cost', 'payments.after_discount', 'payments.paid_amount'])
+            ->where('payment_gateway', '=', 'offline')
+            ->orderBy('updated_at', 'desc');
+        if ($slug != 'all') {
             $records->where('payment_status', '=', $slug);
         }
         return Datatables::of($records)
 
-          ->editColumn('payment_status', function ($records) {
-              $rec = '';
-              if ($records->payment_status==PAYMENT_STATUS_CANCELLED) {
-                  $rec = '<span class="label label-danger">'.ucfirst($records->payment_status).'</span>';
-              } elseif ($records->payment_status==PAYMENT_STATUS_PENDING) {
-                  $rec = '<span class="label label-info">'.ucfirst($records->payment_status).'</span>&nbsp;<button class="btn btn-primary btn-sm" onclick="viewDetails('.$records->id.');">'.getPhrase('view_details').'</button>';
-              } elseif ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                  $rec = '<span class="label label-success">'.ucfirst($records->payment_status).'</span>';
-              }
-              return $rec;
-          })
-          ->editColumn('image', function ($records) {
-              return '<img src="'.getProfilePath($records->image).'"  /> ';
-          })
-          ->editColumn('name', function ($records) {
-              return ucfirst($records->name);
-          })
-           ->editColumn('payment_gateway', function ($records) {
-               $text =  ucfirst($records->payment_gateway);
+            ->editColumn('payment_status', function ($records) {
+                $rec = '';
+                if ($records->payment_status == PAYMENT_STATUS_CANCELLED) {
+                    $rec = '<span class="label label-danger">' . ucfirst($records->payment_status) . '</span>';
+                } elseif ($records->payment_status == PAYMENT_STATUS_PENDING) {
+                    $rec = '<span class="label label-info">' . ucfirst($records->payment_status) . '</span>&nbsp;<button class="btn btn-primary btn-sm" onclick="viewDetails(' . $records->id . ');">' . getPhrase('view_details') . '</button>';
+                } elseif ($records->payment_status == PAYMENT_STATUS_SUCCESS) {
+                    $rec = '<span class="label label-success">' . ucfirst($records->payment_status) . '</span>';
+                }
+                return $rec;
+            })
+            ->editColumn('image', function ($records) {
+                return '<img src="' . getProfilePath($records->image) . '"  /> ';
+            })
+            ->editColumn('name', function ($records) {
+                return ucfirst($records->name);
+            })
+            ->editColumn('payment_gateway', function ($records) {
+                $text = ucfirst($records->payment_gateway);
 
-               if ($records->payment_status==PAYMENT_STATUS_SUCCESS) {
-                   $extra = '<ul class="list-unstyled payment-col clearfix"><li>'.$text.'</li>';
-                   $extra .='<li><p>Cost:'.$records->cost.'</p><p>Aftr Dis.:'.$records->after_discount.'</p><p>Paid:'.$records->paid_amount.'</p></li></ul>';
-                   return $extra;
-               }
-               return $text;
-           })
+                if ($records->payment_status == PAYMENT_STATUS_SUCCESS) {
+                    $extra = '<ul class="list-unstyled payment-col clearfix"><li>' . $text . '</li>';
+                    $extra .= '<li><p>Cost:' . $records->cost . '</p><p>Aftr Dis.:' . $records->after_discount . '</p><p>Paid:' . $records->paid_amount . '</p></li></ul>';
+                    return $extra;
+                }
+                return $text;
+            })
 
-          ->editColumn('plan_type', function ($records) {
-              return ucfirst($records->plan_type);
-          })
-          ->editColumn('start_date', function ($records) {
-              if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
-                  return '-';
-              }
-              return $records->start_date;
-          })
-          ->editColumn('end_date', function ($records) {
-              if ($records->payment_status==PAYMENT_STATUS_CANCELLED || $records->payment_status==PAYMENT_STATUS_PENDING) {
-                  return '-';
-              }
-              return $records->end_date;
-          })
+            ->editColumn('plan_type', function ($records) {
+                return ucfirst($records->plan_type);
+            })
+            ->editColumn('start_date', function ($records) {
+                if ($records->payment_status == PAYMENT_STATUS_CANCELLED || $records->payment_status == PAYMENT_STATUS_PENDING) {
+                    return '-';
+                }
+                return $records->start_date;
+            })
+            ->editColumn('end_date', function ($records) {
+                if ($records->payment_status == PAYMENT_STATUS_CANCELLED || $records->payment_status == PAYMENT_STATUS_PENDING) {
+                    return '-';
+                }
+                return $records->end_date;
+            })
 
-          ->removeColumn('id')
-          ->removeColumn('users.image')
-          ->removeColumn('action')
-          ->make();
+            ->removeColumn('id')
+            ->removeColumn('users.image')
+            ->removeColumn('action')
+            ->make();
     }
 
     /**
@@ -1565,16 +1569,16 @@ class PaymentsController extends Controller
      * @param  string $type [description]
      * @return [type]       [description]
      */
-    public function prepareSummaryRecord($type='overall')
+    public function prepareSummaryRecord($type = 'overall')
     {
         $payments = [];
-        if ($type=='online') {
+        if ($type == 'online') {
             $payments['all'] = $this->getRecordsCount('online');
 
             $payments['success'] = $this->getRecordsCount('online', 'success');
             $payments['cancelled'] = $this->getRecordsCount('online', 'cancelled');
             $payments['pending'] = $this->getRecordsCount('online', 'pending');
-        } elseif ($type=='offline') {
+        } elseif ($type == 'offline') {
             $payments['all'] = $this->getRecordsCount('offline');
 
             $payments['success'] = $this->getRecordsCount('offline', 'success');
@@ -1591,24 +1595,24 @@ class PaymentsController extends Controller
      * @param  string $status [description]
      * @return [type]         [description]
      */
-    public function getRecordsCount($type, $status='')
+    public function getRecordsCount($type, $status = '')
     {
         $count = 0;
-        if ($type=='online') {
-            if ($status=='') {
+        if ($type == 'online') {
+            if ($status == '') {
                 $count = Payment::where('payment_gateway', '!=', 'offline')->count();
             } else {
                 $count = Payment::where('payment_gateway', '!=', 'offline')
-                                  ->where('payment_status', '=', $status)
-                                  ->count();
+                    ->where('payment_status', '=', $status)
+                    ->count();
             }
-        } elseif ($type=='offline') {
-            if ($status=='') {
+        } elseif ($type == 'offline') {
+            if ($status == '') {
                 $count = Payment::where('payment_gateway', '=', 'offline')->count();
             } else {
                 $count = Payment::where('payment_gateway', '=', 'offline')
-                                  ->where('payment_status', '=', $status)
-                                  ->count();
+                    ->where('payment_status', '=', $status)
+                    ->count();
             }
         }
 
@@ -1632,16 +1636,16 @@ class PaymentsController extends Controller
         $payment_labels = [getPhrase('success'), getPhrase('cancelled'), getPhrase('pending')];
         $payment_dataset_labels = [getPhrase('total')];
 
-        $payment_bgcolor = [getColor('', 4),getColor('', 9),getColor('', 18)];
-        $payment_border_color = [getColor('background', 4),getColor('background', 9),getColor('background', 18)];
+        $payment_bgcolor = [getColor('', 4), getColor('', 9), getColor('', 18)];
+        $payment_border_color = [getColor('background', 4), getColor('background', 9), getColor('background', 18)];
 
-        $payments_stats['data']    = (object) array(
-                                      'labels'            => $payment_labels,
-                                      'dataset'           => $payment_dataset,
-                                      'dataset_label'     => $payment_dataset_labels,
-                                      'bgcolor'           => $payment_bgcolor,
-                                      'border_color'      => $payment_border_color
-                                      );
+        $payments_stats['data'] = (object) array(
+            'labels' => $payment_labels,
+            'dataset' => $payment_dataset,
+            'dataset_label' => $payment_dataset_labels,
+            'bgcolor' => $payment_bgcolor,
+            'border_color' => $payment_border_color
+        );
         $payments_stats['type'] = 'bar';
         $payments_stats['title'] = getPhrase('overall_statistics');
 
@@ -1652,14 +1656,14 @@ class PaymentsController extends Controller
      * This method returns the overall monthly summary of the payments made with status success
      * @return [type] [description]
      */
-    public function getPaymentMonthlyStats($type = 'offline', $symbol='!=')
+    public function getPaymentMonthlyStats($type = 'offline', $symbol = '!=')
     {
         if (!checkRole(getUserGrade(2))) {
             prepareBlockUserMessage();
             return back();
         }
         $paymentObject = new App\Payment();
-        $payment_data = (object)$paymentObject->getSuccessMonthlyData('', $type, $symbol);
+        $payment_data = (object) $paymentObject->getSuccessMonthlyData('', $type, $symbol);
 
 
         $payment_dataset = [];
@@ -1673,20 +1677,20 @@ class PaymentsController extends Controller
             $color_number = rand(0, 999);
             ;
             $payment_dataset[] = $record->total;
-            $payment_labels[]  = $record->month;
+            $payment_labels[] = $record->month;
             $payment_bgcolor[] = getColor('', $color_number);
             $payment_border_color[] = getColor('background', $color_number);
         }
 
-        $payments_stats['data']    = (object) array(
-                                      'labels'            => $payment_labels,
-                                      'dataset'           => $payment_dataset,
-                                      'dataset_label'     => $payment_dataset_labels,
-                                      'bgcolor'           => $payment_bgcolor,
-                                      'border_color'      => $payment_border_color
-                                      );
+        $payments_stats['data'] = (object) array(
+            'labels' => $payment_labels,
+            'dataset' => $payment_dataset,
+            'dataset_label' => $payment_dataset_labels,
+            'bgcolor' => $payment_bgcolor,
+            'border_color' => $payment_border_color
+        );
         $payments_stats['type'] = 'line';
-        $payments_stats['title'] = getPhrase('payments_reports_in').' '.getCurrencyCode();
+        $payments_stats['title'] = getPhrase('payments_reports_in') . ' ' . getCurrencyCode();
 
         return $payments_stats;
     }
@@ -1701,13 +1705,13 @@ class PaymentsController extends Controller
             prepareBlockUserMessage();
             return back();
         }
-        $data['active_class']       = 'reports';
-        $data['title']              = getPhrase('export_payments_report');
-        $data['layout']             = getLayout();
-        $data['record']             = false;
+        $data['active_class'] = 'reports';
+        $data['title'] = getPhrase('export_payments_report');
+        $data['layout'] = getLayout();
+        $data['record'] = false;
 
 
-        $view_name = getTheme().'::payments.reports.payments-export';
+        $view_name = getTheme() . '::payments.reports.payments-export';
         return view($view_name, $data);
     }
 
@@ -1718,19 +1722,19 @@ class PaymentsController extends Controller
             return back();
         }
         $columns = array(
-        'all_records'  => 'bail|required'
+            'all_records' => 'bail|required'
         );
 
-        if ($request->all_records==0) {
+        if ($request->all_records == 0) {
             $columns['from_date'] = 'bail|required';
-            $columns['to_date']    = 'bail|required';
+            $columns['to_date'] = 'bail|required';
         }
 
         $this->validate($request, $columns);
 
         $payment_status = $request->payment_status;
         $payment_type = $request->payment_type;
-        $record_type  = $request->all_records;
+        $record_type = $request->all_records;
         $from_date = '';
         $to_date = '';
 
@@ -1741,25 +1745,25 @@ class PaymentsController extends Controller
         $records = [];
         $query = '';
 
-        if ($payment_status=='all' && $payment_type=='all' && $record_type=='1') {
-            $query =  Payment::whereRaw("1 = 1");
+        if ($payment_status == 'all' && $payment_type == 'all' && $record_type == '1') {
+            $query = Payment::whereRaw("1 = 1");
         } else {
-            if ($record_type==0) {
+            if ($record_type == 0) {
                 $query = Payment::where('created_at', '>=', $from_date)
-                                  ->where('created_at', '<=', $to_date);
+                    ->where('created_at', '<=', $to_date);
             } else {
-                $query =  Payment::whereRaw("1 = 1");
+                $query = Payment::whereRaw("1 = 1");
             }
 
-            if ($payment_type!='all') {
-                if ($payment_type=='online') {
+            if ($payment_type != 'all') {
+                if ($payment_type == 'online') {
                     $query->where('payment_gateway', '!=', 'offline');
                 } else {
                     $query->where('payment_gateway', '=', 'offline');
                 }
             }
 
-            if ($payment_status!='all') {
+            if ($payment_status != 'all') {
                 $query->where('payment_status', '=', $payment_status);
             }
         }
@@ -1783,16 +1787,16 @@ class PaymentsController extends Controller
 
         Excel::create('payments_report', function ($excel) {
             $excel->sheet('payments_records', function ($sheet) {
-                $sheet->row(1, array('sno','ItemID', 'Purchased Item Name','User ID','Plan Startdate','Plan Enddate','Subscription Type', 'Payment Gateway', 'TransactionID','Paid by parent', 'Paid UserID', 'Cost', 'Coupon Applied', 'CouponID', 'Actual Cost', 'Discount Amount', 'After Discount', 'Paid Amount', 'Payment status', 'created_datetime','updated_datetime'));
+                $sheet->row(1, array('sno', 'ItemID', 'Purchased Item Name', 'User ID', 'Plan Startdate', 'Plan Enddate', 'Subscription Type', 'Payment Gateway', 'TransactionID', 'Paid by parent', 'Paid UserID', 'Cost', 'Coupon Applied', 'CouponID', 'Actual Cost', 'Discount Amount', 'After Discount', 'Paid Amount', 'Payment status', 'created_datetime', 'updated_datetime'));
                 $records = $this->getPaymentRecords();
                 $cnt = 2;
                 foreach ($records as $item) {
                     $item_type = ucfirst($item->plan_type);
-                    if ($item->plan_type=='combo') {
+                    if ($item->plan_type == 'combo') {
                         $item_type = 'Exam Series';
                     }
 
-                    $sheet->appendRow($cnt, array(($cnt-1), $item->item_id, $item->item_name, $item->user_id, $item->start_date, $item->end_date, $item_type, $item->payment_gateway, $item->transaction_id, $item->paid_by_parent, $item->paid_by, $item->cost, $item->coupon_applied, $item->coupon_id, $item->actual_cost, $item->discount_amount, $item->after_discount, $item->paid_amount, $item->payment_status, $item->created_at, $item->updated_at));
+                    $sheet->appendRow($cnt, array(($cnt - 1), $item->item_id, $item->item_name, $item->user_id, $item->start_date, $item->end_date, $item_type, $item->payment_gateway, $item->transaction_id, $item->paid_by_parent, $item->paid_by, $item->cost, $item->coupon_applied, $item->coupon_id, $item->actual_cost, $item->discount_amount, $item->after_discount, $item->paid_amount, $item->payment_status, $item->created_at, $item->updated_at));
                     $cnt++;
                 }
             });
@@ -1863,21 +1867,21 @@ class PaymentsController extends Controller
                     $days = $validity * 365;
                     break;
             }
-            $daysToAdd = '+'.$days.'days';
+            $daysToAdd = '+' . $days . 'days';
         } else {
-            $daysToAdd = '+'.$item_details->validity.'days';
+            $daysToAdd = '+' . $item_details->validity . 'days';
         }
 
         $payment_record->start_date = date('Y-m-d');
         $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
 
-        $details_before_payment          = (object)json_decode($payment_record->other_details);
-        $payment_record->coupon_applied  = $details_before_payment->is_coupon_applied;
-        $payment_record->coupon_id       = $details_before_payment->coupon_id;
-        $payment_record->actual_cost     = $details_before_payment->actual_cost;
+        $details_before_payment = (object) json_decode($payment_record->other_details);
+        $payment_record->coupon_applied = $details_before_payment->is_coupon_applied;
+        $payment_record->coupon_id = $details_before_payment->coupon_id;
+        $payment_record->actual_cost = $details_before_payment->actual_cost;
         $payment_record->discount_amount = $details_before_payment->discount_availed;
-        $payment_record->after_discount  = $details_before_payment->after_discount;
-        $payment_record->paid_amount     = $details_before_payment->after_discount;
+        $payment_record->after_discount = $details_before_payment->after_discount;
+        $payment_record->paid_amount = $details_before_payment->after_discount;
 
         if (!$iscoupon_zero) {
             $payment_record->admin_comments = $request->admin_comment;
@@ -1891,13 +1895,15 @@ class PaymentsController extends Controller
         try {
             if ($iscoupon_zero) {
                 $email_template = 'subscription_success';
-                $subject  = getPhrase($email_template);
-                $template     = new EmailTemplate();
-                $content_data   =  $template->sendEmailNotification(
+                $subject = getPhrase($email_template);
+                $template = new EmailTemplate();
+                $content_data = $template->sendEmailNotification(
                     $email_template,
-                    array('username'  =>$user->name,
-                          'plan'     => $payment_record->plan_type,
-                          'to_email' => $user->email)
+                    array(
+                        'username' => $user->name,
+                        'plan' => $payment_record->plan_type,
+                        'to_email' => $user->email
+                    )
                 );
 
 
@@ -1907,14 +1913,16 @@ class PaymentsController extends Controller
                 } catch (Exception $e) {
                 }
             } else {
-                $template    = new EmailTemplate();
-                $subject  = getPhrase($email_template);
-                $content_data =  $template->sendEmailNotification(
+                $template = new EmailTemplate();
+                $subject = getPhrase($email_template);
+                $content_data = $template->sendEmailNotification(
                     $email_template,
-                    array('username' =>$user->name,
-                          'plan'     => $payment_record->plan_type,
-                          'to_email' => $user->email,
-                          'admin_comment'=>$request->admin_comment)
+                    array(
+                        'username' => $user->name,
+                        'plan' => $payment_record->plan_type,
+                        'to_email' => $user->email,
+                        'admin_comment' => $request->admin_comment
+                    )
                 );
 
                 try {
@@ -1922,12 +1930,12 @@ class PaymentsController extends Controller
                 } catch (Exception $e) {
                 }
             }
-        } catch(Exception $ex) {
+        } catch (Exception $ex) {
             $message = getPhrase('\ncannot_send_email_to_user, please_check_your_server_settings');
             $exception = 1;
         }
 
-           $payment_record->save();
+        $payment_record->save();
 
         if ($payment_record->coupon_applied) {
             $this->couponcodes_usage($payment_record);
@@ -1938,7 +1946,7 @@ class PaymentsController extends Controller
 
     public function razorpaySuccess(Request $request)
     {
-        $user    = Auth::user();
+        $user = Auth::user();
         //Input items of form
         $input = Input::all();
 
@@ -1947,9 +1955,9 @@ class PaymentsController extends Controller
         //Fetch payment information by razorpay_payment_id
         $payment = $api->payment->fetch($input['razorpay_payment_id']);
 
-        if (count($input)  && !empty($input['razorpay_payment_id'])) {
+        if (count($input) && !empty($input['razorpay_payment_id'])) {
             try {
-                $response = $api->payment->fetch($input['razorpay_payment_id'])->capture(array('amount'=>$payment['amount']));
+                $response = $api->payment->fetch($input['razorpay_payment_id'])->capture(array('amount' => $payment['amount']));
 
                 $item = $this->getPackageDetails($request->type, $request->item_name);
                 $user = getUserRecord();
@@ -1958,26 +1966,26 @@ class PaymentsController extends Controller
                     $user = getUserRecord($request->selected_child_id);
                 }
 
-                $payment_record                  = new Payment();
-                $payment_record->transaction_id  = $request->razorpay_payment_id;
-                $payment_record->item_id         = $item->id;
-                $payment_record->item_name       = $item->title;
-                $payment_record->plan_type       = $request->type;
+                $payment_record = new Payment();
+                $payment_record->transaction_id = $request->razorpay_payment_id;
+                $payment_record->item_id = $item->id;
+                $payment_record->item_name = $item->title;
+                $payment_record->plan_type = $request->type;
                 $payment_record->payment_gateway = 'Razorpay';
-                $payment_record->slug            = $payment_record::makeSlug(getHashCode());
-                $payment_record->cost            = $item->cost;
-                $payment_record->user_id         = $user->id;
-                $payment_record->payment_status  = PAYMENT_STATUS_SUCCESS;
-                $payment_record->coupon_applied  = $request->is_coupon_applied;
-                $payment_record->coupon_id       = $request->coupon_id;
-                $payment_record->actual_cost     = $request->actual_cost;
+                $payment_record->slug = $payment_record::makeSlug(getHashCode());
+                $payment_record->cost = $item->cost;
+                $payment_record->user_id = $user->id;
+                $payment_record->payment_status = PAYMENT_STATUS_SUCCESS;
+                $payment_record->coupon_applied = $request->is_coupon_applied;
+                $payment_record->coupon_id = $request->coupon_id;
+                $payment_record->actual_cost = $request->actual_cost;
                 $payment_record->discount_amount = $request->discount_availed;
-                $payment_record->after_discount  = $request->after_discount;
-                $payment_record->paid_by         = $response->email;
-                $payment_record->paid_amount     = $request->after_discount;
-                $payment_record->paid_by_parent  = $request->parent_user;
+                $payment_record->after_discount = $request->after_discount;
+                $payment_record->paid_by = $response->email;
+                $payment_record->paid_amount = $request->after_discount;
+                $payment_record->paid_by_parent = $request->parent_user;
 
-                $daysToAdd = '+'.$item->validity.'days';
+                $daysToAdd = '+' . $item->validity . 'days';
 
                 $payment_record->start_date = date('Y-m-d');
                 $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
@@ -1991,11 +1999,11 @@ class PaymentsController extends Controller
                 $this->sendEmail($user->id, $payment_record->id);
             } catch (\Exception $e) {
                 flash('Ooops..!', $e->getMessage(), 'overlay');
-                return redirect(URL_PAYMENTS_CHECKOUT.$request->type.'/'.$request->item_name);
+                return redirect(URL_PAYMENTS_CHECKOUT . $request->type . '/' . $request->item_name);
             }
 
             flash('success', 'your_payment_done_successfully', 'success');
-            return redirect(URL_PAYMENTS_LIST.$user->slug);
+            return redirect(URL_PAYMENTS_LIST . $user->slug);
 
             // Do something here for store payment details in database...
         }
@@ -2016,7 +2024,7 @@ class PaymentsController extends Controller
 
                     $logo = getSetting('Invoice-Logo', 'invoice-settings');
                     if (empty($logo)) {
-                        $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
+                        $logo = IMAGE_PATH_SETTINGS . getSetting('site_logo', 'site_settings');
                     } else {
                         $logo = asset('uploads/settings/' . $logo);
                     }
@@ -2025,7 +2033,7 @@ class PaymentsController extends Controller
                     if ($record) {
                         $product_name = $record->name;
                         if ($record->type === 'temp') {
-                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
+                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity . ' ' . str_plural($record->validity_type, $record->validity);
                         }
                     }
 
@@ -2035,7 +2043,7 @@ class PaymentsController extends Controller
                     $data['id'] = $payment_record->id;
                     $data['username'] = $user_record->name;
                     $data['to_email'] = $user_record->email;
-                    $template    = new EmailTemplate();
+                    $template = new EmailTemplate();
                     $template->sendEmail('subscription', $data);
                 }
                 break;
@@ -2047,7 +2055,7 @@ class PaymentsController extends Controller
 
                 $logo = getSetting('Invoice-Logo', 'invoice-settings');
                 if (empty($logo)) {
-                    $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
+                    $logo = IMAGE_PATH_SETTINGS . getSetting('site_logo', 'site_settings');
                 } else {
                     $logo = asset('uploads/settings/' . $logo);
                 }
@@ -2070,85 +2078,84 @@ class PaymentsController extends Controller
 
                 ob_start();
                 ?>
-<table class="table invoice-items">
-    <thead>
-        <tr class="h4 text-dark text-view">
-            <th width="30%" class="text-center">
-                <?php echo getPhrase('item_name'); ?>
-            </th>
+                <table class="table invoice-items">
+                    <thead>
+                        <tr class="h4 text-dark text-view">
+                            <th width="30%" class="text-center">
+                                <?php echo getPhrase('item_name'); ?>
+                            </th>
 
-            <th width="10%" class="text-center">
-                <?php echo getPhrase('rate'); ?>
-            </th>
-            <th width="7%" class="text-center">
-                <?php echo getPhrase('discount'); ?>
-            </th>
-            <th width="10%" class="text-center">
-                <?php echo getPhrase('amount'); ?>
-            </th>
+                            <th width="10%" class="text-center">
+                                <?php echo getPhrase('rate'); ?>
+                            </th>
+                            <th width="7%" class="text-center">
+                                <?php echo getPhrase('discount'); ?>
+                            </th>
+                            <th width="10%" class="text-center">
+                                <?php echo getPhrase('amount'); ?>
+                            </th>
 
-        </tr>
-    </thead>
-    <tbody>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-        <tr height="90px" class="product_row">
-            <td valign="top" valign="top">
+                        <tr height="90px" class="product_row">
+                            <td valign="top" valign="top">
+                                <?php
+                                $product_name = '';
+                                $item_id = $invoice->item_id;
+                                if ('subscribe' === $invoice->plan_type) {
+                                    $record = \App\Package::find($item_id);
+                                    if ($record) {
+                                        $product_name = $record->name;
+                                        if ($record->type === 'temp') {
+                                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity . ' ' . str_plural($record->validity_type, $record->validity);
+                                        }
+                                    }
+                                } elseif ('lms' === $invoice->plan_type) {
+                                    $record = \App\LmsSeries::find($item_id);
+                                    if ($record) {
+                                        $product_name = $record->title;
+                                    }
+                                } elseif ('exam' === $invoice->plan_type) {
+                                    $record = \App\Quiz::find($item_id);
+                                    if ($record) {
+                                        $product_name = $record->title;
+                                    }
+                                } elseif ('combo' === $invoice->plan_type) {
+                                    $record = \App\ExamSeries::find($item_id);
+                                    if ($record) {
+                                        $product_name = $record->title;
+                                    }
+                                }
+
+                                $product_tax_display = 0;
+                                $tax_value = 0;
+                                $discount_value = 0;
+                                $amount = $invoice->paid_amount;
+                                $product_qty = 1;
+                                $product_discount_display = $invoice->discount_amount;
+                                ?>
+                                <?php echo $product_name; ?>
+                            </td>
+
+                            <td valign="top">
+                                <?php echo digiCurrency($invoice->actual_cost); ?>
+                            </td>
+                            <td valign="top">
+                                <?php echo digiCurrency($invoice->discount_amount); ?>
+                            </td>
+                            <td class="text-center" valign="top"><strong><span class="ttlText"><?php echo digiCurrency($amount); ?></span></strong>
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
                 <?php
-                          $product_name = '';
-                $item_id = $invoice->item_id;
-                if ('subscribe' === $invoice->plan_type) {
-                    $record = \App\Package::find($item_id);
-                    if ($record) {
-                        $product_name = $record->name;
-                        if ($record->type === 'temp') {
-                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
-                        }
-                    }
-                } elseif ('lms' === $invoice->plan_type) {
-                    $record = \App\LmsSeries::find($item_id);
-                    if ($record) {
-                        $product_name = $record->title;
-                    }
-                } elseif ('exam' === $invoice->plan_type) {
-                    $record = \App\Quiz::find($item_id);
-                    if ($record) {
-                        $product_name = $record->title;
-                    }
-                } elseif ('combo' === $invoice->plan_type) {
-                    $record = \App\ExamSeries::find($item_id);
-                    if ($record) {
-                        $product_name = $record->title;
-                    }
-                }
+                $data['products'] = ob_get_clean();
 
-                $product_tax_display = 0;
-                $tax_value = 0;
-                $discount_value = 0;
-                $amount = $invoice->paid_amount;
-                $product_qty = 1;
-                $product_discount_display = $invoice->discount_amount;
-                ?>
-                <?php echo $product_name; ?>
-            </td>
-
-            <td valign="top">
-                <?php echo digiCurrency($invoice->actual_cost);?>
-            </td>
-            <td valign="top">
-                <?php echo digiCurrency($invoice->discount_amount);?>
-            </td>
-            <td class="text-center" valign="top"><strong><span
-                        class="ttlText"><?php echo digiCurrency($amount);?></span></strong>
-            </td>
-
-        </tr>
-
-    </tbody>
-</table>
-<?php
-        $data['products'] = ob_get_clean();
-
-                $template    = new EmailTemplate();
+                $template = new EmailTemplate();
                 $template->sendEmail('payment-invoice', $data);
                 break;
 
@@ -2161,7 +2168,7 @@ class PaymentsController extends Controller
 
                     $logo = getSetting('Invoice-Logo', 'invoice-settings');
                     if (empty($logo)) {
-                        $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
+                        $logo = IMAGE_PATH_SETTINGS . getSetting('site_logo', 'site_settings');
                     } else {
                         $logo = asset('uploads/settings/' . $logo);
                     }
@@ -2170,7 +2177,7 @@ class PaymentsController extends Controller
                     if ($record) {
                         $product_name = $record->name;
                         if ($record->type === 'temp') {
-                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
+                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity . ' ' . str_plural($record->validity_type, $record->validity);
                         }
                     }
 
@@ -2180,7 +2187,7 @@ class PaymentsController extends Controller
                     $data['id'] = $payment_record->id;
                     $data['username'] = $user_record->name;
                     $data['to_email'] = $user_record->email;
-                    $template    = new EmailTemplate();
+                    $template = new EmailTemplate();
                     $template->sendEmail('subscription', $data);
                 }
 
@@ -2191,7 +2198,7 @@ class PaymentsController extends Controller
 
                 $logo = getSetting('Invoice-Logo', 'invoice-settings');
                 if (empty($logo)) {
-                    $logo = IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings');
+                    $logo = IMAGE_PATH_SETTINGS . getSetting('site_logo', 'site_settings');
                 } else {
                     $logo = asset('uploads/settings/' . $logo);
                 }
@@ -2214,182 +2221,181 @@ class PaymentsController extends Controller
 
                 ob_start();
                 ?>
-<table class="table invoice-items">
-    <thead>
-        <tr class="h4 text-dark text-view">
-            <th width="30%" class="text-center">
-                <?php echo getPhrase('item_name'); ?>
-            </th>
+                <table class="table invoice-items">
+                    <thead>
+                        <tr class="h4 text-dark text-view">
+                            <th width="30%" class="text-center">
+                                <?php echo getPhrase('item_name'); ?>
+                            </th>
 
-            <th width="10%" class="text-center">
-                <?php echo getPhrase('rate'); ?>
-            </th>
-            <th width="7%" class="text-center">
-                <?php echo getPhrase('discount'); ?>
-            </th>
-            <th width="10%" class="text-center">
-                <?php echo getPhrase('amount'); ?>
-            </th>
+                            <th width="10%" class="text-center">
+                                <?php echo getPhrase('rate'); ?>
+                            </th>
+                            <th width="7%" class="text-center">
+                                <?php echo getPhrase('discount'); ?>
+                            </th>
+                            <th width="10%" class="text-center">
+                                <?php echo getPhrase('amount'); ?>
+                            </th>
 
-        </tr>
-    </thead>
-    <tbody>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-        <tr height="90px" class="product_row">
-            <td valign="top" valign="top">
+                        <tr height="90px" class="product_row">
+                            <td valign="top" valign="top">
+                                <?php
+                                $product_name = '';
+                                $item_id = $invoice->item_id;
+                                if ('subscribe' === $invoice->plan_type) {
+                                    $record = \App\Package::find($item_id);
+                                    if ($record) {
+                                        $product_name = $record->name;
+                                        if ($record->type === 'temp') {
+                                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity . ' ' . str_plural($record->validity_type, $record->validity);
+                                        }
+                                    }
+                                } elseif ('lms' === $invoice->plan_type) {
+                                    $record = \App\LmsSeries::find($item_id);
+                                    if ($record) {
+                                        $product_name = $record->title;
+                                    }
+                                } elseif ('exam' === $invoice->plan_type) {
+                                    $record = \App\Quiz::find($item_id);
+                                    if ($record) {
+                                        $product_name = $record->title;
+                                    }
+                                } elseif ('combo' === $invoice->plan_type) {
+                                    $record = \App\ExamSeries::find($item_id);
+                                    if ($record) {
+                                        $product_name = $record->title;
+                                    }
+                                }
+
+                                $product_tax_display = 0;
+                                $tax_value = 0;
+                                $discount_value = 0;
+                                $amount = $invoice->paid_amount;
+                                $product_qty = 1;
+                                $product_discount_display = $invoice->discount_amount;
+                                ?>
+                                <?php echo $product_name; ?>
+                            </td>
+
+                            <td valign="top">
+                                <?php echo digiCurrency($invoice->actual_cost); ?>
+                            </td>
+                            <td valign="top">
+                                <?php echo digiCurrency($invoice->discount_amount); ?>
+                            </td>
+                            <td class="text-center" valign="top"><strong><span class="ttlText"><?php echo digiCurrency($amount); ?></span></strong>
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
                 <?php
-                          $product_name = '';
-                $item_id = $invoice->item_id;
-                if ('subscribe' === $invoice->plan_type) {
-                    $record = \App\Package::find($item_id);
-                    if ($record) {
-                        $product_name = $record->name;
-                        if ($record->type === 'temp') {
-                            $product_name = getPhrase('subscription_for') . ' ' . $record->validity. ' ' . str_plural($record->validity_type, $record->validity);
-                        }
-                    }
-                } elseif ('lms' === $invoice->plan_type) {
-                    $record = \App\LmsSeries::find($item_id);
-                    if ($record) {
-                        $product_name = $record->title;
-                    }
-                } elseif ('exam' === $invoice->plan_type) {
-                    $record = \App\Quiz::find($item_id);
-                    if ($record) {
-                        $product_name = $record->title;
-                    }
-                } elseif ('combo' === $invoice->plan_type) {
-                    $record = \App\ExamSeries::find($item_id);
-                    if ($record) {
-                        $product_name = $record->title;
-                    }
-                }
+                $data['products'] = ob_get_clean();
 
-                $product_tax_display = 0;
-                $tax_value = 0;
-                $discount_value = 0;
-                $amount = $invoice->paid_amount;
-                $product_qty = 1;
-                $product_discount_display = $invoice->discount_amount;
-                ?>
-                <?php echo $product_name; ?>
-            </td>
-
-            <td valign="top">
-                <?php echo digiCurrency($invoice->actual_cost);?>
-            </td>
-            <td valign="top">
-                <?php echo digiCurrency($invoice->discount_amount);?>
-            </td>
-            <td class="text-center" valign="top"><strong><span
-                        class="ttlText"><?php echo digiCurrency($amount);?></span></strong>
-            </td>
-
-        </tr>
-
-    </tbody>
-</table>
-<?php
-        $data['products'] = ob_get_clean();
-
-                $template    = new EmailTemplate();
+                $template = new EmailTemplate();
                 $template->sendEmail('payment-invoice', $data);
                 break;
         }
     }
 
-  public function sendInvoice($invoice_id)
-  {
-      $payment = Payment::find($invoice_id);
+    public function sendInvoice($invoice_id)
+    {
+        $payment = Payment::find($invoice_id);
 
-      if (!checkRole(getUserGrade(2)) && !checkRole(getUserGrade(5)) && !checkRole(getUserGrade(7))) {
-          prepareBlockUserMessage();
-          return back();
-      }
+        if (!checkRole(getUserGrade(2)) && !checkRole(getUserGrade(5)) && !checkRole(getUserGrade(7))) {
+            prepareBlockUserMessage();
+            return back();
+        }
 
-      if (empty($invoice_id)) {
-          prepareBlockUserMessage('record_not_found');
-          return back();
-      }
+        if (empty($invoice_id)) {
+            prepareBlockUserMessage('record_not_found');
+            return back();
+        }
 
-      $invoice = Payment::find($invoice_id);
-      if (! $invoice) {
-          prepareBlockUserMessage('record_not_found');
-          return back();
-      }
+        $invoice = Payment::find($invoice_id);
+        if (!$invoice) {
+            prepareBlockUserMessage('record_not_found');
+            return back();
+        }
 
-      $user_record = \App\User::find($invoice->user_id);
-      if (! $user_record) {
-          prepareBlockUserMessage('record_not_found');
-          return back();
-      }
+        $user_record = \App\User::find($invoice->user_id);
+        if (!$user_record) {
+            prepareBlockUserMessage('record_not_found');
+            return back();
+        }
 
-      $this->sendEmail($user_record->id, $invoice->id, 'invoice');
+        $this->sendEmail($user_record->id, $invoice->id, 'invoice');
 
-      flash('success', 'invoice_send_successfully', 'success');
-      return redirect()->route('payments.view_invoice', ['invoice_id' => $invoice_id]);
-  }
+        flash('success', 'invoice_send_successfully', 'success');
+        return redirect()->route('payments.view_invoice', ['invoice_id' => $invoice_id]);
+    }
 
-  public function viewInvoice($invoice_id)
-  {
-      if (!checkRole(getUserGrade(2)) && !checkRole(getUserGrade(5)) && !checkRole(getUserGrade(7))) {
-          prepareBlockUserMessage();
-          return back();
-      }
+    public function viewInvoice($invoice_id)
+    {
+        if (!checkRole(getUserGrade(2)) && !checkRole(getUserGrade(5)) && !checkRole(getUserGrade(7))) {
+            prepareBlockUserMessage();
+            return back();
+        }
 
-      if (empty($invoice_id)) {
-          prepareBlockUserMessage('record_not_found');
-          return back();
-      }
+        if (empty($invoice_id)) {
+            prepareBlockUserMessage('record_not_found');
+            return back();
+        }
 
-      $payment = Payment::find($invoice_id);
-      if (! $payment) {
-          prepareBlockUserMessage('record_not_found');
-          return back();
-      }
+        $payment = Payment::find($invoice_id);
+        if (!$payment) {
+            prepareBlockUserMessage('record_not_found');
+            return back();
+        }
 
-      $data = [
-        'title' => getPhrase('invoice'),
-        'invoice' => $payment,
-        'layout' => getLayout(),
-        'active_class' => 'subscriptions',
-      ];
-      $view_name = getTheme().'::payments.invoice.invoice';
-      return view($view_name, $data);
-  }
+        $data = [
+            'title' => getPhrase('invoice'),
+            'invoice' => $payment,
+            'layout' => getLayout(),
+            'active_class' => 'subscriptions',
+        ];
+        $view_name = getTheme() . '::payments.invoice.invoice';
+        return view($view_name, $data);
+    }
 
-  public function viewInvoicePdf($invoice_id)
-  {
-      if (!checkRole(getUserGrade(2))) {
-          prepareBlockUserMessage();
-          return back();
-      }
+    public function viewInvoicePdf($invoice_id)
+    {
+        if (!checkRole(getUserGrade(2))) {
+            prepareBlockUserMessage();
+            return back();
+        }
 
-      if (empty($invoice_id)) {
-          prepareBlockUserMessage('record_not_found');
-          return back();
-      }
+        if (empty($invoice_id)) {
+            prepareBlockUserMessage('record_not_found');
+            return back();
+        }
 
-      $payment = Payment::find($invoice_id);
-      if (! $payment) {
-          prepareBlockUserMessage('record_not_found');
-          return back();
-      }
+        $payment = Payment::find($invoice_id);
+        if (!$payment) {
+            prepareBlockUserMessage('record_not_found');
+            return back();
+        }
 
-      $data = [
-        'title' => getPhrase('invoice'),
-        'invoice' => $payment,
-        'layout' => getLayout(),
-        'active_class' => 'subscriptions',
-      ];
+        $data = [
+            'title' => getPhrase('invoice'),
+            'invoice' => $payment,
+            'layout' => getLayout(),
+            'active_class' => 'subscriptions',
+        ];
 
-      $file_name = $payment->id . '.pdf';
-      $path = public_path() . '/uploads/invoices/' . $file_name;
-      $view_name = getTheme().'::payments.invoice.invoice-content';
-      $conv = new \Anam\PhantomMagick\Converter();
-      $conv->source($view_name)
-      ->toPdf()
-      ->save($path);
-  }
+        $file_name = $payment->id . '.pdf';
+        $path = public_path() . '/uploads/invoices/' . $file_name;
+        $view_name = getTheme() . '::payments.invoice.invoice-content';
+        $conv = new \Anam\PhantomMagick\Converter();
+        $conv->source($view_name)
+            ->toPdf()
+            ->save($path);
+    }
 }
 ?>
