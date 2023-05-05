@@ -101,8 +101,8 @@ class SiteController extends Controller
         $data['active_class'] = $key;
 
 
-        // $view_name = getTheme() . '::site.dynamic-view';
-        // return view($view_name, $data);
+        $view_name = getTheme() . '::site.dynamic-view';
+        return view($view_name, $data);
     }
 
 

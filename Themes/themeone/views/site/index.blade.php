@@ -55,11 +55,7 @@
                             <div class="col-md-3 col-sm-6 princing-item yellow">
                                 <div class="pricing-divider m-auto text-center w-75">
                                             <h3 class="text-light">
-                                                @if ($exam->is_paid)
-                                                    <div class="ribbon green"><span> Premium Exam </span></div>
-                                                @else
-                                                    <div class="ribbon yellow"><span> Free Exam </span></div>
-                                                @endif
+                                            {{ ucfirst($exam->name) }}
                                             </h3>
                                                         <h4 class="my-0 display-4 text-light font-weight-normal mb-3"><span class="h3"></span>  {{ getCurrencyCode() }} {{ idrFormat((int) $exam->amount) }} 
                                                         <svg class='pricing-divider-img' enable-background='new 0 0 300 100' height='100px' id='Layer_1' preserveAspectRatio='none' version='1.1' viewBox='0 0 300 100' width='300px' x='0px' xml:space='preserve' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg' y='0px'>
@@ -74,29 +70,21 @@
                                                     </svg>
                                 </div>
 
-                                    <div class="card-body bg-white mt-0 shadow">
-                                        <ul class="list-unstyled mb-5 position-relative list-group">
+                                    <div class="card-body cs-white-bg mt-0 shadow">
+                                        <ul class="mb-5 position-relative list-group">
                                             
-                                            <a href="" class="cs-product-title text-center">{{ ucfirst($exam->name) }}
-                                           
-                                            </a>
                                             <li class="text-center"> {!! $exam->description !!}<li>
-                                            <li>
-                                                <a href="#">Marks : {{ (int) $exam->total_marks }}</a>
-                                            </li>
 
-                                            <li >
-                                                <a class="text-right" href="#">{{ $exam->validity_type }}</a>
-                                            </li>
+                                           
 
-
+                                            <div class="text-center mt-2">
+                                                <a href="{{ url('exams/student-exam-series/' . $exam->slug) }}"
+                                                    class="btn btn-blue btn-sm btn-block btn-radius">
+                                                    {{ getPhrase('start_exam') }}
+                                                </a>
+                                            </div>
                                         </ul>
-                                        <div class="text-center mt-2 btn btn-sm btn-block  btn-custom  ">
-                                        <button type="button" class="btn btn-lg btn-block  btn-custom ">Sign up for free</button>
-                                        <a href="{{ url('exams/student-exam-series/' . $exam->slug) }}">
-                                                {{ getPhrase('start_exam') }}
-                                            </a>
-                                        </div>
+                                       
                                     </div>
                             </div>
                         @endforeach

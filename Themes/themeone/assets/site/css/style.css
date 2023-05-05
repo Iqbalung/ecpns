@@ -83,7 +83,7 @@ ul li {
 
 .pricing-divider {
     border-radius: 20px;
-    background: #C64545;
+    background: #ffae00;
     padding: 1em 0 4em;
     position: relative;
 }
@@ -268,6 +268,10 @@ h2 {
 
 .cs-gray-bg {
     background-color: #f5f5f5;
+}
+
+.cs-white-bg {
+    background-color: #ffffff;
 }
 
 .cs-gr-bg {
