@@ -9,6 +9,7 @@ use App\Quiz;
 use App\Subject;
 use App\QuestionBank;
 use App\QuizCategory;
+use App\Package;
 use Yajra\Datatables\Datatables;
 use DB;
 use Auth;
@@ -134,6 +135,7 @@ class QuizController extends Controller
         $data['record']             = false;
         $data['active_class']       = 'exams';
         $data['categories']         = array_pluck(QuizCategory::all(), 'category', 'id');
+        $data['packages']            = array_pluck(Package::all(), 'name', 'id');
         $data['instructions']       = array_pluck(App\Instruction::all(), 'title', 'id');
         $data['exam_types']         = App\ExamType::where('status', '=', 1)->get()->pluck('title', 'code')->toArray();
         $data['title']              = getPhrase('create_quiz');

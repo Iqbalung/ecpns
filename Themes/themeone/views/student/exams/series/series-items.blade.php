@@ -9,8 +9,11 @@
       </tr>
     </thead>
     <tbody>   
-        <?php $nos = 1; ?>
-      @foreach($contents as $content)
+        <?php $nos = 1; 
+        
+        ?>
+        
+        @foreach($contents as $content)
       <?php 
         $url = URL_STUDENT_TAKE_EXAM.$content->slug;
         $paid = ($content->is_paid && !isItemPurchased($content->id, 'combo')) ? true : false;
@@ -28,7 +31,8 @@
               @else
                 onclick="showInstructions('{{$url}}');" 
               @endif>
-              @if($content->is_paid)
+              @if($user_level >= $content->level)
+                
                 {{getPhrase('take_exam')}}
               @endif
             </a>

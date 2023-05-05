@@ -21,7 +21,7 @@ use Razorpay\Api\Api;
 use Yajra\Datatables\Datatables;
 
 use App\Services\MidtransService;
-use App\UserExam;
+use App\UserPackage;
 use App\Utils\MidtransNotification;
 
 use Carbon;
@@ -198,6 +198,7 @@ class PaymentsController extends Controller
      */
     public function paynow(Request $request, $slug)
     {
+        $request->type = 'subscribe';
         if ($request->gateway  == 'razorpay') {
             $type   = $request->type;
 
@@ -270,7 +271,7 @@ class PaymentsController extends Controller
         $item = $this->getPackageDetails($type, $slug);
 
         if (!$item) {
-            dd('failed');
+            dd('failed1');
         }
 
         $other_details = array();
@@ -635,14 +636,11 @@ class PaymentsController extends Controller
      */
     public function getPackageDetails($type, $slug)
     {
-        if ('subscribe' === $type) {
-            $record = \App\Package::where('slug', $slug)->first();
-            $record->cost = $record->amount;
-            $record->title = $record->name;
-            return $record;
-        } else {
-            return $this->getmodelName($type, $slug);
-        }
+        $record = \App\Package::where('slug', $slug)->first();
+        $record->cost = $record->amount;
+        $record->title = $record->name;
+        return $record;
+       
     }
 
     /**
@@ -1024,7 +1022,7 @@ class PaymentsController extends Controller
 
     public function checkoutExamSeries(Request $request, $slug)
     {
-        $record = ExamSeries::getRecordWithSlug($slug);
+        $record = Package::getRecordWithSlug($slug);
 
         if (!$record) {
             flash('Ooops...!', 'Terjadi kesalahan saat memproses data.', 'error');
@@ -1032,11 +1030,11 @@ class PaymentsController extends Controller
         }
 
         $user = $request->user();
-
-        if ($user->isPurchasedExamSeries($record)) {
+        if (Package::isPurchasedExamSeries($record->id,$user->id)) {
             flash('Hey ' . $user->name, 'you_already_purchased_this_item', 'overlay');
             return redirect()->to('/exams/student-exam-series/' . $record->slug);
         }
+        
 
         if ($user->role_id == 6) {
             // TODO: Check if parent already purchased series for their childs
@@ -1045,11 +1043,11 @@ class PaymentsController extends Controller
 
         $data['active_class']     = 'exams';
         $data['pay_by']           = '';
-        $data['title']            = $record->title;
+        $data['title']            = $record->name;
         $data['item_type']        = 'combo';
         $data['item']             = $record;
         $current_theme            = getDefaultTheme();
-
+        
         if ($current_theme == 'default') {
             $data['right_bar']          = false;
             $data['right_bar_class']   	= 'order-user-details';
@@ -1058,6 +1056,8 @@ class PaymentsController extends Controller
                 'item' => $record,
             );
         }
+
+       
 
         $data['layout'] = getLayout();
         $data['parent_user'] = false;
@@ -1118,7 +1118,7 @@ class PaymentsController extends Controller
         }
 
         // if (Payment::isItemPurchased($record->id, $type, $user->id)) {
-        if (UserExam::isItemPurchased($record->id, $user->id)) {
+        if (UserPackage::isItemPurchased($record->id, $user->id)) {
             //User already purchased this item and it is valid
             //Return the user to back by the message
             flash('Hey '.$user->name, 'you_already_purchased_this_item', 'overlay');

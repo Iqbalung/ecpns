@@ -1,6 +1,7 @@
 @extends('layouts.admin.adminlayout')
 <link href="{{CSS}}bootstrap-datepicker.css" rel="stylesheet">	
 @section('content')
+111
 <div id="page-wrapper">
 			<div class="container-fluid">
 				<!-- Page Heading -->

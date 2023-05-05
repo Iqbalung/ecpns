@@ -88,7 +88,9 @@
 
 					 array('button_name'=> $button_name),
 
-					 array(	'categories' 		=> $categories,
+					 array(	
+							'categories' 		=> $categories,
+							'packages' 			=> $packages,
 
 					 		'instructions' 		=> $instructions,
 

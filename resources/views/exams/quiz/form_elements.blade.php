@@ -29,6 +29,14 @@
 						
 					</fieldset>
 
+					<fieldset class="form-group col-md-6">
+						
+						{{ Form::label('package_id', 'Paket' }}
+						<span class="text-red">*</span>
+						{{Form::select('package_id', $package, null, ['class'=>'form-control'])}}
+						
+					</fieldset>
+
   
 				    </div>
 

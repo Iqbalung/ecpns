@@ -207,8 +207,5 @@ class User extends Authenticatable
         return $this->hasMany('App\Activity');
     }
 
-    public function isPurchasedExamSeries(ExamSeries $examSeries)
-    {
-        return UserExam::where(['user_id' => $this->id, 'exam_series_id' => $examSeries->id])->first() !== null;
-    }
+    
 }

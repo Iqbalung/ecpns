@@ -16,7 +16,12 @@ class Package extends Model
     public function itemsList()
     {
         return DB::table('quizzes', 'quizzes.id', '=', 'quiz_id')
-         ->select('quizzes.*')
+          ->leftJoin('packages', 'packages.id', '=', 'package_id')
             ->get();
+    }
+
+    public static function isPurchasedExamSeries($package_id,$user_id)
+    {
+        return UserPackage::where(['user_id' => $user_id, 'package_id' => $package_id])->first() !== null;
     }
 }

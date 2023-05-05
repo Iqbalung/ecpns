@@ -157,7 +157,7 @@
 
                                     <?php } ?>
 
-                                    <h3>{{ $item->title }}</h3>
+                                    <h3>{{ $item->name }}</h3>
                                     <p>{{ getPhrase('valid_for') . ' ' . $item->validity . ' ' }}
                                         @if ('subscribe' === $item_type)
                                             {{ str_plural($item->validity_type, $item->validity) }}
@@ -325,19 +325,14 @@
 
                                    ?>
 
-                                        <button onclick="submitForm('razorpay');" class="btn-lg btn button btn-primary"><i
-                                                class="icon-razorpay"></i>{{ getPhrase('razorpay') }}</button>
-
+                                        
                                         <?php }
 
 									if($payu == '1'){
 
 									?>
 
-                                        <button type="submit" onclick="submitForm('payu');"
-                                            class="btn-lg btn button btn-card"><i class="icon-credit-card"></i>
-                                            {{ getPhrase('payu') }}</button>
-
+                                        
                                         <?php }
 
 
@@ -348,9 +343,7 @@
 
 
 
-                                        <button type="submit" class="btn-lg btn button btn-paypal"
-                                            onclick="submitForm('paypal');"><i class="icon-paypal"></i>
-                                            {{ getPhrase('paypal') }}</button>
+                                       
 
                                         <?php }
 
@@ -367,11 +360,11 @@
 
                                         @if ($snapTokenQuery)
                                             <button type="submit" class="btn-lg btn button btn-info"
-                                                onclick="triggerSnapUI()"><i class="fa fa-money"></i> Midtrans</button>
+                                                onclick="triggerSnapUI()"><i class="fa fa-money"></i> Bayar</button>
                                         @else
                                             <button type="submit" class="btn-lg btn button btn-info"
                                                 onclick="submitForm('midtrans');"><i class="fa fa-money"></i>
-                                                Midtrans</button>
+                                                Bayar</button>
                                         @endif
 
                                         <?php } ?>

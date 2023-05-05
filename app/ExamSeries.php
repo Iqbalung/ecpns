@@ -23,6 +23,6 @@ class ExamSeries extends Model
         return DB::table('examseries_data')
          ->join('quizzes', 'quizzes.id', '=', 'quiz_id')
          ->select('quizzes.*')
-         ->where('examseries_id', '=', $this->id)->get();
+            ->where('examseries_id', '=', $this->id)->get();
     }
 }

@@ -79,6 +79,7 @@
 					 array(	'categories' 		=> $categories,
 
 					 		'instructions' 		=> $instructions,
+					 		'package' 		=> $pack,
 
 					 		'record'			=> $record,
 					 		
