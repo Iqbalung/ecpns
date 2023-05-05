@@ -58,8 +58,8 @@
 
 <body class="login-screen" background="{{IMAGE_PATH_SETTINGS.getSetting('background_image','site_settings')}}" ng-app="academia" >
 
- <!-- NAVIGATION -->
- <div class="login-nav">
+ <!-- NAVIGATION --> 
+ <div class="login-nav">Bergabung
     <nav class="navbar navbar-default st-navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">

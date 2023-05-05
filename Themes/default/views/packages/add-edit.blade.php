@@ -1,7 +1,7 @@
 @extends('layouts.admin.adminlayout')
 
 @section('content')
-<div id="page-wrapper">
+<div id="page-wrapper">sss
 			<div class="container-fluid">
 				<!-- Page Heading -->
 				<div class="row">

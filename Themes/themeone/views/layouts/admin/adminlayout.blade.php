@@ -161,7 +161,6 @@
 		?>
 		</div>
 		@endif
-
 		<aside class="left-sidebar">			<div class="collapse navbar-collapse navbar-ex1-collapse">				<ul class="nav navbar-nav side-nav">					<li {{ isActive($active_class, 'dashboard') }}>
 						<a href="{{PREFIX}}">
 							<i class="fa fa-fw fa-window-maximize"></i> {{ getPhrase('dashboard') }}
@@ -212,6 +211,20 @@
 					</ul>
 
 					</li>
+
+					<li {{ isActive($active_class, 'packages') }} >
+
+						<a data-toggle="collapse" data-target="#coupons"><i class="fa fa-fw fa-cubes"></i>
+						{{ getPhrase('packages') }} </a>
+
+						<ul id="coupons" class="collapse sidemenu-dropdown">
+								<li><a href="{{URL_PACKAGES}}"> <i class="fa fa-fw fa-list"></i>{{ getPhrase('list') }}</a></li>
+								<li><a href="{{URL_PACKAGES_ADD}}"> <i class="fa fa-fw fa-plus"></i>{{ getPhrase('add') }}</a></li>
+
+						</ul>
+
+					</li>
+
 
 					<li {{ isActive($active_class, 'lms') }} >
 

@@ -40,7 +40,7 @@
 						{{Form::select('validity_type', $validity_types, null, ['class'=>'form-control'])}}
 					</fieldset>
 
-					<fieldset class="form-group col-md-6">
+					<fieldset class="form-group col-md-3">
 						{{ Form::label('amount', getphrase('amount')) }}
 						<span class="text-red">*</span>
 						{{ Form::number('amount', $value = null , $attributes = array('class'=>'form-control', 'placeholder' => getPhrase('amount'),
@@ -56,7 +56,7 @@
 					</fieldset>
 
 
-					<fieldset class="form-group col-md-6">
+					<fieldset class="form-group col-md-3">
 
 						<?php $status = array('1' =>'Active', '0' => 'Inactive', );?>
 
@@ -66,6 +66,36 @@
 
 						{{Form::select('status', $status, null, ['class'=>'form-control'])}}
 
+					</fieldset>
+
+					<fieldset class="form-group col-md-3">
+						{{ Form::label('Cost', getphrase('cost')) }}
+						<span class="text-red">*</span>
+						{{ Form::number('cost', $value = null , $attributes = array('class'=>'form-control', 'placeholder' => getPhrase('cost'),
+							'ng-model'=>'cost',
+							'min'=>1,
+							'required'=> 'true',
+							'ng-class'=>'{"has-error": formQuiz.cost.$touched && formQuiz.cost.$invalid}',
+						)) }}
+						<div class="validation-error" ng-messages="formQuiz.cost.$error" >
+	    					{!! getValidationMessage()!!}
+	    					{!! getValidationMessage('number')!!}
+						</div>
+					</fieldset>
+
+					<fieldset class="form-group col-md-3">
+						{{ Form::label('level', getphrase('level')) }}
+						<span class="text-red">*</span>
+						{{ Form::number('level', $value = null , $attributes = array('class'=>'form-control', 'placeholder' => getPhrase('level'),
+							'ng-model'=>'level',
+							'min'=>1,
+							'required'=> 'true',
+							'ng-class'=>'{"has-error": formQuiz.level.$touched && formQuiz.level.$invalid}',
+						)) }}
+						<div class="validation-error" ng-messages="formQuiz.level.$error" >
+	    					{!! getValidationMessage()!!}
+	    					{!! getValidationMessage('number')!!}
+						</div>
 					</fieldset>
 
 				</div>

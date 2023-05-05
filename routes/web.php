@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Artisan;
 
-if (env('DB_DATABASE')=='') {
+if (env('DB_DATABASE') == '') {
     Route::get('/', 'InstallatationController@index');
     Route::get('/install', 'InstallatationController@index');
     Route::get('/update-details', 'InstallatationController@updateDetails');
@@ -51,7 +51,7 @@ Route::get('install/reg', 'InstallatationController@reg');
 Route::post('install/register', 'InstallatationController@registerUser');
 
 
-if (env('DB_DATABASE')=='') {
+if (env('DB_DATABASE') == '') {
     Route::get('/', 'SiteController@index');
 }
 Route::get('home', 'SiteController@index');
@@ -127,8 +127,10 @@ Route::post('send-notification', 'FcmNotificationController@sendNotification');
 
 
 Route::get('languages/list', 'NativeController@index');
-Route::get('languages/getList', [ 'as'   => 'languages.dataTable',
-     'uses' => 'NativeController@getDatatable']);
+Route::get('languages/getList', [
+    'as' => 'languages.dataTable',
+    'uses' => 'NativeController@getDatatable'
+]);
 
 Route::get('languages/add', 'NativeController@create');
 Route::post('languages/add', 'NativeController@store');
@@ -165,8 +167,10 @@ Route::post('users/import', 'UsersController@readExcel');
 
 Route::get('users/import-report', 'UsersController@importResult');
 
-Route::get('users/list/getList/{role_name?}', [ 'as'   => 'users.dataTable',
-    'uses' => 'UsersController@getDatatable']);
+Route::get('users/list/getList/{role_name?}', [
+    'as' => 'users.dataTable',
+    'uses' => 'UsersController@getDatatable'
+]);
 Route::get('users/parent-details/{slug}', 'UsersController@viewParentDetails');
 Route::patch('users/parent-details/{slug}', 'UsersController@updateParentDetails');
 Route::post('users/search/parent', 'UsersController@getParentsOnSearch');
@@ -193,8 +197,10 @@ Route::post('mastersettings/subjects/add', 'SubjectsController@store');
 Route::get('mastersettings/subjects/edit/{slug}', 'SubjectsController@edit');
 Route::patch('mastersettings/subjects/edit/{slug}', 'SubjectsController@update');
 Route::delete('mastersettings/subjects/delete/{id}', 'SubjectsController@delete');
-Route::get('mastersettings/subjects/getList', [ 'as'   => 'subjects.dataTable',
-    'uses' => 'SubjectsController@getDatatable']);
+Route::get('mastersettings/subjects/getList', [
+    'as' => 'subjects.dataTable',
+    'uses' => 'SubjectsController@getDatatable'
+]);
 
 Route::get('mastersettings/subjects/import', 'SubjectsController@import');
 Route::post('mastersettings/subjects/import', 'SubjectsController@readExcel');
@@ -206,8 +212,10 @@ Route::post('mastersettings/topics/add', 'TopicsController@store');
 Route::get('mastersettings/topics/edit/{slug}', 'TopicsController@edit');
 Route::patch('mastersettings/topics/edit/{slug}', 'TopicsController@update');
 Route::delete('mastersettings/topics/delete/{id}', 'TopicsController@delete');
-Route::get('mastersettings/topics/getList', [ 'as'   => 'topics.dataTable',
-    'uses' => 'TopicsController@getDatatable']);
+Route::get('mastersettings/topics/getList', [
+    'as' => 'topics.dataTable',
+    'uses' => 'TopicsController@getDatatable'
+]);
 
 Route::get('mastersettings/topics/get-parents-topics/{subject_id}', 'TopicsController@getParentTopics');
 
@@ -244,8 +252,10 @@ Route::post('exams/categories/add', 'QuizCategoryController@store');
 Route::get('exams/categories/edit/{slug}', 'QuizCategoryController@edit');
 Route::patch('exams/categories/edit/{slug}', 'QuizCategoryController@update');
 Route::delete('exams/categories/delete/{slug}', 'QuizCategoryController@delete');
-Route::get('exams/categories/getList', [ 'as'   => 'quizcategories.dataTable',
-    'uses' => 'QuizCategoryController@getDatatable']);
+Route::get('exams/categories/getList', [
+    'as' => 'quizcategories.dataTable',
+    'uses' => 'QuizCategoryController@getDatatable'
+]);
 
 // Quiz Student Categories
 Route::get('exams/student/categories', 'StudentQuizController@index');
@@ -386,8 +396,10 @@ Route::post('lms/categories/add', 'LmsCategoryController@store');
 Route::get('lms/categories/edit/{slug}', 'LmsCategoryController@edit');
 Route::patch('lms/categories/edit/{slug}', 'LmsCategoryController@update');
 Route::delete('lms/categories/delete/{slug}', 'LmsCategoryController@delete');
-Route::get('lms/categories/getList', [ 'as'   => 'lmscategories.dataTable',
-    'uses' => 'LmsCategoryController@getDatatable']);
+Route::get('lms/categories/getList', [
+    'as' => 'lmscategories.dataTable',
+    'uses' => 'LmsCategoryController@getDatatable'
+]);
 
 //LMS Contents
 Route::get('lms/content', 'LmsContentController@index');
@@ -396,8 +408,10 @@ Route::post('lms/content/add', 'LmsContentController@store');
 Route::get('lms/content/edit/{slug}', 'LmsContentController@edit');
 Route::patch('lms/content/edit/{slug}', 'LmsContentController@update');
 Route::delete('lms/content/delete/{slug}', 'LmsContentController@delete');
-Route::get('lms/content/getList', [ 'as'   => 'lmscontent.dataTable',
-    'uses' => 'LmsContentController@getDatatable']);
+Route::get('lms/content/getList', [
+    'as' => 'lmscontent.dataTable',
+    'uses' => 'LmsContentController@getDatatable'
+]);
 
 
 
@@ -475,8 +489,10 @@ Route::get('mastersettings/settings/add-sub-settings/{slug}', 'SettingsControlle
 Route::post('mastersettings/settings/add-sub-settings/{slug}', 'SettingsController@storeSubSettings');
 Route::patch('mastersettings/settings/add-sub-settings/{slug}', 'SettingsController@updateSubSettings');
 
-Route::get('mastersettings/settings/getList', [ 'as'   => 'mastersettings.dataTable',
-     'uses' => 'SettingsController@getDatatable']);
+Route::get('mastersettings/settings/getList', [
+    'as' => 'mastersettings.dataTable',
+    'uses' => 'SettingsController@getDatatable'
+]);
 
 ////////////////////////////
 // EMAIL TEMPLATES MODULE //
@@ -489,8 +505,10 @@ Route::post('email/templates/add', 'EmailTemplatesController@store');
 Route::get('email/templates/edit/{slug}', 'EmailTemplatesController@edit');
 Route::patch('email/templates/edit/{slug}', 'EmailTemplatesController@update');
 Route::delete('email/templates/delete/{slug}', 'EmailTemplatesController@delete');
-Route::get('email/templates/getList', [ 'as'   => 'emailtemplates.dataTable',
-    'uses' => 'EmailTemplatesController@getDatatable']);
+Route::get('email/templates/getList', [
+    'as' => 'emailtemplates.dataTable',
+    'uses' => 'EmailTemplatesController@getDatatable'
+]);
 
 
 //Coupons Module
@@ -508,6 +526,7 @@ Route::post('coupons/update-questions/{slug}', 'CouponcodesController@storeQuest
 
 
 Route::post('coupons/validate-coupon', 'CouponcodesController@validateCoupon');
+
 
 
 //Feedback Module
@@ -591,9 +610,9 @@ Route::get('LMS/contents/{slug}', 'SiteController@forntLMSContents');
 Route::get('download/lms/contents/{slug}', 'SiteController@downloadLMSContent');
 Route::get('lms/video/{slug}/{cat_id?}', 'SiteController@viewVideo');
 Route::get('contact-us', function () {
-    $view_name = getTheme().'::site.contact-us';
-    $data['active_class']  = "contact-us";
-    $data['title']  = getPhrase('contact_us');
+    $view_name = getTheme() . '::site.contact-us';
+    $data['active_class'] = "contact-us";
+    $data['title'] = getPhrase('contact_us');
     return view($view_name, $data);
 });
 Route::post('send/contact-us/details', 'SiteController@ContactUs');
@@ -686,8 +705,10 @@ Route::post('resume/templates/add', 'ResumeTemplatesController@store');
 Route::get('resume/templates/edit/{slug}', 'ResumeTemplatesController@edit');
 Route::patch('resume/templates/edit/{slug}', 'ResumeTemplatesController@update');
 Route::delete('resume/templates/delete/{slug}', 'ResumeTemplatesController@delete');
-Route::get('resume/templates/getList', [ 'as'   => 'resumetemplates.dataTable',
-    'uses' => 'ResumeTemplatesController@getDatatable']);
+Route::get('resume/templates/getList', [
+    'as' => 'resumetemplates.dataTable',
+    'uses' => 'ResumeTemplatesController@getDatatable'
+]);
 
 Route::get('resume/build-resume/{slug}', 'ResumeController@editResume');
 Route::patch('resume/build-resume/{slug}', 'ResumeController@updateResume');
@@ -710,8 +731,11 @@ Route::delete('packages/delete/{slug}', 'PackagesController@delete');
 
 //Run new migrations
 Route::get('/new-migrations', function () {
-    $exitCode = Artisan::call('migrate', ['--path'=>'database/migrations/version2']);
+    $exitCode = Artisan::call('migrate', ['--path' => 'database/migrations/version2']);
     return redirect(PREFIX);
 });
 
 Route::post('mastersettings/settings/smtp-test', 'SettingsController@smtpTest')->name('mastersettings.smtp_test');
+
+
+
