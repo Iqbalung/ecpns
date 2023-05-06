@@ -78,7 +78,7 @@
                                            
 
                                             <div class="text-center mt-2">
-                                                <a href="{{ url('exams/student-exam-series/' . $exam->slug) }}"
+                                                <a href="{{ url('payments/checkout/subscribe/' . $exam->slug) }}"
                                                     class="btn btn-blue btn-sm btn-block btn-radius">
                                                     {{ getPhrase('start_exam') }}
                                                 </a>

@@ -311,8 +311,7 @@ Route::delete('exams/exam-series/delete/{slug}', 'ExamSeriesController@delete');
 Route::get('exams/exam-series/getList', 'ExamSeriesController@getDatatable');
 
 //EXAM SERIES STUDENT LINKS
-Route::get('exams/student-exam-series/list', 'ExamSeriesController@listSeries');
-Route::get('exams/student-exam-series/{slug}', 'ExamSeriesController@viewItem');
+Route::get('exams/student-exam-series/list', 'ExamSeriesController@viewItem');
 
 
 

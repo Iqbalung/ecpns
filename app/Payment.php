@@ -17,15 +17,15 @@ class Payment extends Model
         return Payment::where('slug', '=', $slug)->first();
     }
 
-    public static function getValidPackage($package_id,$user_id)
+    public static function getValidPackage($user_id)
     {
         $records = \DB::table('payments')
         ->join('packages', 'packages.id', '=', 'payments.item_id')
         ->where('payments.updated_at', '>',\DB::raw( 'DATE_SUB(NOW(),INTERVAL 30 DAY)'))
         ->where('payment_status',  'success')
         ->where('plan_type', 'subscribe')
-        ->where('user_id',$user_id)
-        ->where('item_id',$package_id)->first();
+        ->orderBy('payments.updated_at', 'DESC')
+        ->where('user_id',$user_id)->first();
         return $records;
     }
 

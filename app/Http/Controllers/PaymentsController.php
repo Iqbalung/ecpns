@@ -615,13 +615,13 @@ class PaymentsController extends Controller
             $this->couponcodes_usage($payment_record);
         }
 
-        $userExam = new UserExam();
+        $userExam = new UserPackage();
 
         $userExam->user_id = $payment_record->user_id;
         $userExam->payment_id = $payment_record->id;
-        $userExam->exam_series_id = $payment_record->item_id;
+        $userExam->package_id = $payment_record->item_id;
 
-        UserExam::purchaseExamSeries($userExam);
+        UserPackage::purchaseExamSeries($userExam);
 
         // Ignore for now (unhandled error :v)
         // $this->sendEmail($payment_record->user_id, $payment_record->id);
@@ -1120,7 +1120,7 @@ class PaymentsController extends Controller
         }
 
         // if (Payment::isItemPurchased($record->id, $type, $user->id)) {
-        if (UserPackage::isItemPurchased($record->id, $user->id)) {
+        if (UserPackage::isItemPurchased($record->id, $user->id) && Payment::getValidPackage($user->id)) {
             //User already purchased this item and it is valid
             //Return the user to back by the message
             flash('Hey ' . $user->name, 'you_already_purchased_this_item', 'overlay');

@@ -123,9 +123,7 @@
 
 		@if(env('APP_DEBUG'))
 		<div class="col-lg-12">
-		<?php
-		print_r(getController());
-		?>
+		
 		</div>
 		@endif
 		<aside class="left-sidebar">			<div class="collapse navbar-collapse navbar-ex1-collapse">				<ul class="nav navbar-nav side-nav">					<li {{ isActive($active_class, 'dashboard') }}>

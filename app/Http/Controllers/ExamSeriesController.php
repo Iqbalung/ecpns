@@ -524,11 +524,16 @@ class ExamSeriesController extends Controller
      * @param  [type] $slug [description]
      * @return [type]       [description]
      */
-    public function viewItem(Request $request, $slug)
+    public function viewItem(Request $request)
     {
         $user = Auth::user();
-        $record = Package::getRecordWithSlug($slug);
-        $userStatus = Payment::getValidPackage($record->id,$user->id);
+        $userStatus = Payment::getValidPackage($user->id);
+        if($userStatus){
+            $record = Package::where('id',$userStatus->item_id)->first();
+        }else{
+            $record = Package::where('level',0)->first();
+        }
+        
 
         /* if (!$request->user()->isPurchasedExamSeries($record)) {
             return redirect()->to('/payments/checkout/exam-series/' . $record->slug);
@@ -538,8 +543,7 @@ class ExamSeriesController extends Controller
             return redirect($isValid);
         } */
 
-       
-
+     
         $data['active_class']       = 'exams';
         $data['pay_by']             = '';
         $data['content_record']     = false;
