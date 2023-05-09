@@ -14,7 +14,8 @@
         
         @foreach($contents as $content)
         <?php 
-        $url = "http://localhost:3000?id=".$content->id;
+        
+        $url = "http://localhost:3000?id=".$content->id."&token=".uniqid()."&user_id=".$user->id;
         $paid = ($content->is_paid && !isItemPurchased($content->id, 'combo')) ? true : false;
         $role = getRoleData(Auth::user()->role_id); 
       ?>
