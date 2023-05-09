@@ -10,12 +10,11 @@
     </thead>
     <tbody>   
         <?php $nos = 1; 
-        
         ?>
         
         @foreach($contents as $content)
-      <?php 
-        $url = URL_STUDENT_TAKE_EXAM.$content->slug;
+        <?php 
+        $url = "http://localhost:3000?id=".$content->id;
         $paid = ($content->is_paid && !isItemPurchased($content->id, 'combo')) ? true : false;
         $role = getRoleData(Auth::user()->role_id); 
       ?>
@@ -32,7 +31,6 @@
                 onclick="showInstructions('{{$url}}');" 
               @endif>
               @if($user_level >= $content->level)
-                
                 {{getPhrase('take_exam')}}
               @endif
             </a>

@@ -16,6 +16,7 @@ class Package extends Model
     public function itemsList()
     {
         return DB::table('quizzes', 'quizzes.id', '=', 'quiz_id')
+        ->select('quizzes.*','packages.name','packages.level')
           ->leftJoin('packages', 'packages.id', '=', 'package_id')
             ->get();
     }
