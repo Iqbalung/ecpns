@@ -92,11 +92,11 @@
 
 
 
-                 <h4 class="text-center login-head">{{getPhrase('login')}}</h4>
+                 <h4 class="text-center login-head">{{getPhrase('login')}}111</h4>
 
                     <!-- Form Login/Register -->
                       {!! Form::open(array('url' => URL_USERS_LOGIN, 'method' => 'POST', 'name'=>'formLanguage ', 'novalidate'=>'', 'class'=>"loginform", 'name'=>"loginForm")) !!}
-
+                      @csrf
                         @include('errors.errors')
 
                         <div class="form-group">
