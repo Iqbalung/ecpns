@@ -17,25 +17,25 @@
         
         $url = "http://localhost:3000?id=".$content->id."&token=".uniqid()."&user_id=".$user->id;
         $paid = ($content->is_paid && !isItemPurchased($content->id, 'combo')) ? true : false;
-        $role = getRoleData(Auth::user()->role_id); 
+        $role = getRoleData(Auth::user()->role_id);
       ?>
       <tr>
         <td>{{$nos++}}</td>
         <td>{{$content->title}}</td>
         <td>
           <span>
-            @if($content->is_paid == 0)
+            
+            @if($user_level >= $content->level)
+            <a href="javascript:void(0);" onclick="showInstructions('{{$url}}');">
+                {{getPhrase('take_exam')}}
+              </a>
+            @endif
+            @if($user_level < $content->level)
            <!-- Button trigger modal -->
               <button type="button" class="btn btn-link" data-toggle="modal" data-target="#exampleModalCenter">
                 Buy  
               </button>
-            @elseif($content->is_paid == 1)
-            <a href="javascript:void(0);" onclick="showInstructions('{{$url}}');">
-              @if($user_level >= $content->level)
-                {{getPhrase('Take_exam')}}
-              @endif
-            </a>
-          @endif
+            @endif
           </span>
         </td>
       </tr>
@@ -64,7 +64,7 @@
         <section class="our-plans">
                    
           @foreach($packageslist as $package)
-                        <div class="row mrt-40">
+                        <div class="card">
                             <div class="price-plan">
                               <div class="plan-details">
                                   <h2>{{ $package->name }}</h2>
@@ -81,7 +81,7 @@
                                   </h3>
                               </div>
                               <div class="plan-features">
-                                    <li>{!! $package->description !!}</li>
+                                   {!! $package->description !!}
                               </div>
                               <div class="accept-plan">
                                   <a href="{{ url('payments/checkout/subscribe/' . $package->slug) }}"
