@@ -106,16 +106,23 @@ return [
     */
 
     'redis' => [
-
-        'cluster' => false,
-
+        'client' => 'predis',
         'default' => [
+            'scheme'   => env('REDIS_SCHEME', 'rediss'),
             'host' => env('REDIS_HOST', 'localhost'),
-            'password' => env('REDIS_PASSWORD', null),
+            'password' => env('REDIS_PASSWORD', null), //if password otherwise set null
             'port' => env('REDIS_PORT', 6379),
+            'user' => "default", //if password otherwise set null
             'database' => 0,
         ],
-
-    ],
+        'queue' => [
+            'scheme'   => env('REDIS_SCHEME', 'tcp'),
+            'host' => env('REDIS_HOST', 'localhost'),
+            'password' => env('REDIS_PASSWORD', null), //if password otherwise set null
+            'port' => env('REDIS_PORT', 6379),
+            'user' => "default", //if password otherwise set null
+            'database' => 1,
+        ],
+    ]
 
 ];
