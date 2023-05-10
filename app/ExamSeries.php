@@ -21,8 +21,16 @@ class ExamSeries extends Model
     public function itemsList()
     {
         return DB::table('examseries_data')
-         ->join('quizzes', 'quizzes.id', '=', 'quiz_id')
-         ->select('quizzes.*')
+            ->join('quizzes', 'quizzes.id', '=', 'quiz_id')
+            ->select('quizzes.*')
             ->where('examseries_id', '=', $this->id)->get();
+    }
+
+    public function packageList()
+    {
+        return DB::table('quizzes')
+            ->select('quizzes.*', 'packages.name', 'packages.level')
+            ->leftJoin('packages', 'packages.id', '=', 'package_id')
+            ->get();
     }
 }

@@ -17,7 +17,6 @@
 	<meta name="keywords" content="{{getSetting('meta_keywords', 'seo_settings')}}">
 
 
-
 	<link rel="icon" href="{{IMAGE_PATH_SETTINGS.getSetting('site_favicon', 'site_settings')}}" type="image/x-icon" />
 
 

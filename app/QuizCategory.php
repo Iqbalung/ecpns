@@ -21,10 +21,10 @@ class QuizCategory extends Model
     public function quizzes()
     {
         return $this->getQuizzes()
-        ->where('start_date', '<=', date('Y-m-d'))
-        ->where('end_date', '>=', date('Y-m-d'))
-        ->where('total_questions', '>', '0')
-        ->get();
+            ->where('start_date', '<=', date('Y-m-d'))
+            ->where('end_date', '>=', date('Y-m-d'))
+            ->where('total_questions', '>', '0')
+            ->get();
     }
 
     public function getQuizzes()
@@ -33,19 +33,19 @@ class QuizCategory extends Model
     }
 
 
-    public static function getShowFrontCategories($limit=0)
+    public static function getShowFrontCategories($limit = 0)
     {
-        if ($limit>0) {
-            $list   = ExamSeries::get();
+        if ($limit > 0) {
+            $list = ExamSeries::get();
         } else {
-            $list   = ExamSeries::get();
+            $list = ExamSeries::get();
         }
 
-        $cat_ids  = array_pluck($list, 'category_id');
+        $cat_ids = array_pluck($list, 'category_id');
 
         $categories = [];
         foreach ($cat_ids as $key => $value) {
-            $categories[]  = ExamSeries::where('id', $value)->first();
+            $categories[] = ExamSeries::where('id', $value)->first();
         }
         return $categories;
     }
@@ -54,25 +54,25 @@ class QuizCategory extends Model
 
 
 
-   /**
+    /**
      * [getPracticeExamsCategories Practice Exams Categories]
      * @return [type] [description]
      */
-   public static function getPracticeExamsCategories($limit='')
-   {
-       if ($limit>0) {
-           $list   = ExamSeries::limit($limit)
-                         ->get();
-       } else {
-           $list   = ExamSeries::get();
-       }
+    public static function getPracticeExamsCategories($limit = '')
+    {
+        if ($limit > 0) {
+            $list = ExamSeries::limit($limit)
+                ->get();
+        } else {
+            $list = ExamSeries::get();
+        }
 
-       $cat_ids  = array_pluck($list, 'category_id');
+        $cat_ids = array_pluck($list, 'category_id');
 
-       $categories = [];
-       foreach ($cat_ids as $key => $value) {
-           $categories[]  = ExamSeries::where('id', $value)->first();
-       }
-       return $categories;
-   }
+        $categories = [];
+        foreach ($cat_ids as $key => $value) {
+            $categories[] = ExamSeries::where('id', $value)->first();
+        }
+        return $categories;
+    }
 }

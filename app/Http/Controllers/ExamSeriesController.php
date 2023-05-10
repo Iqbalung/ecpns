@@ -38,9 +38,9 @@ class ExamSeriesController extends Controller
             return back();
         }
 
-        $data['active_class']       = 'exams';
-        $data['title']              = getPhrase('exam_series');
-        $view_name = getTheme().'::exams.examseries.list';
+        $data['active_class'] = 'exams';
+        $data['title'] = getPhrase('exam_series');
+        $view_name = getTheme() . '::exams.examseries.list';
 
         return view($view_name, $data);
     }
@@ -61,38 +61,39 @@ class ExamSeriesController extends Controller
 
         $records = ExamSeries::select(
             [
-            'title',
-            'image',
-            'is_paid',
-            'cost',
-            'validity',
-            'total_exams',
-            'total_questions',
-            'slug',
-            'id',
-            'updated_at']
+                'title',
+                'image',
+                'is_paid',
+                'cost',
+                'validity',
+                'total_exams',
+                'total_questions',
+                'slug',
+                'id',
+                'updated_at'
+            ]
         )->orderBy('updated_at', 'desc');
 
         return Datatables::of($records)
-        ->escapeColumns([])
-        ->addColumn('action', function ($records) {
-            $link_data = '<div class="dropdown more">
+            ->escapeColumns([])
+            ->addColumn('action', function ($records) {
+                $link_data = '<div class="dropdown more">
             <a id="dLabel" type="button" class="more-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="mdi mdi-dots-vertical"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dLabel">
-                <li><a href="'.URL_EXAM_SERIES_UPDATE_SERIES.$records->slug.'"><i class="fa fa-spinner"></i>'.getPhrase("update_quizzes").'</a></li>
-                <li><a href="'.URL_EXAM_SERIES_EDIT.$records->slug.'"><i class="fa fa-pencil"></i>'.getPhrase("edit").'</a></li>';
-            $temp = '';
-            if (checkRole(getUserGrade(1))) {
-                $temp .= ' <li><a href="javascript:void(0);" onclick="deleteRecord(\''.$records->slug.'\');"><i class="fa fa-trash"></i>'. getPhrase("delete").'</a></li>';
-            }
+                <li><a href="' . URL_EXAM_SERIES_UPDATE_SERIES . $records->slug . '"><i class="fa fa-spinner"></i>' . getPhrase("update_quizzes") . '</a></li>
+                <li><a href="' . URL_EXAM_SERIES_EDIT . $records->slug . '"><i class="fa fa-pencil"></i>' . getPhrase("edit") . '</a></li>';
+                $temp = '';
+                if (checkRole(getUserGrade(1))) {
+                    $temp .= ' <li><a href="javascript:void(0);" onclick="deleteRecord(\'' . $records->slug . '\');"><i class="fa fa-trash"></i>' . getPhrase("delete") . '</a></li>';
+                }
 
-            $temp .='</ul></div>';
-            $link_data .=$temp;
-            return $link_data;
-        })->editColumn('title', function ($records) {
-            return '<a href="'.URL_EXAM_SERIES_UPDATE_SERIES.$records->slug.'">'.$records->title.'</a>';
+                $temp .= '</ul></div>';
+                $link_data .= $temp;
+                return $link_data;
+            })->editColumn('title', function ($records) {
+            return '<a href="' . URL_EXAM_SERIES_UPDATE_SERIES . $records->slug . '">' . $records->title . '</a>';
         })->editColumn('cost', function ($records) {
             return ($records->is_paid) ? $records->cost : '-';
         })->editColumn('validity', function ($records) {
@@ -101,18 +102,23 @@ class ExamSeriesController extends Controller
             $image_path = IMAGE_PATH_UPLOAD_LMS_DEFAULT;
 
             if ($records->image) {
-                $image_path = IMAGE_PATH_UPLOAD_SERIES.$records->image;
-                return '<img src="'.$image_path.'" height="60" width="60"  />';
+                $image_path = IMAGE_PATH_UPLOAD_SERIES . $records->image;
+                return '<img src="' . $image_path . '" height="60" width="60"  />';
             }
         })->editColumn('is_paid', function ($records) {
-            return ($records->is_paid) ? '<span class="label label-primary">'.getPhrase('paid') .'</span>' : '<span class="label label-success">'.getPhrase('free').'</span>';
+            return ($records->is_paid) ? '<span class="label label-primary">' . getPhrase('paid') . '</span>' : '<span class="label label-success">' . getPhrase('free') . '</span>';
         })->removeColumn('id')
-        ->removeColumn('slug')
-        ->removeColumn('updated_at')
-        ->make(false);
+            ->removeColumn('slug')
+            ->removeColumn('updated_at')
+            ->make(false);
         dd($records->is_paid);
     }
 
+    public function showPackages()
+    {
+        $packageslist = Package::all();
+        return view('packages.index', ['packageslist' => $packageslist]);
+    }
     /**
      * This method loads the create view
      * @return void
@@ -123,11 +129,11 @@ class ExamSeriesController extends Controller
             prepareBlockUserMessage();
             return back();
         }
-        $data['record']         	= false;
-        $data['categories']         = array_pluck(QuizCategory::all(), 'category', 'id');
-        $data['active_class']       = 'exams';
-        $data['title']              = getPhrase('add_exam_series');
-        $view_name = getTheme().'::exams.examseries.add-edit';
+        $data['record'] = false;
+        $data['categories'] = array_pluck(QuizCategory::all(), 'category', 'id');
+        $data['active_class'] = 'exams';
+        $data['title'] = getPhrase('add_exam_series');
+        $view_name = getTheme() . '::exams.examseries.add-edit';
         return view($view_name, $data);
     }
 
@@ -148,12 +154,12 @@ class ExamSeriesController extends Controller
         if ($isValid = $this->isValidRecord($record)) {
             return redirect($isValid);
         }
-        $data['record']       	  = $record;
-        $data['active_class']     = 'exams';
-        $data['settings']         = false;
-        $data['categories']         = array_pluck(QuizCategory::all(), 'category', 'id');
-        $data['title']            = getPhrase('edit_series');
-        $view_name = getTheme().'::exams.examseries.add-edit';
+        $data['record'] = $record;
+        $data['active_class'] = 'exams';
+        $data['settings'] = false;
+        $data['categories'] = array_pluck(QuizCategory::all(), 'category', 'id');
+        $data['title'] = getPhrase('edit_series');
+        $view_name = getTheme() . '::exams.examseries.add-edit';
         return view($view_name, $data);
     }
 
@@ -172,13 +178,13 @@ class ExamSeriesController extends Controller
 
         $record = ExamSeries::getRecordWithSlug($slug);
         $rules = [
-        'title'          	   => 'bail|required|max:40' ,
+            'title' => 'bail|required|max:40',
 
-           ];
+        ];
         /**
-        * Check if the title of the record is changed,
-        * if changed update the slug value based on the new title
-        */
+         * Check if the title of the record is changed,
+         * if changed update the slug value based on the new title
+         */
         $name = $request->title;
         if ($name != $record->title) {
             $record->slug = $record->makeSlug($name);
@@ -186,33 +192,33 @@ class ExamSeriesController extends Controller
 
         //Validate the overall request
         $this->validate($request, $rules);
-        $record->title 				= $name;
-        $record->slug 				= $record->makeSlug($name);
-        $record->is_paid      = $request->is_paid;
-        $record->category_id			= $request->category_id;
-        $record->validity			= -1;
-        $record->cost				= 0;
+        $record->title = $name;
+        $record->slug = $record->makeSlug($name);
+        $record->is_paid = $request->is_paid;
+        $record->category_id = $request->category_id;
+        $record->validity = -1;
+        $record->cost = 0;
         if ($request->is_paid) {
-            $record->validity		= $request->validity;
-            $record->cost			= $request->cost;
+            $record->validity = $request->validity;
+            $record->cost = $request->cost;
         }
-        $record->total_exams		= $request->total_exams;
-        $record->total_questions	= $request->total_questions;
+        $record->total_exams = $request->total_exams;
+        $record->total_questions = $request->total_questions;
 
-        $record->short_description	= $request->short_description;
-        $record->description    = $request->description;
-        $record->start_date   = $request->start_date;
-        $record->end_date		= $request->end_date;
-        $record->record_updated_by 	= Auth::user()->id;
+        $record->short_description = $request->short_description;
+        $record->description = $request->description;
+        $record->start_date = $request->start_date;
+        $record->end_date = $request->end_date;
+        $record->record_updated_by = Auth::user()->id;
         $record->save();
         $file_name = 'image';
         if ($request->hasFile($file_name)) {
-            $rules = array( $file_name => 'mimes:jpeg,jpg,png,gif|max:10000' );
+            $rules = array($file_name => 'mimes:jpeg,jpg,png,gif|max:10000');
             $this->validate($request, $rules);
             $examSettings = getExamSettings();
             $path = $examSettings->seriesImagepath;
             $this->deleteFile($record->image, $path);
-            $record->image      = $this->processUpload($request, $record, $file_name);
+            $record->image = $this->processUpload($request, $record, $file_name);
             $record->save();
         }
         flash('success', 'record_updated_successfully', 'success');
@@ -232,40 +238,40 @@ class ExamSeriesController extends Controller
         }
 
         $rules = [
-         'title'          	   => 'bail|required|max:40' ,
-          ];
+            'title' => 'bail|required|max:40',
+        ];
 
         $this->validate($request, $rules);
         $record = new ExamSeries();
-        $name  						=  $request->title;
-        $record->title 				= $name;
-        $record->slug 				= $record->makeSlug($name);
-        $record->is_paid			= $request->is_paid;
-        $record->validity			= -1;
-        $record->cost				= 0;
+        $name = $request->title;
+        $record->title = $name;
+        $record->slug = $record->makeSlug($name);
+        $record->is_paid = $request->is_paid;
+        $record->validity = -1;
+        $record->cost = 0;
         if ($request->is_paid) {
-            $record->validity		= $request->validity;
-            $record->cost			= $request->cost;
+            $record->validity = $request->validity;
+            $record->cost = $request->cost;
         }
 
-        $record->total_exams		= $request->total_exams;
-        $record->total_questions	= $request->total_questions;
-        $record->category_id      = $request->category_id;
+        $record->total_exams = $request->total_exams;
+        $record->total_questions = $request->total_questions;
+        $record->category_id = $request->category_id;
 
-        $record->short_description	= $request->short_description;
-        $record->description		= $request->description;
-        $record->start_date   = $request->start_date;
-        $record->end_date   = $request->end_date;
-        $record->record_updated_by 	= Auth::user()->id;
+        $record->short_description = $request->short_description;
+        $record->description = $request->description;
+        $record->start_date = $request->start_date;
+        $record->end_date = $request->end_date;
+        $record->record_updated_by = Auth::user()->id;
         $record->save();
         $file_name = 'image';
         if ($request->hasFile($file_name)) {
-            $rules = array( $file_name => 'mimes:jpeg,jpg,png,gif|max:10000' );
+            $rules = array($file_name => 'mimes:jpeg,jpg,png,gif|max:10000');
             $this->validate($request, $rules);
             $examSettings = getExamSettings();
             $path = $examSettings->seriesImagepath;
             $this->deleteFile($record->image, $path);
-            $record->image      = $this->processUpload($request, $record, $file_name);
+            $record->image = $this->processUpload($request, $record, $file_name);
             $record->save();
         }
         flash('success', 'record_added_successfully', 'success');
@@ -278,7 +284,7 @@ class ExamSeriesController extends Controller
             return '';
         }
         $files = array();
-        $files[] = $path.$record;
+        $files[] = $path . $record;
         File::delete($files);
     }
 
@@ -300,27 +306,27 @@ class ExamSeriesController extends Controller
 
             $imageObject = new ImageSettings();
 
-            $destinationPath            = $examSettings->seriesImagepath;
-            $destinationPathThumb       = $examSettings->seriesThumbImagepath;
+            $destinationPath = $examSettings->seriesImagepath;
+            $destinationPathThumb = $examSettings->seriesThumbImagepath;
 
-            $fileName = $record->id.'-'.$file_name.'.'.$request->$file_name->guessClientExtension();
+            $fileName = $record->id . '-' . $file_name . '.' . $request->$file_name->guessClientExtension();
 
             $request->file($file_name)->move($destinationPath, $fileName);
 
             //Save Normal Image with 300x300
-            Image::make($destinationPath.$fileName)->fit($examSettings->imageSize)->save($destinationPath.$fileName);
+            Image::make($destinationPath . $fileName)->fit($examSettings->imageSize)->save($destinationPath . $fileName);
 
 
-            Image::make($destinationPath.$fileName)->fit($imageObject->getThumbnailSize())->save($destinationPathThumb.$fileName);
+            Image::make($destinationPath . $fileName)->fit($imageObject->getThumbnailSize())->save($destinationPathThumb . $fileName);
             return $fileName;
         }
     }
 
     /**
-    * Delete Record based on the provided slug
-    * @param  [string] $slug [unique slug]
-    * @return Boolean
-    */
+     * Delete Record based on the provided slug
+     * @param  [string] $slug [unique slug]
+     * @return Boolean
+     */
     public function delete($slug)
     {
         if (!checkRole(getUserGrade(2))) {
@@ -343,12 +349,12 @@ class ExamSeriesController extends Controller
         } catch (\Illuminate\Database\QueryException $e) {
             $response['status'] = 0;
             if (getSetting('show_foreign_key_constraint', 'module')) {
-                $response['message'] =  $e->errorInfo;
+                $response['message'] = $e->errorInfo;
             } else {
-                $response['message'] =  getPhrase('this_record_is_in_use_in_other_modules');
+                $response['message'] = getPhrase('this_record_is_in_use_in_other_modules');
             }
         }
-         return json_encode($response);
+        return json_encode($response);
     }
 
     public function isValidRecord($record)
@@ -375,14 +381,14 @@ class ExamSeriesController extends Controller
     public function getExams(Request $request)
     {
         $category_id = $request->category_id;
-        $is_paid     = $request->series_type;
+        $is_paid = $request->series_type;
 
         $exams = Quiz::where('category_id', '=', $category_id)
-                            ->where('total_marks', '!=', '0')
-                    ->where('is_paid', $is_paid)
-                            ->get();
+            ->where('total_marks', '!=', '0')
+            ->where('is_paid', $is_paid)
+            ->get();
 
-        return json_encode(array('exams'=>$exams));
+        return json_encode(array('exams' => $exams));
     }
 
     /**
@@ -398,23 +404,23 @@ class ExamSeriesController extends Controller
         }
 
         /**
-    	 * Get the Quiz Id with the slug
-    	 * Get the available questions from questionbank_quizzes table
-    	 * Load view with this data
-    	 */
+         * Get the Quiz Id with the slug
+         * Get the available questions from questionbank_quizzes table
+         * Load view with this data
+         */
         $record = ExamSeries::getRecordWithSlug($slug);
 
-        $data['record']         	= $record;
-        $data['active_class']       = 'exams';
-        $data['right_bar']          = true;
-        $data['right_bar_path']     = 'exams.examseries.right-bar-update-questions';
+        $data['record'] = $record;
+        $data['active_class'] = 'exams';
+        $data['right_bar'] = true;
+        $data['right_bar_path'] = 'exams.examseries.right-bar-update-questions';
 
-        $data['settings']           = false;
+        $data['settings'] = false;
         $previous_records = array();
         if ($record->total_exams > 0) {
             $quizzes = DB::table('examseries_data')
-                            ->where('examseries_id', '=', $record->id)
-                            ->get();
+                ->where('examseries_id', '=', $record->id)
+                ->get();
 
             foreach ($quizzes as $quiz) {
                 $temp = array();
@@ -430,18 +436,18 @@ class ExamSeriesController extends Controller
             }
             $settings['exams'] = $previous_records;
             $settings['total_questions'] = $record->total_questions;
-            $data['settings']           = json_encode($settings);
+            $data['settings'] = json_encode($settings);
         }
 
 
-        $data['exam_categories']       	= array_pluck(
+        $data['exam_categories'] = array_pluck(
             App\QuizCategory::all(),
             'category',
             'id'
         );
 
-        $data['title']              = getPhrase('update_series_for').' '.$record->title;
-        $view_name = getTheme().'::exams.examseries.update-questions';
+        $data['title'] = getPhrase('update_series_for') . ' ' . $record->title;
+        $view_name = getTheme() . '::exams.examseries.update-questions';
         return view($view_name, $data);
     }
 
@@ -454,10 +460,10 @@ class ExamSeriesController extends Controller
 
         $exam_series = ExamSeries::getRecordWithSlug($slug);
 
-        $series_id  = $exam_series->id;
-        $quizzes  	= json_decode($request->saved_series);
-        $questions 	= 0;
-        $exams 		= 0;
+        $series_id = $exam_series->id;
+        $quizzes = json_decode($request->saved_series);
+        $questions = 0;
+        $exams = 0;
         $quizzes_to_update = array();
         foreach ($quizzes as $record) {
             $temp = array();
@@ -491,13 +497,13 @@ class ExamSeriesController extends Controller
         }
 
         $user = Auth::user();
-        $data['active_class']       = 'exams';
-        $data['title']              = getPhrase('exam_series');
-        $data['series']             = [];
-        $interested_categories      = null;
+        $data['active_class'] = 'exams';
+        $data['title'] = getPhrase('exam_series');
+        $data['series'] = [];
+        $interested_categories = null;
 
         if ($user->settings) {
-            $interested_categories =  json_decode($user->settings)->user_preferences;
+            $interested_categories = json_decode($user->settings)->user_preferences;
         }
 
         if ($interested_categories) {
@@ -511,12 +517,12 @@ class ExamSeriesController extends Controller
         }
 
 
-        $data['user']   = $user;
+        $data['user'] = $user;
         $data['layout'] = getLayout();
 
-        $view_name = getTheme().'::student.exams.exam-series-list';
+        //$view_name = getTheme() . '::student.exams.exam-series-list';
 
-        return view($view_name, $data);
+        return view($data);
     }
 
     /**
@@ -526,41 +532,43 @@ class ExamSeriesController extends Controller
      */
     public function viewItem(Request $request)
     {
+        $packageList = Package::all();
         $user = Auth::user();
         $userStatus = Payment::getValidPackage($user->id);
-        if($userStatus){
-            $record = Package::where('id',$userStatus->item_id)->first();
-        }else{
-            $record = Package::where('level',0)->first();
+        if ($userStatus) {
+            $record = Package::where('id', $userStatus->item_id)->first();
+        } else {
+            $record = Package::where('level', 0)->first();
         }
-        
+
 
         /* if (!$request->user()->isPurchasedExamSeries($record)) {
-            return redirect()->to('/payments/checkout/exam-series/' . $record->slug);
+        return redirect()->to('/payments/checkout/exam-series/' . $record->slug);
         }
-
         if ($isValid = $this->isValidRecord($record)) {
-            return redirect($isValid);
+        return redirect($isValid);
         } */
 
-     
-        $data['active_class']       = 'exams';
-        $data['pay_by']             = '';
-        $data['content_record']     = false;
-        $data['title']              = $record->name;
-        $data['item']               = $record;
-        $data['right_bar']          = true;
-        $data['user_level']         = !empty($userStatus)?$userStatus->level:0;
-        $data['right_bar_path']     = 'student.exams.exam-series-item-view-right-bar';
-        $data['right_bar_data']     = array(
-                                        'item' => $record,
-                                        );
-                                           
-        $data['layout']              = getLayout();
 
-        $view_name = getTheme().'::student.exams.series.series-view-item';
+        $data['active_class'] = 'exams';
+        $data['pay_by'] = '';
+        $data['content_record'] = false;
+        $data['title'] = $record->name;
+        $data['item'] = $record;
+        $data['right_bar'] = true;
+        $data['user_level'] = !empty($userStatus) ? $userStatus->level : 0;
+        $data['right_bar_path'] = 'student.exams.exam-series-item-view-right-bar';
+        $data['right_bar_data'] = array(
+            'item' => $record,
+        );
 
-       
+        $data['packageslist'] = $packageList;
+
+        $data['layout'] = getLayout();
+
+        $view_name = getTheme() . '::student.exams.series.series-view-item';
+
+
 
         return view($view_name, $data);
     }

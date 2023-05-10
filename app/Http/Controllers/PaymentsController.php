@@ -199,8 +199,8 @@ class PaymentsController extends Controller
     public function paynow(Request $request, $slug)
     {
         $request->type = 'subscribe';
-        if ($request->gateway  == 'razorpay') {
-            $type   = $request->type;
+        if ($request->gateway == 'razorpay') {
+            $type = $request->type;
 
 
             if ($request->after_discount == 0) {
@@ -642,7 +642,7 @@ class PaymentsController extends Controller
         $record->cost = $record->amount;
         $record->title = $record->name;
         return $record;
-       
+
     }
 
     /**
@@ -1032,24 +1032,24 @@ class PaymentsController extends Controller
         }
 
         $user = $request->user();
-        if (Package::isPurchasedExamSeries($record->id,$user->id)) {
+        if (Package::isPurchasedExamSeries($record->id, $user->id)) {
             flash('Hey ' . $user->name, 'you_already_purchased_this_item', 'overlay');
             return redirect()->to('/exams/student-exam-series/' . $record->slug);
         }
-        
+
 
         if ($user->role_id == 6) {
             // TODO: Check if parent already purchased series for their childs
             //       Redirect to item view if already purchased
         }
 
-        $data['active_class']     = 'exams';
-        $data['pay_by']           = '';
-        $data['title']            = $record->name;
-        $data['item_type']        = 'combo';
-        $data['item']             = $record;
-        $current_theme            = getDefaultTheme();
-        
+        $data['active_class'] = 'exams';
+        $data['pay_by'] = '';
+        $data['title'] = $record->name;
+        $data['item_type'] = 'combo';
+        $data['item'] = $record;
+        $current_theme = getDefaultTheme();
+
         if ($current_theme == 'default') {
             $data['right_bar'] = false;
             $data['right_bar_class'] = 'order-user-details';
@@ -1059,7 +1059,7 @@ class PaymentsController extends Controller
             );
         }
 
-       
+
 
         $data['layout'] = getLayout();
         $data['parent_user'] = false;
@@ -2145,7 +2145,9 @@ class PaymentsController extends Controller
                             <td valign="top">
                                 <?php echo digiCurrency($invoice->discount_amount); ?>
                             </td>
-                            <td class="text-center" valign="top"><strong><span class="ttlText"><?php echo digiCurrency($amount); ?></span></strong>
+                            <td class="text-center" valign="top"><strong><span class="ttlText">
+                                        <?php echo digiCurrency($amount); ?>
+                                    </span></strong>
                             </td>
 
                         </tr>
@@ -2288,7 +2290,9 @@ class PaymentsController extends Controller
                             <td valign="top">
                                 <?php echo digiCurrency($invoice->discount_amount); ?>
                             </td>
-                            <td class="text-center" valign="top"><strong><span class="ttlText"><?php echo digiCurrency($amount); ?></span></strong>
+                            <td class="text-center" valign="top"><strong><span class="ttlText">
+                                        <?php echo digiCurrency($amount); ?>
+                                    </span></strong>
                             </td>
 
                         </tr>
