@@ -70,6 +70,19 @@ body {
 
 
 /* cek */
+.h6-red {
+    color: #f8c6c6
+}
+
+.h6-yellow {
+    color: #532020
+}
+
+.row.my-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .bg-gradient {
     background: #C9D6FF;
@@ -81,9 +94,16 @@ ul li {
     margin-bottom: 1.4rem;
 }
 
-.pricing-divider {
+.pricing-divider-yellow {
     border-radius: 20px;
     background: #ffae00;
+    padding: 1em 0 4em;
+    position: relative;
+}
+
+.pricing-divider-red {
+    border-radius: 20px;
+    background: #c91010;
     padding: 1em 0 4em;
     position: relative;
 }
@@ -171,7 +191,7 @@ p.paragraph {
 }
 
 h2 {
-    color: #333333;
+    color: #f1e8e8;
     font-size: 24px;
     font-weight: 500;
     line-height: 26px;
@@ -351,8 +371,13 @@ Buttons & Links #STYLING
 
 /* Blue Button */
 
-.btn-blue {
-    background-color: #ff9800;
+.btn-yellow {
+    background-color: #ffae00;
+    color: #ffffff;
+}
+
+.btn-red {
+    background-color: #c91010;
     color: #ffffff;
 }
 

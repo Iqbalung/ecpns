@@ -19,6 +19,7 @@ use Image;
 use ImageSettings;
 use File;
 use Input;
+use Ramsey\Uuid\Uuid;
 
 class ExamSeriesController extends Controller
 {
@@ -111,7 +112,7 @@ class ExamSeriesController extends Controller
             ->removeColumn('slug')
             ->removeColumn('updated_at')
             ->make(false);
-        dd($records->is_paid);
+        // dd($records->is_paid);
     }
 
     public function showPackages()
@@ -549,6 +550,21 @@ class ExamSeriesController extends Controller
         return redirect($isValid);
         } */
 
+
+        $data['active_class'] = 'exams';
+        $data['pay_by'] = '';
+        $data['content_record'] = false;
+        $data['title'] = $record->name;
+        $data['item'] = $record;
+        $data['right_bar'] = true;
+        $data['user'] = $user;
+        $data['user_level'] = !empty($userStatus) ? $userStatus->level : 0;
+        $data['right_bar_path'] = 'student.exams.exam-series-item-view-right-bar';
+        $data['right_bar_data'] = array(
+            'item' => $record,
+        );
+
+        $data['layout'] = getLayout();
 
         $data['active_class'] = 'exams';
         $data['pay_by'] = '';

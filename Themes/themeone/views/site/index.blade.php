@@ -50,14 +50,14 @@
 
 
                 @if (!empty($exam_series))
-                    <div class="row ">
+                    <div class="row my-center" >
                         @foreach ($exam_series as $exam)
-                            <div class="col-md-3 col-sm-6 princing-item yellow">
-                                <div class="pricing-divider m-auto text-center w-75">
-                                            <h3 class="text-light">
+                            <div class="col-md-3 col-sm-6 princing-item ">
+                                <div class="{{ ($exam->validity > 0) ? 'pricing-divider-yellow' : 'pricing-divider-red' }}  m-auto text-center w-75">
+                                            <h3 class="text-light {{ ($exam->validity > 0) ? 'h6-yellow' : 'h6-red' }}">
                                             {{ ucfirst($exam->name) }}
                                             </h3>
-                                                        <h4 class="my-0 display-4 text-light font-weight-normal mb-3"><span class="h3"></span>  {{ getCurrencyCode() }} {{ idrFormat((int) $exam->amount) }} 
+                                                        <h4 class="my-0 display-4 text-light font-weight-normal mb-3 {{ ($exam->validity > 0) ? 'h6-yellow' : 'h6-red' }}"><span class="h3"></span>  {{ getCurrencyCode() }} {{ idrFormat((int) $exam->amount) }} 
                                                         <svg class='pricing-divider-img' enable-background='new 0 0 300 100' height='100px' id='Layer_1' preserveAspectRatio='none' version='1.1' viewBox='0 0 300 100' width='300px' x='0px' xml:space='preserve' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg' y='0px'>
                                                     <path class='deco-layer deco-layer--1' d='M30.913,43.944c0,0,42.911-34.464,87.51-14.191c77.31,35.14,113.304-1.952,146.638-4.729
                                                 c48.654-4.056,69.94,16.218,69.94,16.218v54.396H30.913V43.944z' fill='#FFFFFF' opacity='0.6'></path>
@@ -75,11 +75,9 @@
                                             
                                             <li class="text-center"> {!! $exam->description !!}<li>
 
-                                           
-
                                             <div class="text-center mt-2">
                                                 <a href="{{ url('payments/checkout/subscribe/' . $exam->slug) }}"
-                                                    class="btn btn-blue btn-sm btn-block btn-radius">
+                                                    class="btn {{ ($exam->validity > 0) ? 'btn-yellow' : 'btn-red' }} btn-sm btn-block btn-radius">
                                                     {{ getPhrase('start_exam') }}
                                                 </a>
                                             </div>
