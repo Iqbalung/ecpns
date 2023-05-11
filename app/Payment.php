@@ -20,24 +20,24 @@ class Payment extends Model
     public static function getValidPackage($user_id)
     {
         $records = \DB::table('payments')
-        ->join('packages', 'packages.id', '=', 'payments.item_id')
-        ->where('payments.updated_at', '>',\DB::raw( 'DATE_SUB(NOW(),INTERVAL 30 DAY)'))
-        ->where('payment_status',  'success')
-        ->where('plan_type', 'subscribe')
-        ->orderBy('payments.updated_at', 'DESC')
-        ->where('user_id',$user_id)->first();
+            ->join('packages', 'packages.id', '=', 'payments.item_id')
+            ->where('payments.updated_at', '>', \DB::raw('DATE_SUB(NOW(),INTERVAL 30 DAY)'))
+            ->where('payment_status', 'success')
+            ->where('plan_type', 'subscribe')
+            ->orderBy('payments.updated_at', 'DESC')
+            ->where('user_id', $user_id)->first();
         return $records;
     }
 
     public function updateTransactionRecords($records_type)
     {
-        $records = \DB::table('payments')
-        ->where('updated_at', '>', 'DATE_SUB(NOW(),INTERVAL -1 HOUR)')
-        ->where('payment_status', '=', PAYMENT_STATUS_PENDING);
+        $records = DB::table('payments')
+            ->where('updated_at', '>', 'DATE_SUB(NOW(),INTERVAL -1 HOUR)')
+            ->where('payment_status', '=', PAYMENT_STATUS_PENDING);
 
-        if ($records_type=='online') {
+        if ($records_type == 'online') {
             $records->where('payment_gateway', '!=', 'offline');
-        } elseif ($records_type=='offline') {
+        } elseif ($records_type == 'offline') {
             $records->where('payment_gateway', '=', 'offline');
         } else {
             $records->where('user_id', '=', $records_type);
@@ -56,9 +56,9 @@ class Payment extends Model
      * @param  string  $user_id   [description]
      * @return boolean            [description]
      */
-    public static function isItemPurchased($item_id, $item_type = 'combo', $user_id='')
+    public static function isItemPurchased($item_id, $item_type = 'combo', $user_id = '')
     {
-        if ($user_id=='') {
+        if ($user_id == '') {
             $user_id = Auth::user()->id;
         }
 
@@ -68,10 +68,10 @@ class Payment extends Model
 
 
         $subscription_records = Payment::where('start_date', '<=', $date)
-                          ->where('end_date', '>=', $date)
-                          ->where('user_id', '=', $user_id)
-                          ->where('payment_status', '=', 'success')
-                          ->get();
+            ->where('end_date', '>=', $date)
+            ->where('user_id', '=', $user_id)
+            ->where('payment_status', '=', 'success')
+            ->get();
 
         $validity_type = validityType();
 
@@ -88,9 +88,9 @@ class Payment extends Model
                         if ($item_type == 'exam') {
                             $combo_record = App\ExamSeries::where('id', '=', $record->item_id)->first();
                             $combo_data = DB::table('examseries_data')->select('*')
-                            ->where('examseries_id', '=', $combo_record->id)
-                            ->where('quiz_id', '=', $item_id)
-                            ->get();
+                                ->where('examseries_id', '=', $combo_record->id)
+                                ->where('quiz_id', '=', $item_id)
+                                ->get();
                             if ($combo_data) {
                                 return true;
                             }
@@ -124,9 +124,9 @@ class Payment extends Model
     public function getSuccessFailedCount()
     {
         $data = [];
-        $data['success_count']      = Payment::where('payment_status', '=', 'success')->count();
-        $data['cancelled_count']    = Payment::where('payment_status', '=', 'cancelled')->count();
-        $data['pending_count']      = Payment::where('payment_status', '=', 'pending')->count();
+        $data['success_count'] = Payment::where('payment_status', '=', 'success')->count();
+        $data['cancelled_count'] = Payment::where('payment_status', '=', 'cancelled')->count();
+        $data['pending_count'] = Payment::where('payment_status', '=', 'pending')->count();
         return $data;
     }
 
@@ -137,15 +137,15 @@ class Payment extends Model
      * @param  string $payment_status [description]
      * @return [type]                 [description]
      */
-    public function getSuccessMonthlyData($year='', $gateway='', $symbol='=', $payment_status='success')
+    public function getSuccessMonthlyData($year = '', $gateway = '', $symbol = '=', $payment_status = 'success')
     {
-        if ($year=='') {
+        if ($year == '') {
             $year = date('Y');
         }
 
-        $query = 'select sum(paid_amount) as total, sum(cost) as cost, MONTHNAME(created_at) as month from payments  where YEAR(created_at) = '.$year.' and payment_status = "'.$payment_status.'" group by YEAR(created_at), MONTH(created_at)';
-        if ($gateway!='') {
-            $query = 'select sum(paid_amount) as total, MONTHNAME(created_at) as month from payments  where YEAR(created_at) = '.$year.' and payment_status = "'.$payment_status.'" and payment_gateway '.$symbol.' "'.$gateway.'" group by YEAR(created_at), MONTH(created_at)';
+        $query = 'select sum(paid_amount) as total, sum(cost) as cost, MONTHNAME(created_at) as month from payments  where YEAR(created_at) = ' . $year . ' and payment_status = "' . $payment_status . '" group by YEAR(created_at), MONTH(created_at)';
+        if ($gateway != '') {
+            $query = 'select sum(paid_amount) as total, MONTHNAME(created_at) as month from payments  where YEAR(created_at) = ' . $year . ' and payment_status = "' . $payment_status . '" and payment_gateway ' . $symbol . ' "' . $gateway . '" group by YEAR(created_at), MONTH(created_at)';
         }
 
         $result = DB::select($query);
@@ -153,7 +153,7 @@ class Payment extends Model
         return $result;
     }
 
-     /**
+    /**
      * This method checks the item is purchased or not
      * If purchased, it validates the date is valid to use
      * If valid, it return TRUE
@@ -163,9 +163,9 @@ class Payment extends Model
      * @param  string  $user_id   [description]
      * @return boolean            [description]
      */
-    public static function isParentPurchased($item_id, $item_type = 'combo', $user_id='')
+    public static function isParentPurchased($item_id, $item_type = 'combo', $user_id = '')
     {
-        if ($user_id=='') {
+        if ($user_id == '') {
             $user_id = Auth::user()->id;
         }
 
@@ -173,9 +173,9 @@ class Payment extends Model
         $count = 0;
 
         $subscription_records = Payment::where('start_date', '<=', $date)
-                          ->where('end_date', '>=', $date)
-                          ->where('user_id', '=', $user_id)
-                          ->get();
+            ->where('end_date', '>=', $date)
+            ->where('user_id', '=', $user_id)
+            ->get();
 
         $validity_type = getSetting('validity_type', 'site_settings');
         if (empty($validity_type)) {
@@ -195,9 +195,9 @@ class Payment extends Model
                         if ($item_type == 'exam') {
                             $combo_record = App\ExamSeries::where('id', '=', $record->item_id)->first();
                             $combo_data = DB::table('examseries_data')->select('*')
-                            ->where('examseries_id', '=', $combo_record->id)
-                            ->where('quiz_id', '=', $item_id)
-                            ->get();
+                                ->where('examseries_id', '=', $combo_record->id)
+                                ->where('quiz_id', '=', $item_id)
+                                ->get();
                             if ($combo_data) {
                                 return 'purchased';
                             }
@@ -246,7 +246,7 @@ class Payment extends Model
 
 
         $invoice_no_display = $invoice_no;
-        if (! empty($invoice_number_length)) {
+        if (!empty($invoice_number_length)) {
             $invoice_no = str_pad($invoice_no, $invoice_number_length, 0, STR_PAD_LEFT);
         }
         if ('yearbased' === $invoice_number_format) {

@@ -71,7 +71,7 @@ class PaymentsController extends Controller
 
         $payment = new Payment();
         $records = $payment->updateTransactionRecords($user->id);
-
+        // dd($records);
         foreach ($records as $record) {
             $rec = Payment::where('id', $record->id)->first();
             $this->isExpired($rec);
@@ -122,7 +122,8 @@ class PaymentsController extends Controller
         } else {
             $records = Payment::select(['item_name', 'plan_type', 'start_date', 'end_date', 'payment_gateway', 'updated_at', 'payment_status', 'id', 'cost', 'after_discount', 'paid_amount'])
                 ->where('user_id', '=', $user->id)
-                ->orderBy('updated_at', 'desc');
+                ->orderBy('updated_at', 'desc')
+                ->get();
         }
 
         $dta = Datatables::of($records)
@@ -153,13 +154,14 @@ class PaymentsController extends Controller
                 if ($records->payment_status == PAYMENT_STATUS_CANCELLED || $records->payment_status == PAYMENT_STATUS_PENDING) {
                     return '-';
                 }
-                return $records->start_date;
+                return $records->start_date = date('Y-m-d');
             })
             ->editColumn('end_date', function ($records) {
                 if ($records->payment_status == PAYMENT_STATUS_CANCELLED || $records->payment_status == PAYMENT_STATUS_PENDING) {
                     return '-';
                 }
-                return $records->end_date;
+                //tinggal munculin end_date nya mas
+                return $records->end_date = date('Y-m-d');
             })
             ->editColumn('payment_gateway', function ($records) {
                 $text = ucfirst($records->payment_gateway);
@@ -554,7 +556,6 @@ class PaymentsController extends Controller
 
         $payment_record->start_date = date('Y-m-d');
         $payment_record->end_date = date('Y-m-d', strtotime($daysToAdd));
-
         $details_before_payment = (object) json_decode($payment_record->other_details);
         $payment_record->coupon_applied = $details_before_payment->is_coupon_applied;
         $payment_record->coupon_id = $details_before_payment->coupon_id;

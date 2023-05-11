@@ -1236,12 +1236,12 @@ class StudentQuizController extends Controller
         // Chart code start
         $records = array();
 
-        $records = Quiz::leftJoin('quizresults', 'quizzes.id', '=', 'quizresults.quiz_id')
-             ->select(['title','is_paid' ,'dueration', 'quizzes.total_marks',  \DB::raw('count(quizresults.user_id) as attempts, quizzes.slug, user_id') ])
-             ->where('user_id', '=', $user->id)
-             ->groupBy('quizresults.quiz_id')
-             ->get();
-        
+        $records = Quiz::join('quizresults', 'quizzes.id', '=', 'quizresults.quiz_id')
+            ->select(['title', 'is_paid', 'dueration', 'quizzes.total_marks', \DB::raw('count(quizresults.user_id) as attempts, quizzes.slug, user_id')])
+            ->where('user_id', '=', $user->id)
+            ->groupBy('quizresults.quiz_id')
+            ->get();
+        //
         $chartSettings = new App\ChartSettings();
         $colors = (object) $chartSettings->getRandomColors(count($records));
         $i = 0;
