@@ -15,7 +15,7 @@
         @foreach($contents as $content)
         <?php 
         
-        $url = "http://localhost:3000?id=".$content->id."&token=".uniqid()."&user_id=".$user->id;
+        $url = "https://lobster-app-lfxlw.ondigitalocean.app?id=".$content->id."&token=".uniqid()."&user_id=".$user->id;
         $paid = ($content->is_paid && !isItemPurchased($content->id, 'combo')) ? true : false;
         $role = getRoleData(Auth::user()->role_id);
       ?>
