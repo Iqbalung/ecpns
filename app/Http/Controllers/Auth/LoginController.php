@@ -423,8 +423,7 @@ class LoginController extends Controller
             } else {
                 User::where('activation_code', $activation_code)
                     ->update(['is_verified' => 1]);
-                $record->is_verified = 1;
-                $record->save();
+                $record = User::where('activation_code', $activation_code)->first();
                 $view_name = getTheme() . '::auth.loginverif';
 
                 return view($view_name, $record);
