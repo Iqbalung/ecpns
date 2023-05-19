@@ -469,6 +469,8 @@ define('URL_FAQS', PREFIX . 'faqs');
 //User Email Verification
 define('URL_USERS_CONFIRM', PREFIX . 'user/confirmation/');
 define('URL_MAIL_VERIFICATION_FEATURE', PREFIX . 'add/email-verification-feature');
+define('URL_MAIL_VER', PREFIX . env('APP_URL'));
+
 
 
 //User Account status
