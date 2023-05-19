@@ -203,8 +203,8 @@ class PaymentsController extends Controller
         $request->type = 'subscribe';
         if ($request->gateway == 'razorpay') {
             $type = $request->type;
-
-
+            
+            
             if ($request->after_discount == 0) {
                 $item = $this->getPackageDetails($type, $slug);
 
@@ -277,6 +277,7 @@ class PaymentsController extends Controller
         }
 
         $other_details = array();
+       
         $other_details['is_coupon_applied'] = $request->is_coupon_applied;
         $other_details['actual_cost'] = $request->actual_cost;
         $other_details['discount_availed'] = $request->discount_availed;
@@ -394,7 +395,7 @@ class PaymentsController extends Controller
             $item_details = array(
                 [
                     'id' => $item->id,
-                    'price' => $item->cost,
+                    'price' => $request->after_discount,
                     'quantity' => 1,
                     'name' => $item->title
                 ]
@@ -412,7 +413,7 @@ class PaymentsController extends Controller
                 return back();
             }
 
-            $url = PREFIX . 'payments/checkout/' . $request->type . '/' . $item->slug . '?md_snap_token=' . $snapToken . '&oid=' . $token;
+            $url = PREFIX . 'payments/checkout/' . $request->type . '/' . $item->slug . '?md_snap_token=' . $snapToken . '&oid=' . $token . '&amount=' . $transaction_details['gross_amount'];
 
             return redirect($url);
         }
@@ -1084,16 +1085,20 @@ class PaymentsController extends Controller
      * @param  [type] $slug [description]
      * @return [type]       [description]
      */
-    public function checkout($type, $slug)
+    public function checkout($type, $slug, Request $request)
     {
         if ('subscribe' === $type) {
             $record = \App\Package::where('slug', $slug)->first();
         } else {
             $record = $this->getModelName($type, $slug);
         }
-
+        
         if ($isValid = $this->isValidRecord($record)) {
             return redirect($isValid);
+        }
+        
+        if(!empty($request->amount)){
+            $record->amount = $request->amount;
         }
 
         if ('subscribe' === $type) {
