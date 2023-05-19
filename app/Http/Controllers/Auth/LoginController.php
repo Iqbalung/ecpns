@@ -24,9 +24,9 @@ class LoginController extends Controller
     */
 
     //use AuthenticatesUsers;
-	use AuthenticatesUsers {
-		logout as performLogout;
-	}
+    use AuthenticatesUsers {
+        logout as performLogout;
+    }
 
     /**
      * Where to redirect users after login.
@@ -51,7 +51,7 @@ class LoginController extends Controller
 
 
 
-   /**
+    /**
      * Get a validator for an incoming registration request.
      *
      * @param  array  $data
@@ -77,93 +77,90 @@ class LoginController extends Controller
     {
 
         $type = 'student';
-        if($data['is_student'])
+        if ($data['is_student'])
             $type = 'parent';
 
         $role = getRoleData($type);
 
-        $user           = new User();
-        $user->name     = $data['name'];
-        $user->username     = $data['username'];
+        $user = new User();
+        $user->name = $data['name'];
+        $user->username = $data['username'];
 
-        $user->email    = $data['email'];
+        $user->email = $data['email'];
         $user->password = bcrypt($data['password']);
-        $user->role_id  = $role;
-        $user->slug     = $user->makeSlug($user->name);
+        $user->role_id = $role;
+        $user->slug = $user->makeSlug($user->name);
 
         $user->save();
 
         $user->roles()->attach($user->role_id);
-        try{
+        try {
             $this->sendPushNotification($user);
-        sendEmail('registration', array('user_name'=>$user->name, 'username'=>$data['username'], 'to_email' => $user->email, 'password'=>$data['password']));
+            sendEmail('registration', array('user_name' => $user->name, 'username' => $data['username'], 'to_email' => $user->email, 'password' => $data['password']));
 
-          }
-         catch(Exception $ex)
-        {
+        } catch (Exception $ex) {
 
         }
 
-        flash('success','record_added_successfully', 'success');
+        flash('success', 'record_added_successfully', 'success');
 
         $options = array(
-                            'name' => $user->name,
-                            'image' => getProfilePath($user->image),
-                            'slug' => $user->slug,
-                            'role' => getRoleData($user->role_id),
-                        );
-        pushNotification(['owner','admin'], 'newUser', $options);
-         return $user;
+            'name' => $user->name,
+            'image' => getProfilePath($user->image),
+            'slug' => $user->slug,
+            'role' => getRoleData($user->role_id),
+        );
+        pushNotification(['owner', 'admin'], 'newUser', $options);
+        return $user;
     }
 
 
 
-      public function sendPushNotification($user)
-     {
-        if(getSetting('push_notifications', 'module')) {
-          if(getSetting('default', 'push_notifications')=='pusher') {
-              $options = array(
+    public function sendPushNotification($user)
+    {
+        if (getSetting('push_notifications', 'module')) {
+            if (getSetting('default', 'push_notifications') == 'pusher') {
+                $options = array(
                     'name' => $user->name,
                     'image' => getProfilePath($user->image),
                     'slug' => $user->slug,
                     'role' => getRoleData($user->role_id),
                 );
 
-            pushNotification(['owner','admin'], 'newUser', $options);
-          }
-          else {
-            $this->sendOneSignalMessage('New Registration');
-          }
+                pushNotification(['owner', 'admin'], 'newUser', $options);
+            } else {
+                $this->sendOneSignalMessage('New Registration');
+            }
         }
-     }
+    }
 
 
-      //this view the login page
-     public function getLogin($layout_type = '')
+    //this view the login page
+    public function getLogin($layout_type = '')
     {
 
 
-        try{
+        try {
 
-         session()->put("layout_number",$layout_type);
+            session()->put("layout_number", $layout_type);
 
-         $data['active_class']       = 'login';
-         $data['title']              = getPhrase('login');
-         $rechaptcha_status          = getSetting('enable_rechaptcha','recaptcha_settings');
-         $data['rechaptcha_status']  = $rechaptcha_status;
+            $data['active_class'] = 'login';
+            $data['title'] = getPhrase('login');
+            $rechaptcha_status = getSetting('enable_rechaptcha', 'recaptcha_settings');
+            $data['rechaptcha_status'] = $rechaptcha_status;
 
-        
-         $view_name = getTheme().'::auth.login';
-        return view($view_name, $data);
 
-        }catch (Exception $e) {
+            $view_name = getTheme() . '::auth.login';
+            return view($view_name, $data);
 
-                if(env('DB_DATABASE')=='') {
-                return redirect( URL_INSTALL_SYSTEM );
-                } else {
-                return redirect( URL_UPDATE_DATABASE );
-                }
-           }
+        } catch (Exception $e) {
+
+            if (env('DB_DATABASE') == '') {
+                return redirect(URL_INSTALL_SYSTEM);
+            } else {
+                return redirect(URL_UPDATE_DATABASE);
+            }
+        }
     }
 
 
@@ -175,41 +172,38 @@ class LoginController extends Controller
      */
     public function postLogin(Request $request)
     {
-    	
-        $rechaptcha_status    = getSetting('enable_rechaptcha','recaptcha_settings');
 
-        if($rechaptcha_status == 'yes'){
+        $rechaptcha_status = getSetting('enable_rechaptcha', 'recaptcha_settings');
 
-             $columns = array(
+        if ($rechaptcha_status == 'yes') {
 
-            'g-recaptcha-response' => 'required|captcha',
+            $columns = array(
 
-            );
-
-              $messsages = array(
-            'g-recaptcha-response.required'=>'Please Select Captcha',
+                'g-recaptcha-response' => 'required|captcha',
 
             );
 
-              $this->validate($request,$columns,$messsages);
+            $messsages = array(
+                'g-recaptcha-response.required' => 'Please Select Captcha',
 
-         }
+            );
+
+            $this->validate($request, $columns, $messsages);
+
+        }
 
         $login_status = FALSE;
         if (Auth::attempt(['username' => $request->email, 'password' => $request->password])) {
-                
-                $login_status = TRUE;
-        }
 
-        elseif (Auth::attempt(['email'=> $request->email, 'password' => $request->password])) {
+            $login_status = TRUE;
+        } elseif (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $login_status = TRUE;
         }
 
-        if(!$login_status)
-        {
-        	 $message = getPhrase("Please Check Your Details");
-            flash('Ooops...!', $message, 'error');
-			   return redirect()->back();
+        if (!$login_status) {
+            $message = getPhrase("Please Check Your Details");
+            flash('Ooopsiii...!', $message, 'error');
+            return redirect()->back();
 
 
         }
@@ -223,35 +217,35 @@ class LoginController extends Controller
 
 
 
-        if($login_status){
+        if ($login_status) {
 
             $user = Auth::user();
-            if($user->is_verified == 0){
+            if ($user->is_verified == 0) {
                 Auth::logout();
-                flash('Ooops...!', 'please_active_your_email_verification_to_login_into_your_account', 'overlay');
+                flash('Ooopsiie...!', 'please_active_your_email_verification_to_login_into_your_account', 'overlay');
                 return redirect()->back();
             }
 
 
-            if($user->login_enabled == 0){
+            if ($user->login_enabled == 0) {
                 Auth::logout();
-                flash('Ooops...!', 'your_account_is_inactive_please_contact_admin', 'overlay');
+                flash('Ooopsiie...!', 'your_account_is_inactive_please_contact_admin', 'overlay');
                 return redirect()->back();
             }
 
-            $enable_multiple_logins = getSetting('enable_multiple_logins','site_settings');
-            if ( empty( $enable_multiple_logins ) ) {
+            $enable_multiple_logins = getSetting('enable_multiple_logins', 'site_settings');
+            if (empty($enable_multiple_logins)) {
                 $enable_multiple_logins = 'yes';
             }
-            if($user->is_loggedin == 'yes' && $enable_multiple_logins == 'no' ){
+            if ($user->is_loggedin == 'yes' && $enable_multiple_logins == 'no') {
                 $hourdiff = 0;
-                if ( ! empty( $user->last_login ) ) {
-                    $hourdiff = abs(round((strtotime($user->last_login) - strtotime(date('Y-m-d H:i:s')))/3600, 1));
+                if (!empty($user->last_login)) {
+                    $hourdiff = abs(round((strtotime($user->last_login) - strtotime(date('Y-m-d H:i:s'))) / 3600, 1));
                 }
                 /**
                  * Some times system obruptly shutdown, in that case database may not updated that 'is_loggedin' fields, so let us allow user to login again after 24 hours.
                  */
-                if ( $hourdiff < 24 ) {
+                if ($hourdiff < 24) {
                     Auth::logout();
                     flash('Ooops...!', 'you_already_logged_into_system', 'overlay');
                     return redirect()->back();
@@ -263,30 +257,29 @@ class LoginController extends Controller
 
 
 
-        if($login_status) {
+        if ($login_status) {
             $user->is_loggedin = 'yes';
             $user->last_login = date('Y-m-d H:i:s');
             $user->save();
 
-            if(checkRole(getUserGrade(7)))  {
-               if(!getSetting('parent', 'module')) {
-                return redirect(URL_PARENT_LOGOUT);
-               }
+            if (checkRole(getUserGrade(7))) {
+                if (!getSetting('parent', 'module')) {
+                    return redirect(URL_PARENT_LOGOUT);
+                }
             }
         }
 
         /**
          * The logged in user is student/admin/owner
          */
-            if($login_status)
-            {
-                $user->is_loggedin = 'yes';
-                $user->last_login = date('Y-m-d H:i:s');
-                $user->save();
-                $layout_num  = session()->get('layout_number');
-                
-                return redirect(PREFIX);
-            }
+        if ($login_status) {
+            $user->is_loggedin = 'yes';
+            $user->last_login = date('Y-m-d H:i:s');
+            $user->save();
+            $layout_num = session()->get('layout_number');
+
+            return redirect(PREFIX);
+        }
 
 
 
@@ -297,7 +290,7 @@ class LoginController extends Controller
 
 
 
-     /**
+    /**
      * Redirect the user to the GitHub authentication page.
      *
      * @return Response
@@ -305,25 +298,24 @@ class LoginController extends Controller
     public function redirectToProvider($logintype)
     {
 
-       
+
         $checker = 'google_plus';
 
-        if($logintype=='facebook')
-            $checker=$logintype;
-        if($logintype=='twitter')
-            $checker=$logintype;
+        if ($logintype == 'facebook')
+            $checker = $logintype;
+        if ($logintype == 'twitter')
+            $checker = $logintype;
 
-        if(!getSetting($checker.'_login', 'module'))
-        {
-            flash('Ooops..!', $logintype.'_login_is_disabled','error');
-             return redirect(PREFIX);
+        if (!getSetting($checker . '_login', 'module')) {
+            flash('Ooops..!', $logintype . '_login_is_disabled', 'error');
+            return redirect(PREFIX);
         }
         $this->provider = $logintype;
         return Socialite::driver($this->provider)->redirect();
 
     }
 
-     /**
+    /**
      * Obtain the user information from GitHub.
      *
      * @return Response
@@ -331,15 +323,14 @@ class LoginController extends Controller
     public function handleProviderCallback(Request $request, $logintype)
     {
 
-        try{
+        try {
             $user = Socialite::driver($logintype);
 
-            if(!$user)
-            {
+            if (!$user) {
                 return redirect(PREFIX);
             }
 
-            if ( 'twitter' === $logintype ) {
+            if ('twitter' === $logintype) {
                 $user = $user->user();
 
                 $token = $user->token;
@@ -350,9 +341,8 @@ class LoginController extends Controller
                 $user = $user->stateless()->user();
             }
 
-             if($user)
-             {
-                if($this->checkIsUserAvailable($user, $logintype)) {
+            if ($user) {
+                if ($this->checkIsUserAvailable($user, $logintype)) {
                     $availableuser = $this->dbuser;
                     Auth::loginUsingId($availableuser->id, true);
                     flash('Success...!', 'log_in_success', 'success');
@@ -360,85 +350,97 @@ class LoginController extends Controller
                 }
                 flash('Ooops...!', 'faiiled_to_login', 'error');
                 return redirect(PREFIX);
-             }
-         }
-         catch (Exception $ex)
-         {
-            
+            }
+        } catch (Exception $ex) {
+
             return redirect(PREFIX);
-         }
+        }
 
     }
 
     public function checkIsUserAvailable($user, $logintype)
     {
+        // dd("tes");
 
-        $id         = $user->getId();
+        $id = $user->getId();
 
-        $nickname   = $user->getNickname();
-        $name       = $user->getName();
-        $email      = $user->getEmail();
-        if ( empty( $email ) ) {
+        $nickname = $user->getNickname();
+        $name = $user->getName();
+        $email = $user->getEmail();
+        if (empty($email)) {
             $email = $id . '@' . $logintype . '.com';
         }
-        $avatar     = $user->getAvatar();
+        $avatar = $user->getAvatar();
 
-        $this->dbuser = User::where('email', '=',$email)->first();
+        $this->dbuser = User::where('email', '=', $email)->first();
 
-        if($this->dbuser) {
+        if ($this->dbuser) {
             //User already available return true
             return TRUE;
         }
 
         $newUser = array(
-                            'name' => $name,
-                            'email'=>$email,
-                        );
-        $newUser = (object)$newUser;
+            'name' => $name,
+            'email' => $email,
+        );
+        $newUser = (object) $newUser;
 
         $userObj = new User();
-       $this->dbuser = $userObj->registerWithSocialLogin($newUser);
-       $this->dbuser = User::where('slug','=',$this->dbuser->slug)->first();
-       
-       return TRUE;
+        $this->dbuser = $userObj->registerWithSocialLogin($newUser);
+        $this->dbuser = User::where('slug', '=', $this->dbuser->slug)->first();
+
+        return TRUE;
 
     }
 
     public function socialLoginCancelled(Request $request)
     {
-         return redirect(PREFIX);
+        return redirect(PREFIX);
     }
 
 
     public function confirmUser($activation_code)
     {
+
         $record = User::where('activation_code', $activation_code)->first();
 
-        if($isValid = $this->isValidRecord($record))
-        return redirect($isValid);
+        if (!$record) {
+            $data['active_class'] = 'login';
+            $data['title'] = getPhrase('login');
+            $rechaptcha_status = getSetting('enable_rechaptcha', 'recaptcha_settings');
+            $data['rechaptcha_status'] = $rechaptcha_status;
 
-        if($record->is_verified == 1){
-
-             flash('Success', 'you_are_already_actived_your_account_you_can_login_into_your_account', 'success');
+            $view_name = getTheme() . '::auth.loginnoverif';
+            return view($view_name, $data);
         }
-        else{
+        if ($isValid = $this->isValidRecord($record))
 
-             $record->is_verified  = 1;
-             $record->save();
-             flash('Success', 'you_have_successfully_actived_your_account_you_can_login_into_your_account', 'success');
-        }
+            if ($record->is_verified == 1) {
 
-        return redirect(URL_USERS_LOGIN);
+                $view_name = getTheme() . '::auth.loginverif';
+
+                return view($view_name, $record);
+            } else {
+
+                $record->is_verified = 1;
+                $record->save();
+                $view_name = getTheme() . '::auth.loginverif';
+
+                return view($view_name, $record);
+            }
+
+        $view_name = getTheme() . '::auth.loginverif';
+        return view($view_name, ['record' => $record]);
 
     }
 
     public function isValidRecord($record)
     {
 
-      if ($record === null) {
+        if ($record === null) {
 
             flash('Ooops...!', 'account_is_not_existed_please_contact_your_admin', 'error');
-             return redirect(URL_HOME);
+            return redirect(URL_HOME);
         }
     }
 
@@ -451,11 +453,9 @@ class LoginController extends Controller
         $response['message'] = 'Email/Password is incorrect';
         $user_object = null;
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                
+
             $user_object = Auth::user();
-        }
-        else if(Auth::attempt(['username' => $request->email, 'password' => $request->password]))
-        {
+        } else if (Auth::attempt(['username' => $request->email, 'password' => $request->password])) {
 
 
             $user_object = Auth::user();
@@ -463,28 +463,26 @@ class LoginController extends Controller
 
         }
 
-        if($user_object)
-        {
-            if($user_object->role_id==6)
-            {
+        if ($user_object) {
+            if ($user_object->role_id == 6) {
                 $response['message'] = 'Parent login is not allowed';
                 return $response;
             }
-              if ($request->device_id) {
-                    $user_object->device_id = $request->device_id;
-                    $user_object->save();
-                }
+            if ($request->device_id) {
+                $user_object->device_id = $request->device_id;
+                $user_object->save();
+            }
 
 
-                $user['id'] = $user_object->id;
-                $user['name'] = $user_object->name;
-                $user['email'] = $user_object->email;
-                $user['phone'] = $user_object->phone;
-                $user['image'] = $user_object->image;
-                $login_status = TRUE;
-                $response['status'] = 1;
-                $response['user'] = $user;
-                $response['message'] = 'Login Success';
+            $user['id'] = $user_object->id;
+            $user['name'] = $user_object->name;
+            $user['email'] = $user_object->email;
+            $user['phone'] = $user_object->phone;
+            $user['image'] = $user_object->image;
+            $login_status = TRUE;
+            $response['status'] = 1;
+            $response['user'] = $user;
+            $response['message'] = 'Login Success';
         }
 
         return $response;
