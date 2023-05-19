@@ -421,7 +421,8 @@ class LoginController extends Controller
 
                 return view($view_name, $record);
             } else {
-
+                User::where('activation_code', $activation_code)
+                    ->update(['is_verified' => 1]);
                 $record->is_verified = 1;
                 $record->save();
                 $view_name = getTheme() . '::auth.loginverif';
