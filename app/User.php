@@ -136,7 +136,7 @@ class User extends Authenticatable
         $preferences  = (array)json_decode($user->settings);
         $cats  = array();
         $lmscats  = array();
-        if (isset($preferences['user_preferences'])) {
+        if (!empty($preferences['user_preferences'])) {
             $cats         = $preferences['user_preferences']->quiz_categories;
             $lmscats      = $preferences['user_preferences']->lms_categories;
         }
