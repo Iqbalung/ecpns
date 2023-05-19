@@ -138,7 +138,7 @@ class RegisterController extends Controller
 
 
         $user->activation_code = str_random(30);
-        $link = URL_USERS_CONFIRM.$user->activation_code;
+        $link = env('APP_URL', 'http://localhost')."/user/confirmation/".$user->activation_code;
 
         $user->login_enabled  = 1;
 
