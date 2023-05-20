@@ -40,7 +40,7 @@
   <tbody>
     <tr>
       <td class="template-header-tabletd">
-           <img src="{{IMAGE_PATH_SETTINGS.getSetting('site_logo', 'site_settings')}}" alt="logo" class="template-header-tabletdimg">
+           <img src="https://starfish-app-tqudn.ondigitalocean.app/uploads/settings/4xtxWTHg9xmyQPk.png" alt="logo" class="template-header-tabletdimg">
       </td>
       <td class="template-header-tabtdone">
            <h4 class="text-center"> {{getSetting('site_title', 'site_settings')}} </h4>
