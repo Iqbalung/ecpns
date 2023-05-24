@@ -12,24 +12,19 @@ use Auth;
 
 class BlogController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('guest');
-    }
-
 
     public function index()
     {
-    	$data['active_class']       = 'blogs';
-        $data['title']              = getPhrase('blogs');
+        $data['active_class'] = 'blogs';
+        $data['title'] = getPhrase('blogs');
 
-        $blogs = Blog::where('status',1)
-        				->orderBy('updated_at', 'desc')
-        				->paginate(9);
+        $blogs = Blog::where('status', 1)
+            ->orderBy('updated_at', 'desc')
+            ->paginate(9);
 
         $data['blogs'] = $blogs;
 
-        $view_name = getTheme().'::site.blogs.list';
+        $view_name = getTheme() . '::site.blogs.list';
         return view($view_name, $data);
     }
 
@@ -37,19 +32,19 @@ class BlogController extends Controller
     public function view($slug)
     {
 
-    	if (!$slug)
-    		return redirect(URL_HOME_BLOGS);
+        if (!$slug)
+            return redirect(URL_HOME_BLOGS);
 
-    	$data['active_class']       = 'blogs';
-        $data['title']              = getPhrase('blogs');
+        $data['active_class'] = 'blogs';
+        $data['title'] = getPhrase('blogs');
 
         $blog = Blog::where('slug', $slug)->first();
         if (!$blog)
-            return redirect( URL_HOME_BLOGS );
+            return redirect(URL_HOME_BLOGS);
 
         $data['blog'] = $blog;
 
-        $view_name = getTheme().'::site.blogs.blog-details';
+        $view_name = getTheme() . '::site.blogs.blog-details';
         return view($view_name, $data);
     }
 }

@@ -13,21 +13,16 @@ use Auth;
 
 class FaqsController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('guest');
-    }
-
 
     public function index()
     {
-    	$data['active_class']       = 'faqs';
-        $data['title']              = getPhrase('faqs');
+        $data['active_class'] = 'faqs';
+        $data['title'] = getPhrase('faqs');
 
-        $categories = FaqCategory::where('status',1)->get();
+        $categories = FaqCategory::where('status', 1)->get();
         $data['categories'] = $categories;
 
-        $view_name = getTheme().'::site.faqs';
+        $view_name = getTheme() . '::site.faqs';
         return view($view_name, $data);
     }
 }
