@@ -213,7 +213,7 @@
 
                  @if ($record->is_verified == 1) 
                  
-                 <h4 class="text-center login-head">Rgistrasi Berhasil</h4>
+                 <h4 class="text-center login-head">Registrasi Berhasil</h4>
                     <div class="alert alert-info ">
                         <strong class="mg-leftt">Silahkan login <br></strong>
                     </div>
