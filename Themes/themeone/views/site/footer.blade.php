@@ -59,3 +59,5 @@
             &copy; {{getThemeSetting('copyrights',$current_theme)}}.
         </div>
     </div>
+
+    <script src="//code.tidio.co/ix2gvdhhxbr2xh1amagrz5knx35hzjtf.js" async></script>

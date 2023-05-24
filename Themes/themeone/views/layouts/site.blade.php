@@ -16,7 +16,7 @@
 
 	<meta name="keywords" content="{{getSetting('meta_keywords', 'seo_settings')}}">
 
-
+    <script src="//code.tidio.co/ix2gvdhhxbr2xh1amagrz5knx35hzjtf.js" async></script>
 
 	<link rel="icon" href="{{IMAGE_PATH_SETTINGS.getSetting('site_favicon', 'site_settings')}}" type="image/x-icon" />
 
